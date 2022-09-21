@@ -3,6 +3,9 @@ import './App.css';
 import { changeColor } from './main';
 
 function App() {
+  useEffect(() => {
+    changeColor();
+  }, []);
   return (
     <div className="App">
       <header className="App-header">
