@@ -91,7 +91,8 @@
 
 #giftlist_extension_popup_container .giftlist-extension-show-more-image-content .giftlist-extension-item-image-container .giftlist-extension-item-image img{
 	border-radius: 10px;
-    height: 180px;
+    width: 100%;
+    height: 100%;
 }
 
 /** success modal */
@@ -204,6 +205,28 @@
     line-height: 26.666666667px;
     min-height: auto;
     height: auto;
+    box-sizing: border-box;
+}
+
+#giftlist_extension_popup_content .form-control{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: #fff;
+    border-radius: 7px;
+    width: 100%;
+    padding: 8px 15px;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 20px;
+    background-clip: padding-box;
+    color: #101a34;
+    border: 1px solid #cad3dd;
+    font-family: Poppins,sans-serif;
+    line-height: 26.666666667px;
+    min-height: auto;
+    height: auto;
+    box-sizing: border-box;
 }
 
 #giftlist_extension_popup_content label{

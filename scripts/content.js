@@ -4,6 +4,8 @@ chrome.runtime.onMessage.addListener((request) => {
 	}
 });
 
+const BASE_URL = 'https://giftlist.dedicateddevelopers.us/api';
+
 // left: 37, up: 38, right: 39, down: 40,
 // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
 var keys = {37: 1, 38: 1, 39: 1, 40: 1};
@@ -151,7 +153,7 @@ const getShowMoreImageModal = () => {
 	`;
 };
 
-const getAddGiftModal = () => {
+const getAddGiftModal = (listData) => {
 	return `
 		<div class="giftlist-extension-add-gift-content">
 			<div class="giftlist-extension-image-container">
@@ -163,11 +165,14 @@ const getAddGiftModal = () => {
 				<hr>
 				<div class="form-group">
 					<label>Add to List</label>
-					<input type="text" placeholder="Enter your email" />
+					<select class="form-control">
+						<option>Favourite</option>
+						${(listData || []).map((item) => ('<option value="' + item.id + '">' + item.name + '</option>'))}
+					</select>
 				</div>
 				<div class="form-group">
 					<label>Item URL</label>
-					<input type="password" placeholder="Enter password" />
+					<input type="text" placeholder="Item URL" />
 				</div>
 				<div class="form-actions">
 					<button class="btn" id="giftlist_extension_add_btn">Add gift</button>
@@ -185,7 +190,7 @@ const getLoginModal = () => {
 			<hr>
 			<div class="form-group">
 				<label>Your email</label>
-				<input type="text" placeholder="Enter your email" />
+				<input type="text" placeholder="Enter your email" id="giftlist-extension-login-email" />
 			</div>
 			<div class="form-group" style="position: relative">
 				<label>Password</label>
@@ -227,7 +232,7 @@ const showModal = () => {
 					<h3>GIFTLIST</h3>
 					<div id="giftlist_extension_authenticated_header">
 						<div style="display: flex;margin-right: 10px;">
-							<span style="font-size: 15px; line-height: 20px; color: #101A34;margin-right: 5px;">Hey Jonathan</span>
+							<span style="font-size: 15px; line-height: 20px; color: #101A34;margin-right: 5px;">Hey <span id="giftlist_extension_logged_in_username"></span></span>
 							<img src="${shakeHandIcon}" class="selected-item-image" />
 						</div>
 						<a href="#" style="font-weight: 600;font-size: 15px;line-height: 18px;color: #50BCD9;">Logout</a>
@@ -258,32 +263,106 @@ const showModal = () => {
 		mask.querySelector("#giftlist-extension-login-input").attributes[0].value = currentType == 'text' ? 'password' : 'text';
 	});
 
-	mask.querySelector("#giftlist_sign_in").addEventListener("click", () => {
-		mask.querySelector('#giftlist_extension_authenticated_header').style.display = "flex";
-		mask.querySelector("#giftlist_extension_popup_main_content").innerHTML = getAddGiftModal();
-
-		mask.querySelector("#giftlist_extension_add_btn").addEventListener("click", () => {
-			mask.querySelector("#giftlist_extension_popup_main_content").innerHTML = getSuccessAddedModal();
-
-			mask.querySelector("#giftlist_extension_leave_feedback").addEventListener("click", () => {
-				mask.querySelector("#giftlist_extension_popup_main_content").innerHTML = getShareFeedbackModal();
-
-				mask.querySelector("#thumb_up_btn").addEventListener("click", () => {
-					mask.querySelector("#thumbup_content_container").style.display = "flex";
-					mask.querySelector("#thumbdown_content_container").style.display = "none";
+	mask.querySelector("#giftlist_sign_in").addEventListener("click", async () => {
+		const result = await fetch(BASE_URL + '/user/signin', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				email: document.querySelector('#giftlist-extension-login-email').value,
+				password: document.querySelector('#giftlist-extension-login-input').value,
+			})
+		}).then(res => res.json());
+		
+		if (result.status === 200) {
+			const listData = await getAllList(result.token);
+			chrome.storage.sync.set({ giftlist_access_token: result.token, giftlist_refresh_token: result.refresh_token, giftlist_user: result.data }, function () {
+				mask.querySelector('#giftlist_extension_authenticated_header').style.display = "flex";
+				mask.querySelector('#giftlist_extension_authenticated_header #giftlist_extension_logged_in_username').innerHTML = result.data.first_name + ' ' + result.data.last_name;
+				mask.querySelector("#giftlist_extension_popup_main_content").innerHTML = getAddGiftModal(listData);
+		
+				mask.querySelector("#giftlist_extension_add_btn").addEventListener("click", () => {
+					mask.querySelector("#giftlist_extension_popup_main_content").innerHTML = getSuccessAddedModal();
+		
+					mask.querySelector("#giftlist_extension_leave_feedback").addEventListener("click", () => {
+						mask.querySelector("#giftlist_extension_popup_main_content").innerHTML = getShareFeedbackModal();
+		
+						mask.querySelector("#thumb_up_btn").addEventListener("click", () => {
+							mask.querySelector("#thumbup_content_container").style.display = "flex";
+							mask.querySelector("#thumbdown_content_container").style.display = "none";
+						});
+		
+						mask.querySelector("#thumb_down_btn").addEventListener("click", () => {
+							mask.querySelector("#thumbup_content_container").style.display = "none";
+							mask.querySelector("#thumbdown_content_container").style.display = "flex";
+						});
+					});
 				});
-
-				mask.querySelector("#thumb_down_btn").addEventListener("click", () => {
-					mask.querySelector("#thumbup_content_container").style.display = "none";
-					mask.querySelector("#thumbdown_content_container").style.display = "flex";
+		
+				mask.querySelector("#giftlist_extension_view_more_images").addEventListener("click", () => {
+					mask.querySelector("#giftlist_extension_popup_main_content").innerHTML = getShowMoreImageModal();
 				});
 			});
-		});
-
-		mask.querySelector("#giftlist_extension_view_more_images").addEventListener("click", () => {
-			mask.querySelector("#giftlist_extension_popup_main_content").innerHTML = getShowMoreImageModal();
-		});
+		}
 	});
+}
 
+function refreshToken() {
+	chrome.storage.sync.get(['giftlist_refresh_token'], function(result) {
+		fetch(BASE_URL + '/user/refresh/token', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				refresh_token: result.giftlist_refresh_token,
+			})
+		}).then(res => res.json())
+		.then(res => {
+			chrome.storage.sync.set({ giftlist_refresh_token: res.token }, function(result) { });
+		});
+	})
+}
 
+function checkTokenValid() {
+	chrome.storage.sync.get(['giftlist_access_token'], function(result) {
+		fetch(BASE_URL + '/token/check', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': result.giftlist_access_token,
+			},
+			body: JSON.stringify({
+				refresh_token: result.giftlist_access_token,
+			})
+		}).then(res => res.json())
+		.then(res => {
+			if (res.status !== 200) {
+				refreshToken();
+			}
+		});
+	})
+}
+
+async function getAllList(token) {
+	const listData = await fetch(BASE_URL + '/occasion/list', {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+			'x-access-token': token,
+		},
+	})
+	.then(res => res.json())
+	.then(res => res.data);
+	const santaListData = await fetch(BASE_URL + '/secret_santa/all/list', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			'x-access-token': token,
+		},
+	})
+	.then(res => res.json())
+	.then(res => res.data);;
+	return [...listData, santaListData.map((item) => ({ id: item.id, name: item.event_name }))]
 }
