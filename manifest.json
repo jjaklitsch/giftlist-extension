@@ -12,7 +12,7 @@
   ],
   "web_accessible_resources": [
     "public/css/index.css",
-    "public/images/*.png"
+    "public/images/*.*"
   ],
   "host_permissions": ["https://giftlist.dedicateddevelopers.us/api/*"],
   "content_scripts": [{
