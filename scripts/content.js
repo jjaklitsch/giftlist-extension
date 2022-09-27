@@ -13,6 +13,7 @@ const BASE_URL = "https://giftlist.dedicateddevelopers.us/api";
 
 let product = null;
 let selected_image = null;
+let selected_list_id = "favourite";
 let listData = [];
 
 // left: 37, up: 38, right: 39, down: 40,
@@ -127,7 +128,7 @@ const getSuccessAddedModal = () => {
 				Feel free to continue adding items using the Giftlist button
 			</p>
 			<div class="giftlist-extension-buttons-row">
-				<button class="btn">View list</button>
+				<button class="btn" id="giftlist_extension_move_to_list">View list</button>
 				<button class="btn btn-outline" id="giftlist_extension_leave_feedback">Continue adding items</button>
 			</div>
 		</div>
@@ -171,11 +172,17 @@ const getAddGiftModal = (data) => {
 				<hr>
 				<div class="form-group">
 					<label>Add to List</label>
-					<select class="form-control">
-						<option>Favourite</option>
+					<select class="form-control" id="giftlist_extension_list_id">
+						<option value="favourite">Favourite</option>
 						${(data || []).map(
               (item) =>
-                '<option value="' + item.id + '">' + item.name + "</option>"
+                '<option value="' +
+                item.id +
+                "_" +
+                (item.isSanta ? "santa" : "list") +
+                '">' +
+                item.name +
+                "</option>"
             )}
 					</select>
 				</div>
@@ -184,7 +191,7 @@ const getAddGiftModal = (data) => {
 					<input type="text" placeholder="Item Name" value="${product[0].product.name}" />
 				</div>
 				<div class="form-group" style="display: flex;">
-					<input type="checkbox" value="" id="most_wanted" />
+					<input type="checkbox" value="" id="giftlist_extension_most_wanted" />
 					<label style="margin-left: 8px;">Most wanted gift</label>
 				</div>
 				<div class="form-group">
@@ -274,6 +281,7 @@ const showModal = async (exist_token) => {
 								<div class="icon-fix"></div>
 							</div>
 						</div>
+						<h2>Getting product data...</h2>
 					</div>
 				</div>
 				<div style="position:absolute; top:22px; right:5px;">
@@ -330,6 +338,7 @@ const showModal = async (exist_token) => {
 							<div class="icon-fix"></div>
 						</div>
 					</div>
+					<h2>Getting product data...</h2>
 				</div>
 			</div>
 		</div>
@@ -356,13 +365,11 @@ const showModal = async (exist_token) => {
     document.querySelector(
       "#giftlist_extension_popup_loading_container .success-checkmark"
     ).style.display = "block";
+    document.querySelector(
+      "#giftlist_extension_popup_loading_container h2"
+    ).style.display = "none";
 
     listData = await getAllList(exist_token);
-    chrome.storage.sync.get(["giftlist_user"], async function (result) {
-      mask.querySelector(
-        "#giftlist_extension_authenticated_header #giftlist_extension_logged_in_username"
-      ).innerHTML = result.first_name + " " + result.last_name;
-    });
     modal.innerHTML = `<div id="giftlist_extension_popup_content"; style="height:100%">
 					<div class="giftlist_extension_popup_header">
 						<h3>GIFTLIST</h3>
@@ -385,6 +392,7 @@ const showModal = async (exist_token) => {
 									<div class="icon-fix"></div>
 								</div>
 							</div>
+							<h2>Getting product data...</h2>
 						</div>
 						${getAddGiftModal(listData)}
 					</div>
@@ -399,88 +407,115 @@ const showModal = async (exist_token) => {
   document.querySelector("#giftlist_extension_popup_container").innerHTML =
     modal.outerHTML;
 
+  chrome.storage.sync.get(["giftlist_user"], async function (result) {
+    mask.querySelector(
+      "#giftlist_extension_authenticated_header #giftlist_extension_logged_in_username"
+    ).innerHTML = result.first_name + " " + result.last_name;
+  });
   disableScroll();
 
   const initInnerEvents = () => {
     if (mask.querySelector("#giftlist_extension_add_btn")) {
       mask
         .querySelector("#giftlist_extension_add_btn")
-        .addEventListener("click", () => {
+        .addEventListener("click", async () => {
+          let url = "giftitem/add/favorite";
           const postData = {
-			gift_title: '',
-			image_url: '',
-			image_file: '',
-			price: '',
-			details: '',
-			isMostWanted: '',
-			product_url: '',
-			shop_product_id: '',
-		  };
-		  postData.giftlist_id = 1;
-		  postData.secretsanta_id = 1;
-          mask.querySelector(
-            "#giftlist_extension_popup_main_content"
-          ).innerHTML = getSuccessAddedModal();
+            gift_title: product[0].product.name,
+            image_url: selected_image,
+            image_file: null,
+            price: product[0].product.offers[0].price,
+            details: product[0].product.description,
+            isMostWanted: document.getElementById(
+              "giftlist_extension_most_wanted"
+            ).checked
+              ? true
+              : false,
+            product_url: window.location.href,
+            shop_product_id: null,
+          };
+          if (selected_list_id.indexOf("_list") > -1) {
+            url = "giftitem/create";
+            postData.giftlist_id = selected_list_id.split("_")[1];
+            delete postData.shop_product_id;
+          } else if (selected_list_id.indexOf("_santa") > -1) {
+            url = "giftitem/add/secret-santa/wish";
+            postData.secretsanta_id = selected_list_id.split("_")[1];
+            delete postData.shop_product_id;
+          }
+          mask.querySelector("#giftlist_extension_add_btn").disabled = true;
+          const data = await addProductToList(url, postData);
+          mask.querySelector("#giftlist_extension_add_btn").disabled = false;
+          if (data.status === 200) {
+            mask.querySelector(
+              "#giftlist_extension_popup_main_content"
+            ).innerHTML = getSuccessAddedModal();
 
-          mask
-            .querySelector("#giftlist_extension_leave_feedback")
-            .addEventListener("click", () => {
-              mask.querySelector(
-                "#giftlist_extension_popup_main_content"
-              ).innerHTML = getAddGiftModal(listData);
-              initInnerEvents();
+            mask
+              .querySelector("#giftlist_extension_leave_feedback")
+              .addEventListener("click", () => {
+                mask.querySelector(
+                  "#giftlist_extension_popup_main_content"
+                ).innerHTML = getShareFeedbackModal();
 
-              mask
-                .querySelector("#thumb_up_btn")
-                .addEventListener("click", () => {
-                  mask.querySelector(
-                    "#thumbup_content_container"
-                  ).style.display = "flex";
-                  mask.querySelector(
-                    "#thumbdown_content_container"
-                  ).style.display = "none";
-                  mask.querySelector("#thumb_down_btn").style.opacity = 0.5;
-                  mask.querySelector("#thumb_up_btn").style.opacity = 1;
-                });
+                mask
+                  .querySelector("#thumb_up_btn")
+                  .addEventListener("click", () => {
+                    mask.querySelector(
+                      "#thumbup_content_container"
+                    ).style.display = "flex";
+                    mask.querySelector(
+                      "#thumbdown_content_container"
+                    ).style.display = "none";
+                    mask.querySelector("#thumb_down_btn").style.opacity = 0.5;
+                    mask.querySelector("#thumb_up_btn").style.opacity = 1;
+                  });
 
-              mask
-                .querySelector("#thumb_down_btn")
-                .addEventListener("click", () => {
-                  mask.querySelector(
-                    "#thumbup_content_container"
-                  ).style.display = "none";
-                  mask.querySelector(
-                    "#thumbdown_content_container"
-                  ).style.display = "flex";
-                  mask.querySelector("#thumb_down_btn").style.opacity = 1;
-                  mask.querySelector("#thumb_up_btn").style.opacity = 0.5;
-                });
-            });
+                mask
+                  .querySelector("#thumb_down_btn")
+                  .addEventListener("click", () => {
+                    mask.querySelector(
+                      "#thumbup_content_container"
+                    ).style.display = "none";
+                    mask.querySelector(
+                      "#thumbdown_content_container"
+                    ).style.display = "flex";
+                    mask.querySelector("#thumb_down_btn").style.opacity = 1;
+                    mask.querySelector("#thumb_up_btn").style.opacity = 0.5;
+                  });
+              });
 
-          mask
-            .querySelector("#giftlist_extension_leave_good_feedback")
-            .addEventListener("click", () => {
-              window.open(
-                "https://chrome.google.com/webstore/detail/add-to-myregistrycom-butt/cnofkjmkojconhdimlkamdckmidfmoio?hl=en-US",
-                "_blank"
-              );
-              mask.querySelector(
-                "#giftlist_extension_popup_main_content"
-              ).innerHTML = getAddGiftModal(listData);
-              initInnerEvents();
-            });
-          mask
-            .querySelector("#giftlist_extension_leave_bad_feedback")
-            .addEventListener("click", () => {
-              window.open(
-                "https://chrome.google.com/webstore/detail/add-to-myregistrycom-butt/cnofkjmkojconhdimlkamdckmidfmoio?hl=en-US",
-                "_blank"
-              );
-              mask.querySelector(
-                "#giftlist_extension_popup_main_content"
-              ).innerHTML = getAddGiftModal(listData);
-              initInnerEvents();
-            });
+            mask
+              .querySelector("#giftlist_extension_move_to_list")
+              .addEventListener("click", () => {
+                window.open("https://www.giftlist.com/lists", "_blank");
+              });
+
+            mask
+              .querySelector("#giftlist_extension_leave_good_feedback")
+              .addEventListener("click", () => {
+                window.open(
+                  "https://chrome.google.com/webstore/detail/add-to-myregistrycom-butt/cnofkjmkojconhdimlkamdckmidfmoio?hl=en-US",
+                  "_blank"
+                );
+                mask.querySelector(
+                  "#giftlist_extension_popup_main_content"
+                ).innerHTML = getAddGiftModal(listData);
+                initInnerEvents();
+              });
+            mask
+              .querySelector("#giftlist_extension_leave_bad_feedback")
+              .addEventListener("click", () => {
+                window.open(
+                  "https://chrome.google.com/webstore/detail/add-to-myregistrycom-butt/cnofkjmkojconhdimlkamdckmidfmoio?hl=en-US",
+                  "_blank"
+                );
+                mask.querySelector(
+                  "#giftlist_extension_popup_main_content"
+                ).innerHTML = getAddGiftModal(listData);
+                initInnerEvents();
+              });
+          }
         });
     }
     if (mask.querySelector("#giftlist_extension_view_more_images")) {
@@ -504,6 +539,13 @@ const showModal = async (exist_token) => {
             });
         });
     }
+    if (mask.querySelector("#giftlist_extension_list_id")) {
+      mask
+        .querySelector("#giftlist_extension_list_id")
+        .addEventListener("change", (evt) => {
+          selected_list_id = evt.target.value;
+        });
+    }
   };
 
   /** Event list */
@@ -523,78 +565,87 @@ const showModal = async (exist_token) => {
       ).attributes[0].value = currentType == "text" ? "password" : "text";
     });
   }
-
-  mask
-    .querySelector("#giftlist_sign_in")
-    .addEventListener("click", async () => {
-      mask.querySelector("#giftlist_sign_in").disabled = true;
-      const result = await fetch(BASE_URL + "/user/signin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: document.querySelector("#giftlist-extension-login-email")
-            .value,
-          password: document.querySelector("#giftlist-extension-login-input")
-            .value,
-        }),
-      }).then((res) => res.json());
-      mask.querySelector("#giftlist_sign_in").disabled = false;
-      if (result.status === 200) {
-        const listData = await getAllList(result.token);
-        chrome.storage.sync.set(
-          {
-            giftlist_access_token: result.token,
-            giftlist_refresh_token: result.refresh_token,
-            giftlist_user: result.data,
+  if (mask.querySelector("#giftlist_sign_in")) {
+    mask
+      .querySelector("#giftlist_sign_in")
+      .addEventListener("click", async () => {
+        mask.querySelector("#giftlist_sign_in").disabled = true;
+        const result = await fetch(BASE_URL + "/user/signin", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-          async function () {
-            mask.querySelector(
-              "#giftlist_extension_authenticated_header"
-            ).style.display = "flex";
-            mask.querySelector(
-              "#giftlist_extension_authenticated_header #giftlist_extension_logged_in_username"
-            ).innerHTML = result.data.first_name + " " + result.data.last_name;
-            mask.querySelector(
-              "#giftlist_extension_popup_main_content"
-            ).innerHTML = `
-				<div id="giftlist_extension_popup_loading_container">
-					<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-					<div class="success-checkmark" style="display: none">
-						<div class="check-icon">
-							<span class="icon-line line-tip"></span>
-							<span class="icon-line line-long"></span>
-							<div class="icon-circle"></div>
-							<div class="icon-fix"></div>
-						</div>
-					</div>
-				</div>
-			`;
+          body: JSON.stringify({
+            email: document.querySelector("#giftlist-extension-login-email")
+              .value,
+            password: document.querySelector("#giftlist-extension-login-input")
+              .value,
+          }),
+        }).then((res) => res.json());
+        mask.querySelector("#giftlist_sign_in").disabled = false;
+        if (result.status === 200) {
+          mask.querySelector(
+            "#giftlist_extension_popup_main_content"
+          ).innerHTML = `
+			  <div id="giftlist_extension_popup_loading_container">
+				  <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+				  <div class="success-checkmark" style="display: none">
+					  <div class="check-icon">
+						  <span class="icon-line line-tip"></span>
+						  <span class="icon-line line-long"></span>
+						  <div class="icon-circle"></div>
+						  <div class="icon-fix"></div>
+					  </div>
+				  </div>
+				  <h2>Getting product data...</h2>
+			  </div>
+		  `;
+          const listData = await getAllList(result.token);
+          chrome.storage.sync.set(
+            {
+              giftlist_access_token: result.token,
+              giftlist_refresh_token: result.refresh_token,
+              giftlist_user: result.data,
+            },
+            async function () {
+              mask.querySelector(
+                "#giftlist_extension_authenticated_header"
+              ).style.display = "flex";
+              mask.querySelector(
+                "#giftlist_extension_authenticated_header #giftlist_extension_logged_in_username"
+              ).innerHTML =
+                result.data.first_name + " " + result.data.last_name;
 
-            document.querySelector(
-              "#giftlist_extension_popup_loading_container"
-            ).style.display = "flex";
-            document.querySelector(
-              "#giftlist_extension_popup_loading_container .success-checkmark"
-            ).style.display = "block";
+              document.querySelector(
+                "#giftlist_extension_popup_loading_container"
+              ).style.display = "flex";
 
-            const productData = await getProductData();
+              const productData = await getProductData();
 
-            if (productData.status !== 200) {
-              return;
+              if (productData.status !== 200) {
+                return;
+              }
+              product = productData.data;
+              document.querySelector(
+                "#giftlist_extension_popup_loading_container .lds-ellipsis"
+              ).style.display = "none";
+              document.querySelector(
+                "#giftlist_extension_popup_loading_container .success-checkmark"
+              ).style.display = "block";
+              document.querySelector(
+                "#giftlist_extension_popup_loading_container h2"
+              ).style.display = "none";
+
+              mask.querySelector(
+                "#giftlist_extension_popup_main_content"
+              ).innerHTML = getAddGiftModal(listData);
+
+              initInnerEvents();
             }
-            product = productData.data;
-
-            mask.querySelector(
-              "#giftlist_extension_popup_main_content"
-            ).innerHTML = getAddGiftModal(listData);
-
-            initInnerEvents();
-          }
-        );
-      }
-    });
+          );
+        }
+      });
+  }
 };
 
 function refreshToken() {
@@ -686,7 +737,11 @@ async function getAllList(token) {
     .then((res) => res.data);
   return [
     ...listData,
-    santaListData.map((item) => ({ id: item.id, name: item.event_name })),
+    santaListData.map((item) => ({
+      id: item.id,
+      name: item.event_name,
+      isSanta: true,
+    })),
   ];
 }
 
@@ -702,4 +757,26 @@ async function getProductData() {
     body: JSON.stringify(postData),
   }).then((res) => res.json());
   return productData;
+}
+
+function addProductToList(url, postData) {
+  return new Promise((resolve, reject) => {
+    chrome.storage.sync.get(["giftlist_access_token"], function (result) {
+      fetch(BASE_URL + "/" + url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": result.giftlist_access_token,
+        },
+        body: JSON.stringify(postData),
+      })
+        .then((res) => res.json())
+        .then(async (res) => {
+          resolve(res);
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+  });
 }
