@@ -15,6 +15,8 @@ let product = null;
 let selected_image = null;
 let selected_list_id = "favourite";
 let listData = [];
+let scrappedURL = "";
+let scrappedProduct = null;
 
 // left: 37, up: 38, right: 39, down: 40,
 // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
@@ -240,7 +242,7 @@ const getLoginModal = () => {
 			<div class="form-actions" style="margin-top: 24px;">
 				<button class="btn" id="giftlist_sign_in">Sign in</button>
 				<a href="#" class="btn btn-link">Forgot password?</a>
-				<span>New to giftlist? <a href="#">Sign up</a></span>
+				<span>New to GiftList? <a href="#">Sign up</a></span>
 			</div>
 		</div>
 	`;
@@ -271,7 +273,7 @@ const showModal = async (exist_token) => {
 					<div class="giftlist_extension_popup_header">
 						<h3>GIFTLIST</h3>
 					</div>
-					<div id="giftlist_extension_popup_main_content" style="display: flex; justify-content: center; align-items: center;">
+					<div id="giftlist_extension_popup_main_content" style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
 						<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
 						<div class="success-checkmark" style="display: none">
 							<div class="check-icon">
@@ -347,18 +349,19 @@ const showModal = async (exist_token) => {
 			<img src="${closeIcon}" style="width: 18px; height: 18px;" />
 		</button>
 	</div>`;
-    document.querySelector("#giftlist_extension_popup_container").innerHTML =
-      modal.outerHTML;
+    document.querySelector("#giftlist_extension_popup_container").innerHTML = modal.outerHTML;
     document.querySelector(
       "#giftlist_extension_popup_loading_container"
     ).style.display = "flex";
 
     const productData = await getProductData();
-
+	console.log('123123');
     if (productData.status !== 200) {
       return;
     }
+	scrappedProduct = productData;
     product = productData.data;
+
     document.querySelector(
       "#giftlist_extension_popup_loading_container .lds-ellipsis"
     ).style.display = "none";
@@ -403,14 +406,18 @@ const showModal = async (exist_token) => {
 				</button>
 			</div>`;
   }
-
-  document.querySelector("#giftlist_extension_popup_container").innerHTML =
-    modal.outerHTML;
+  console.log(modal.outerHTML);
+  document.querySelector("#giftlist_extension_popup_container").innerHTML = modal.outerHTML;
 
   chrome.storage.sync.get(["giftlist_user"], async function (result) {
-    mask.querySelector(
-      "#giftlist_extension_authenticated_header #giftlist_extension_logged_in_username"
-    ).innerHTML = result.first_name + " " + result.last_name;
+	if (mask.querySelector('#giftlist_extension_authenticated_header #giftlist_extension_logged_in_username')) {
+		mask.querySelector(
+		"#giftlist_extension_authenticated_header #giftlist_extension_logged_in_username"
+		).innerHTML = result.giftlist_user.first_name + " " + result.giftlist_user.last_name;
+		mask.querySelector(
+		  "#giftlist_extension_authenticated_header"
+		).style.display = "flex";
+	}
   });
   disableScroll();
 
@@ -550,7 +557,7 @@ const showModal = async (exist_token) => {
 
   /** Event list */
   mask.querySelector("#close_dialog_btn").addEventListener("click", () => {
-    mask.setAttribute("style", "display: none");
+    document.querySelector('#giftlist_extension_popup_container').remove();
     enableScroll();
   });
 
@@ -673,7 +680,7 @@ function refreshToken() {
               {
                 giftlist_refresh_token: "",
                 giftlist_access_token: "",
-                user: null,
+                giftlist_user: null,
               },
               function (result) {}
             );
@@ -749,6 +756,9 @@ async function getProductData() {
   const postData = {
     product_url: window.location.href,
   };
+  if (scrappedURL === window.location.href && scrappedProduct) {
+	return scrappedProduct;
+  }
   const productData = await fetch(BASE_URL + "/scrape/url", {
     method: "POST",
     headers: {
@@ -756,6 +766,7 @@ async function getProductData() {
     },
     body: JSON.stringify(postData),
   }).then((res) => res.json());
+  scrappedURL = window.location.href;
   return productData;
 }
 

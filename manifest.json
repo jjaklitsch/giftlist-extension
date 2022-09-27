@@ -1,6 +1,6 @@
 {
-  "short_name": "Giftlist Extension",
-  "name": "Giftlist extension",
+  "short_name": "Add to GiftList button",
+  "name": "Add to GiftList button",
   "version": "1.0.0",
   "manifest_version": 2,
   "permissions": [
@@ -12,7 +12,8 @@
   ],
   "web_accessible_resources": [
     "public/css/index.css",
-    "public/images/*.*"
+    "public/images/*.*",
+    "public/fonts/*.*"
   ],
   "host_permissions": ["https://giftlist.dedicateddevelopers.us/api/*"],
   "content_scripts": [{
