@@ -240,8 +240,11 @@ const getLoginModal = () => {
 				</div>
 			</div>
 			<div class="form-actions" style="margin-top: 24px;">
-				<button class="btn" id="giftlist_sign_in">Sign in</button>
-				<a href="#" class="btn btn-link">Forgot password?</a>
+				<button class="btn" id="giftlist_sign_in" disabled>
+          <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+          Sign in
+        </button>
+				<a href="#" style="padding-top: 15px; padding-bottom: 20px;">Forgot password?</a>
 				<span>New to GiftList? <a href="#">Sign up</a></span>
 			</div>
 		</div>
@@ -287,7 +290,7 @@ const showModal = async (exist_token) => {
 					</div>
 				</div>
 				<div style="position:absolute; top:22px; right:5px;">
-				<button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;">
+				<button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
 					<img src="${closeIcon}" style="width: 18px; height: 18px;" />
 				</button>
 			</div>`;
@@ -301,7 +304,7 @@ const showModal = async (exist_token) => {
 					<div class="giftlist_extension_popup_header" style="border: none;">
 						<h3>GIFTLIST</h3>
 						<div id="giftlist_extension_authenticated_header">
-							<div style="display: flex;margin-right: 10px;">
+							<div style="display: flex;margin-right: 20px;">
 								<span style="font-size: 15px; line-height: 20px; color: #101A34;margin-right: 5px;">Hey <span id="giftlist_extension_logged_in_username"></span></span>
 								<img src="${shakeHandIcon}" class="selected-item-image" />
 							</div>
@@ -313,7 +316,7 @@ const showModal = async (exist_token) => {
 					</div>
 				</div>
 				<div style="position:absolute; top:22px; right:5px;">
-				<button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
+				<button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
 					<img src="${closeIcon}" style="width: 18px; height: 18px;" />
 				</button>
 			</div>`;
@@ -322,7 +325,7 @@ const showModal = async (exist_token) => {
 			<div class="giftlist_extension_popup_header">
 				<h3>GIFTLIST</h3>
 				<div id="giftlist_extension_authenticated_header">
-					<div style="display: flex;margin-right: 10px;">
+					<div style="display: flex;margin-right: 20px;">
 						<span style="font-size: 15px; line-height: 20px; color: #101A34;margin-right: 5px;">Hey <span id="giftlist_extension_logged_in_username"></span></span>
 						<img src="${shakeHandIcon}" class="selected-item-image" />
 					</div>
@@ -345,7 +348,7 @@ const showModal = async (exist_token) => {
 			</div>
 		</div>
 		<div style="position:absolute; top:22px; right:5px;">
-		<button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;">
+		<button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
 			<img src="${closeIcon}" style="width: 18px; height: 18px;" />
 		</button>
 	</div>`;
@@ -354,8 +357,12 @@ const showModal = async (exist_token) => {
       "#giftlist_extension_popup_loading_container"
     ).style.display = "flex";
 
+    mask.querySelector("#close_dialog_btn").addEventListener("click", () => {
+      document.querySelector('#giftlist_extension_popup_container').remove();
+      enableScroll();
+    });
+  
     const productData = await getProductData();
-	console.log('123123');
     if (productData.status !== 200) {
       return;
     }
@@ -377,7 +384,7 @@ const showModal = async (exist_token) => {
 					<div class="giftlist_extension_popup_header">
 						<h3>GIFTLIST</h3>
 						<div id="giftlist_extension_authenticated_header">
-							<div style="display: flex;margin-right: 10px;">
+							<div style="display: flex;margin-right: 20px;">
 								<span style="font-size: 15px; line-height: 20px; color: #101A34;margin-right: 5px;">Hey <span id="giftlist_extension_logged_in_username"></span></span>
 								<img src="${shakeHandIcon}" class="selected-item-image" />
 							</div>
@@ -401,7 +408,7 @@ const showModal = async (exist_token) => {
 					</div>
 				</div>
 				<div style="position:absolute; top:22px; right:5px;">
-				<button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;">
+        <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
 					<img src="${closeIcon}" style="width: 18px; height: 18px;" />
 				</button>
 			</div>`;
@@ -410,7 +417,7 @@ const showModal = async (exist_token) => {
   document.querySelector("#giftlist_extension_popup_container").innerHTML = modal.outerHTML;
 
   chrome.storage.sync.get(["giftlist_user"], async function (result) {
-	if (mask.querySelector('#giftlist_extension_authenticated_header #giftlist_extension_logged_in_username')) {
+	if (mask.querySelector('#giftlist_extension_authenticated_header #giftlist_extension_logged_in_username') && result.giftlist_user) {
 		mask.querySelector(
 		"#giftlist_extension_authenticated_header #giftlist_extension_logged_in_username"
 		).innerHTML = result.giftlist_user.first_name + " " + result.giftlist_user.last_name;
@@ -577,6 +584,7 @@ const showModal = async (exist_token) => {
       .querySelector("#giftlist_sign_in")
       .addEventListener("click", async () => {
         mask.querySelector("#giftlist_sign_in").disabled = true;
+        mask.querySelector("#giftlist_sign_in .lds-ring").style.display = "inline-block";
         const result = await fetch(BASE_URL + "/user/signin", {
           method: "POST",
           headers: {
@@ -590,6 +598,7 @@ const showModal = async (exist_token) => {
           }),
         }).then((res) => res.json());
         mask.querySelector("#giftlist_sign_in").disabled = false;
+        mask.querySelector("#giftlist_sign_in .lds-ring").style.display = "none";
         if (result.status === 200) {
           mask.querySelector(
             "#giftlist_extension_popup_main_content"
@@ -650,6 +659,27 @@ const showModal = async (exist_token) => {
               initInnerEvents();
             }
           );
+        }
+      });
+  }
+  if (mask.querySelector("#giftlist-extension-login-email")) {
+    mask.querySelector("#giftlist-extension-login-email")
+      .addEventListener('change', function(evt) {
+        if (evt.target.value && mask.querySelector("#giftlist-extension-login-input").value) {
+          mask.querySelector("#giftlist_sign_in").disabled = false;
+        } else {
+          mask.querySelector("#giftlist_sign_in").disabled = true;
+        }
+      });
+  }
+  
+  if (mask.querySelector("#giftlist-extension-login-input")) {
+    mask.querySelector("#giftlist-extension-login-input")
+      .addEventListener('change', function(evt) {
+        if (evt.target.value && mask.querySelector("#giftlist-extension-login-email").value) {
+          mask.querySelector("#giftlist_sign_in").disabled = false;
+        } else {
+          mask.querySelector("#giftlist_sign_in").disabled = true;
         }
       });
   }
@@ -757,7 +787,7 @@ async function getProductData() {
     product_url: window.location.href,
   };
   if (scrappedURL === window.location.href && scrappedProduct) {
-	return scrappedProduct;
+	  return scrappedProduct;
   }
   const productData = await fetch(BASE_URL + "/scrape/url", {
     method: "POST",
@@ -765,8 +795,24 @@ async function getProductData() {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(postData),
-  }).then((res) => res.json());
-  scrappedURL = window.location.href;
+  })
+  .then((res) => {
+    scrappedURL = window.location.href;
+    scrappedProduct = res.json();
+    return res.json();
+  })
+  .catch(error => {
+    document.querySelector('#giftlist_extension_popup_loading_container .lds-ellipsis').style.display = "none";
+    document.querySelector('#giftlist_extension_popup_loading_container h2').innerHTML = 'Something went wrong <a href="javascript:void();" id="try_scrape_again" style="margin-left: 15px;">Try Again</a>';
+
+    document.querySelector("#try_scrape_again")
+      .addEventListener('click', function(evt) {
+        document.querySelector('#giftlist_extension_popup_loading_container .lds-ellipsis').style.display = "inline-block";
+        document.querySelector('#giftlist_extension_popup_loading_container h2').innerHTML = "Getting product data...";
+        getProductData();
+      });
+  });
+
   return productData;
 }
 

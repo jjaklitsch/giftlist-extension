@@ -2,19 +2,21 @@
   "short_name": "Add to GiftList button",
   "name": "Add to GiftList button",
   "version": "1.0.0",
-  "manifest_version": 2,
+  "manifest_version": 3,
   "permissions": [
     "storage",
     "tabs",
-    "activeTab",
-    "http://*/*", 
-    "https://*/*"
+    "activeTab"
   ],
-  "web_accessible_resources": [
-    "public/css/index.css",
-    "public/images/*.*",
-    "public/fonts/*.*"
-  ],
+  "web_accessible_resources": [{
+    "resources": [
+      "public/css/index.css",
+      "public/images/*.*",
+      "public/fonts/*.*"
+    ],
+    "matches": ["<all_urls>"],
+    "extension_ids": []
+  }],
   "host_permissions": ["https://giftlist.dedicateddevelopers.us/api/*"],
   "content_scripts": [{
     "js": ["scripts/content.js"],
@@ -22,10 +24,9 @@
     "matches": ["<all_urls>"]
   }],
   "background": {
-    "scripts": ["scripts/background.js"],
-    "persistent": false
+    "service_worker": "scripts/background.js"
   },
-  "browser_action": {
+  "action": {
     "default_icon": {
       "16": "/public/images/logo_16.png",
       "32": "/public/images/logo_32.png",
@@ -39,5 +40,7 @@
     "48": "/public/images/logo_48.png",
     "128": "/public/images/logo_128.png"
   },
-  "content_security_policy": "script-src 'self' 'sha256-fdAfMKZtCTRPKMRznGwonJHC++vCCrQS7XFnVrzSXAE=' 'sha256-YD8w9VLrdvqI5/tFVmpT+1337ly+e/JvPrkRxYZo/w4='; object-src 'self';"
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; script-src-elem 'self' 'unsafe-inline';"
+  }
 }
