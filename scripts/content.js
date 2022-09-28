@@ -68,10 +68,10 @@ function enableScroll() {
 }
 
 const getShareFeedbackModal = () => {
-  const thumbUpIcon = chrome.runtime.getURL("/public/images/thumb_up.png");
-  const thumbDownIcon = chrome.runtime.getURL("/public/images/thumb_down.png");
+  const thumbUpIcon = chrome.runtime.getURL("/public/images/thumb_up.svg");
+  const thumbDownIcon = chrome.runtime.getURL("/public/images/thumb_down.svg");
   const raiseHandsIcon = chrome.runtime.getURL(
-    "/public/images/raise_hands.png"
+    "/public/images/raise_hands.svg"
   );
   return `
 		<div class="giftlist-extension-share-feedback-content">
@@ -116,7 +116,7 @@ const getShareFeedbackModal = () => {
 };
 
 const getSuccessAddedModal = () => {
-  const giftIcon = chrome.runtime.getURL("/public/images/gift_box.png");
+  const giftIcon = chrome.runtime.getURL("/public/images/gift_box.svg");
   return `
 		<div class="giftlist-extension-success-added-content">
 			<div class="giftlist-extension-success-icon-container">
@@ -223,7 +223,7 @@ const getAddGiftModal = (data) => {
 };
 
 const getLoginModal = () => {
-  const eyeIcon = chrome.runtime.getURL("/public/images/eye.png");
+  const eyeIcon = chrome.runtime.getURL("/public/images/eye.svg");
   return `
 		<div class="giftlist-extension-login-content">
 			<h2>Please login to add this item to your list</h2>
@@ -244,8 +244,8 @@ const getLoginModal = () => {
           <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
           Sign in
         </button>
-				<a href="#" style="padding-top: 15px; padding-bottom: 20px;">Forgot password?</a>
-				<span>New to GiftList? <a href="#">Sign up</a></span>
+				<a href="https://www.giftlist.com/" style="padding-top: 15px; padding-bottom: 20px;">Forgot password?</a>
+				<span>New to GiftList? <a href="https://www.giftlist.com/">Sign up</a></span>
 			</div>
 		</div>
 	`;
@@ -253,8 +253,8 @@ const getLoginModal = () => {
 
 const showModal = async (exist_token) => {
   const isLogin = false;
-  const shakeHandIcon = chrome.runtime.getURL("/public/images/shake_hand.png");
-  const closeIcon = chrome.runtime.getURL("/public/images/close.png");
+  const shakeHandIcon = chrome.runtime.getURL("/public/images/shake_hand.svg");
+  const closeIcon = chrome.runtime.getURL("/public/images/close.svg");
 
   const mask = document.createElement("div");
   mask.setAttribute("id", "giftlist_extension_popup_container");
@@ -308,7 +308,7 @@ const showModal = async (exist_token) => {
 								<span style="font-size: 15px; line-height: 20px; color: #101A34;margin-right: 5px;">Hey <span id="giftlist_extension_logged_in_username"></span></span>
 								<img src="${shakeHandIcon}" class="selected-item-image" />
 							</div>
-							<a href="#" style="font-weight: 600;font-size: 15px;line-height: 18px;color: #50BCD9;">Logout</a>
+							<a href="javascript:void();" style="font-weight: 600;font-size: 15px;line-height: 18px;color: #50BCD9;" id="giftlist_extension_logout_btn">Logout</a>
 						</div>
 					</div>
 					<div id="giftlist_extension_popup_main_content">
@@ -329,7 +329,7 @@ const showModal = async (exist_token) => {
 						<span style="font-size: 15px; line-height: 20px; color: #101A34;margin-right: 5px;">Hey <span id="giftlist_extension_logged_in_username"></span></span>
 						<img src="${shakeHandIcon}" class="selected-item-image" />
 					</div>
-					<a href="#" style="font-weight: 600;font-size: 15px;line-height: 18px;color: #50BCD9;">Logout</a>
+					<a href="javascript:void();" style="font-weight: 600;font-size: 15px;line-height: 18px;color: #50BCD9;" id="giftlist_extension_logout_btn">Logout</a>
 				</div>
 			</div>
 			<div id="giftlist_extension_popup_main_content">
@@ -357,13 +357,25 @@ const showModal = async (exist_token) => {
       "#giftlist_extension_popup_loading_container"
     ).style.display = "flex";
 
+    mask.querySelector("#giftlist_extension_logout_btn").addEventListener("click", () => {
+      chrome.storage.sync.set(
+        {
+          giftlist_access_token: '',
+          giftlist_refresh_token: '',
+          giftlist_user: null,
+        },
+        async function () {
+          document.querySelector('#giftlist_extension_popup_container').remove();
+        })
+    });
+
     mask.querySelector("#close_dialog_btn").addEventListener("click", () => {
       document.querySelector('#giftlist_extension_popup_container').remove();
       enableScroll();
     });
   
     const productData = await getProductData();
-    if (productData.status !== 200) {
+    if (!productData) {
       return;
     }
 	scrappedProduct = productData;
@@ -388,7 +400,7 @@ const showModal = async (exist_token) => {
 								<span style="font-size: 15px; line-height: 20px; color: #101A34;margin-right: 5px;">Hey <span id="giftlist_extension_logged_in_username"></span></span>
 								<img src="${shakeHandIcon}" class="selected-item-image" />
 							</div>
-							<a href="#" style="font-weight: 600;font-size: 15px;line-height: 18px;color: #50BCD9;">Logout</a>
+							<a href="javascript:void();" style="font-weight: 600;font-size: 15px;line-height: 18px;color: #50BCD9;" id="giftlist_extension_logout_btn">Logout</a>
 						</div>
 					</div>
 					<div id="giftlist_extension_popup_main_content">
@@ -413,7 +425,7 @@ const showModal = async (exist_token) => {
 				</button>
 			</div>`;
   }
-  console.log(modal.outerHTML);
+  
   document.querySelector("#giftlist_extension_popup_container").innerHTML = modal.outerHTML;
 
   chrome.storage.sync.get(["giftlist_user"], async function (result) {
@@ -664,7 +676,7 @@ const showModal = async (exist_token) => {
   }
   if (mask.querySelector("#giftlist-extension-login-email")) {
     mask.querySelector("#giftlist-extension-login-email")
-      .addEventListener('change', function(evt) {
+      .addEventListener('input', function(evt) {
         if (evt.target.value && mask.querySelector("#giftlist-extension-login-input").value) {
           mask.querySelector("#giftlist_sign_in").disabled = false;
         } else {
@@ -675,7 +687,7 @@ const showModal = async (exist_token) => {
   
   if (mask.querySelector("#giftlist-extension-login-input")) {
     mask.querySelector("#giftlist-extension-login-input")
-      .addEventListener('change', function(evt) {
+      .addEventListener('input', function(evt) {
         if (evt.target.value && mask.querySelector("#giftlist-extension-login-email").value) {
           mask.querySelector("#giftlist_sign_in").disabled = false;
         } else {
@@ -781,6 +793,24 @@ async function getAllList(token) {
     })),
   ];
 }
+const notificationId = 'abc123'
+
+const shakeHandIcon = chrome.runtime.getURL("/public/images/shake_hand.svg");
+const options = {
+    type: 'basic',
+    title: 'Success',
+    message: 'Product data getting was successful.',
+    icon: shakeHandIcon,
+}
+
+const callback = () => {
+  chrome.storage.sync.get(["giftlist_access_token"], async function (result) {
+    if (result) {
+      result = await checkTokenValid();
+    }
+    showModal(result);
+  });
+}
 
 async function getProductData() {
   const postData = {
@@ -794,14 +824,27 @@ async function getProductData() {
     headers: {
       "Content-Type": "application/json",
     },
+    mode: 'cors',
     body: JSON.stringify(postData),
   })
   .then((res) => {
+    options.title = 'Success';
+    options.message = 'Product data getting was successful.';
+    chrome.runtime.sendMessage('', {
+      type: 'notification',
+      options: options
+    });
     scrappedURL = window.location.href;
     scrappedProduct = res.json();
     return res.json();
   })
   .catch(error => {
+    options.title = 'Error';
+    options.message = 'Something went wrong, Network Time limit';
+    chrome.runtime.sendMessage('', {
+      type: 'notification',
+      options: options
+    });
     document.querySelector('#giftlist_extension_popup_loading_container .lds-ellipsis').style.display = "none";
     document.querySelector('#giftlist_extension_popup_loading_container h2').innerHTML = 'Something went wrong <a href="javascript:void();" id="try_scrape_again" style="margin-left: 15px;">Try Again</a>';
 

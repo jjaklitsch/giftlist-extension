@@ -6,7 +6,8 @@
   "permissions": [
     "storage",
     "tabs",
-    "activeTab"
+    "activeTab",
+    "notifications"
   ],
   "web_accessible_resources": [{
     "resources": [
