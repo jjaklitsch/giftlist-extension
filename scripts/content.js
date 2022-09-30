@@ -9,7 +9,7 @@ chrome.runtime.onMessage.addListener((request) => {
   }
 });
 
-const BASE_URL = "https://giftlist.dedicateddevelopers.us/api";
+const BASE_URL = "https://admin.giftlist.com/api";
 
 let product = null;
 let selected_image = null;
@@ -17,6 +17,7 @@ let selected_list_id = "favourite";
 let listData = [];
 let scrappedURL = "";
 let scrappedProduct = null;
+let isScraped = false;
 
 // left: 37, up: 38, right: 39, down: 40,
 // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
@@ -105,9 +106,9 @@ const getShareFeedbackModal = () => {
 			</div>
 			<div id="thumbdown_content_container">
         <h3 style="font-size: 20px;line-height: 24px;color: #101A34; font-weight: 600;">Let us know how can we improve</h3>
-				<textarea rows="5" class="form-control" placeholder="I would like to improve the following..." style="margin-top: 20px;"></textarea>
+        <p style="margin-top: 10px; margin-bottom: 15px;">Send your feedback to <a href="mailto:support@giftlist.com" style="margin-left: 5px;">support@giftlist.com</a></p>
 				<div class="giftlist-extension-buttons-row">
-					<button class="btn" id="giftlist_extension_leave_bad_feedback">Submit</button>
+					<button class="btn" id="giftlist_extension_leave_bad_feedback">Done</button>
 				</div>
 			</div>
 		</div>
@@ -387,18 +388,22 @@ const showModal = async (exist_token) => {
     if (!productData) {
       return;
     }
-	scrappedProduct = productData;
     product = productData.data;
-
-    document.querySelector(
-      "#giftlist_extension_popup_loading_container .lds-ellipsis"
-    ).style.display = "none";
-    document.querySelector(
-      "#giftlist_extension_popup_loading_container .success-checkmark"
-    ).style.display = "block";
-    document.querySelector(
-      "#giftlist_extension_popup_loading_container h2"
-    ).style.display = "none";
+    if (isScraped) {
+      document.querySelector(
+        "#giftlist_extension_popup_loading_container .lds-ellipsis"
+      ).style.display = "none";
+      document.querySelector(
+        "#giftlist_extension_popup_loading_container .success-checkmark"
+      ).style.display = "block";
+      document.querySelector(
+        "#giftlist_extension_popup_loading_container h2"
+      ).style.display = "none";
+    } else {
+      document.querySelector(
+        "#giftlist_extension_popup_loading_container"
+      ).style.display = "flex";
+    }
 
     listData = await getAllList(exist_token);
     modal.innerHTML = `<div id="giftlist_extension_popup_content" style="height:100%">
@@ -593,10 +598,6 @@ const showModal = async (exist_token) => {
                     mask
                     .querySelector("#giftlist_extension_leave_bad_feedback")
                     .addEventListener("click", () => {
-                      window.open(
-                        "https://chrome.google.com/webstore/detail/add-to-myregistrycom-butt/cnofkjmkojconhdimlkamdckmidfmoio?hl=en-US",
-                        "_blank"
-                      );
                       document.querySelector('#giftlist_extension_popup_container').remove();
                     });
                   });
@@ -936,6 +937,7 @@ async function getProductData() {
     product_url: window.location.href,
   };
   if (scrappedURL === window.location.href && scrappedProduct && scrappedProduct.status === 200) {
+    isScraped = false;
 	  return scrappedProduct;
   }
   const productData = await fetch("https://admin.giftlist.com/api/scrape/url", {
@@ -960,7 +962,7 @@ async function getProductData() {
         });
     }
   });
-
+  isScraped = true;
   scrappedURL = window.location.href;
   scrappedProduct = productData;
 
