@@ -781,6 +781,7 @@ function refreshToken() {
               {
                 giftlist_refresh_token: "",
                 giftlist_access_token: "",
+                giftlist_user: null,
               },
               function (result) {}
             );
