@@ -92,7 +92,7 @@ const getShareFeedbackModal = () => {
 			</div>
 			<div id="thumbup_content_container">
 				<div style="display: flex; flex-direction: row; margin-top: 20px; margin-bottom: 15px;align-items: center;">
-					<h3 style="font-size: 20px;line-height: 24px;color: #101A34;">We love that you love it</h3>
+					<h3 style="font-size: 20px;line-height: 24px;color: #101A34; font-weight: 600;">We love that you love it</h3>
 					<img src="${raiseHandsIcon}" class="selected-item-image" style="width: 32px; height: 32px;" />
 				</div>
 				<p>
@@ -100,14 +100,13 @@ const getShareFeedbackModal = () => {
 				</p>
 				<div class="giftlist-extension-buttons-row">
 					<button class="btn" id="giftlist_extension_leave_good_feedback">Let's do it!</button>
-					<button class="btn btn-outline" id="giftlist_extension_leave_feedback">Maybe later</button>
+					<button class="btn btn-outline" id="giftlist_extension_maybe_later">Maybe later</button>
 				</div>
 			</div>
 			<div id="thumbdown_content_container">
-				<h3 style="font-size: 20px;line-height: 24px;color: #101A34;">We love that you love it</h3>
+        <h3 style="font-size: 20px;line-height: 24px;color: #101A34; font-weight: 600;">Let us know how can we improve</h3>
 				<textarea rows="5" class="form-control" placeholder="I would like to improve the following..." style="margin-top: 20px;"></textarea>
 				<div class="giftlist-extension-buttons-row">
-					<button class="btn btn-outline" id="giftlist_extension_go_back">Go Back</button>
 					<button class="btn" id="giftlist_extension_leave_bad_feedback">Submit</button>
 				</div>
 			</div>
@@ -123,15 +122,12 @@ const getSuccessAddedModal = () => {
 				<img src="${giftIcon}" class="selected-item-image" />
 			</div>
 			<h2>Your item has been added to the list!</h2>
-			<p>
-				It can take up 30 seconds for your gift details to appear on your list.
-			</p>
-			<p>
-				Feel free to continue adding items using the Giftlist button
-			</p>
-			<div class="giftlist-extension-buttons-row">
+      <div>
+        <p>Have feedback? <a href="#" id="giftlist_extension_leave_feedback">Let us know!</a></p>
+      </div>
+			<div class="giftlist-extension-buttons-row" style="margin-top: 20px;">
 				<button class="btn" id="giftlist_extension_move_to_list">View list</button>
-				<button class="btn btn-outline" id="giftlist_extension_leave_feedback">Continue adding items</button>
+				<button class="btn btn-outline" id="giftlist_extension_continue_adding">Continue adding items</button>
 			</div>
 		</div>
 	`;
@@ -162,20 +158,20 @@ const getShowMoreImageModal = () => {
 
 const getAddGiftModal = (data) => {
   return `
+    <h2>Add gift</h2>
+    <hr>
 		<div class="giftlist-extension-add-gift-content">
 			<div class="giftlist-extension-image-container">
 				<img src="${
-          selected_image ?? product[0].product.images[0]
+          selected_image ?? product[0].product.mainImage
         }" class="selected-item-image" />
 				<button id="giftlist_extension_view_more_images" class="btn btn-link">View more images</button>
 			</div>
 			<div class="giftlist-extension-add-gift-form">
-				<h2>Add gift</h2>
-				<hr>
 				<div class="form-group">
 					<label>Add to List</label>
 					<select class="form-control" id="giftlist_extension_list_id">
-						<option value="favourite">Favourite</option>
+						<option value="favourite">Favourites</option>
 						${(data || []).map(
               (item) =>
                 '<option value="' +
@@ -194,7 +190,7 @@ const getAddGiftModal = (data) => {
 				</div>
 				<div class="form-group" style="display: flex;">
 					<input type="checkbox" value="" id="giftlist_extension_most_wanted" />
-					<label style="margin-left: 8px;">Most wanted gift</label>
+					<label style="margin-left: 8px;font-weight: 400;font-size: 15px; line-height: 20px;" for="giftlist_extension_most_wanted">Most wanted gift</label>
 				</div>
 				<div class="form-group">
 					<label>Item URL</label>
@@ -203,19 +199,20 @@ const getAddGiftModal = (data) => {
           }" readonly />
 				</div>
 				<div class="form-group">
-					<label>Price<span style="color: #A8ACB3">(optional)</span></label>
+					<label>Price<span style="color: #A8ACB3; margin-left: 6px;">(optional)</span></label>
 					<input type="text" placeholder="Price" value="${
             product[0].product.offers[0].currency
           } ${product[0].product.offers[0].price}" />
 				</div>
 				<div class="form-group">
-					<label>Other details<span style="color: #A8ACB3">(optional)</span></label>
-					<textarea class="form-control" rows="3" placeholder="Other important details: Size, Colour etc.">${
-            product[0].product.description
-          }</textarea>
+					<label>Other details<span style="color: #A8ACB3; margin-left: 6px;">(optional)</span></label>
+					<textarea class="form-control" rows="3" placeholder="Other important details: Size, Colour etc."></textarea>
 				</div>
 				<div class="form-actions">
-					<button class="btn" id="giftlist_extension_add_btn">Add gift</button>
+					<button class="btn" id="giftlist_extension_add_btn">
+            <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+            Add gift
+          </button>
 				</div>
 			<div>
 		</div>
@@ -275,7 +272,7 @@ const showModal = async (exist_token) => {
 
   modal.innerHTML = `<div id="giftlist_extension_popup_content" style="height:100%">
 					<div class="giftlist_extension_popup_header">
-						<h3>GIFTLIST</h3>
+						<h3>GIFT<span style="font-weight: 400;">LIST</span></h3>
 					</div>
 					<div id="giftlist_extension_popup_main_content" style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
 						<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
@@ -303,7 +300,7 @@ const showModal = async (exist_token) => {
   if (!exist_token) {
     modal.innerHTML = `<div id="giftlist_extension_popup_content" style="height:100%">
 					<div class="giftlist_extension_popup_header" style="border: none;">
-						<h3>GIFTLIST</h3>
+						<h3>GIFT<span style="font-weight: 400">LIST</span></h3>
 						<div id="giftlist_extension_authenticated_header">
 							<div style="display: flex;margin-right: 20px;">
 								<span style="font-size: 15px; line-height: 20px; color: #101A34;margin-right: 5px;">Hey <span id="giftlist_extension_logged_in_username"></span></span>
@@ -324,7 +321,7 @@ const showModal = async (exist_token) => {
   } else {
     modal.innerHTML = `<div id="giftlist_extension_popup_content" style="height:100%">
 			<div class="giftlist_extension_popup_header">
-				<h3>GIFTLIST</h3>
+				<h3>GIFT<span style="font-weight: 400">LIST</span></h3>
 				<div id="giftlist_extension_authenticated_header">
 					<div style="display: flex;margin-right: 20px;">
 						<span style="font-size: 15px; line-height: 20px; color: #101A34;margin-right: 5px;">Hey <span id="giftlist_extension_logged_in_username"></span></span>
@@ -354,6 +351,13 @@ const showModal = async (exist_token) => {
 		</button>
 	</div>`;
     document.querySelector("#giftlist_extension_popup_container").innerHTML = modal.outerHTML;
+    if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
+      document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
+        <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+          <img src="${closeIcon}" style="width: 18px; height: 18px;" />
+        </button>
+      </div>`;
+    }
     document.querySelector(
       "#giftlist_extension_popup_loading_container"
     ).style.display = "flex";
@@ -399,7 +403,7 @@ const showModal = async (exist_token) => {
     listData = await getAllList(exist_token);
     modal.innerHTML = `<div id="giftlist_extension_popup_content" style="height:100%">
 					<div class="giftlist_extension_popup_header">
-						<h3>GIFTLIST</h3>
+						<h3>GIFT<span style="font-weight: 400">LIST</span></h3>
 						<div id="giftlist_extension_authenticated_header">
 							<div style="display: flex;margin-right: 20px;">
 								<span style="font-size: 15px; line-height: 20px; color: #101A34;margin-right: 5px;">Hey <span id="giftlist_extension_logged_in_username"></span></span>
@@ -433,6 +437,13 @@ const showModal = async (exist_token) => {
   
   document.querySelector("#giftlist_extension_popup_container").innerHTML = modal.outerHTML;
   disableScroll();
+  if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
+    document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
+      <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+        <img src="${closeIcon}" style="width: 18px; height: 18px;" />
+      </button>
+    </div>`;
+  }
 
   const initInnerEvents = () => {
     if (mask.querySelector("#giftlist_extension_add_btn")) {
@@ -440,10 +451,10 @@ const showModal = async (exist_token) => {
         .querySelector("#giftlist_extension_add_btn")
         .addEventListener("click", async () => {
           let url = "giftitem/add/favorite";
+          mask.querySelector("#giftlist_extension_add_btn .lds-ring").style.display = "inline-block";
           const postData = {
             gift_title: product[0].product.name,
             image_url: selected_image,
-            image_file: null,
             price: product[0].product.offers[0].price,
             details: product[0].product.description,
             isMostWanted: document.getElementById(
@@ -456,20 +467,44 @@ const showModal = async (exist_token) => {
           };
           if (selected_list_id.indexOf("_list") > -1) {
             url = "giftitem/create";
-            postData.giftlist_id = selected_list_id.split("_")[1];
+            postData.giftlist_id = selected_list_id.split("_")[0];
             delete postData.shop_product_id;
           } else if (selected_list_id.indexOf("_santa") > -1) {
             url = "giftitem/add/secret-santa/wish";
-            postData.secretsanta_id = selected_list_id.split("_")[1];
+            postData.secretsanta_id = selected_list_id.split("_")[0];
             delete postData.shop_product_id;
           }
           mask.querySelector("#giftlist_extension_add_btn").disabled = true;
           const data = await addProductToList(url, postData);
           mask.querySelector("#giftlist_extension_add_btn").disabled = false;
+          mask.querySelector("#giftlist_extension_add_btn .lds-ring").style.display = "none";
           if (data.status === 200) {
             mask.querySelector(
               "#giftlist_extension_popup_main_content"
             ).innerHTML = getSuccessAddedModal();
+            if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
+              document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
+                <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+                  <img src="${closeIcon}" style="width: 18px; height: 18px;" />
+                </button>
+              </div>`;
+            }
+            mask
+            .querySelector("#giftlist_extension_move_to_list")
+            .addEventListener("click", () => {
+              if (selected_list_id == 'favourite') {
+                window.open("https://www.giftlist.com/lists/favorites", "_blank");
+              } else {
+                if (selected_list_id) {
+                  if (selected_list_id.indexOf("_list") > -1) {
+                    window.open("https://www.giftlist.com/lists/" + selected_list_id.split("_")[0], "_blank");
+                  } else if (selected_list_id.indexOf("_santa") > -1) {
+                    window.open("https://www.giftlist.com/gift-exchange/" + selected_list_id.split("_")[0], "_blank");
+                  }
+                }
+              }
+              document.querySelector('#giftlist_extension_popup_container').remove();
+            });
 
             mask
               .querySelector("#giftlist_extension_leave_feedback")
@@ -477,6 +512,13 @@ const showModal = async (exist_token) => {
                 mask.querySelector(
                   "#giftlist_extension_popup_main_content"
                 ).innerHTML = getShareFeedbackModal();
+                if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
+                  document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
+                    <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+                      <img src="${closeIcon}" style="width: 18px; height: 18px;" />
+                    </button>
+                  </div>`;
+                }
 
                 mask
                   .querySelector("#thumb_up_btn")
@@ -502,14 +544,38 @@ const showModal = async (exist_token) => {
                           mask.querySelector(
                             "#giftlist_extension_popup_main_content"
                           ).innerHTML = getAddGiftModal(listData);
+                          if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
+                            document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
+                              <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+                                <img src="${closeIcon}" style="width: 18px; height: 18px;" />
+                              </button>
+                            </div>`;
+                          }
                           initInnerEvents();
                         });
                     }
-                    mask
-                    .querySelector("#giftlist_extension_move_to_list")
-                    .addEventListener("click", () => {
-                      window.open("https://www.giftlist.com/lists", "_blank");
-                    });
+
+                    if (mask.querySelector('#giftlist_extension_maybe_later')) { 
+                      mask
+                        .querySelector("#giftlist_extension_maybe_later")
+                        .addEventListener("click", () => {
+                          window.open(
+                            "https://chrome.google.com/webstore/detail/add-to-myregistrycom-butt/cnofkjmkojconhdimlkamdckmidfmoio?hl=en-US",
+                            "_blank"
+                          );
+                          mask.querySelector(
+                            "#giftlist_extension_popup_main_content"
+                          ).innerHTML = getAddGiftModal(listData);
+                          if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
+                            document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
+                              <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+                                <img src="${closeIcon}" style="width: 18px; height: 18px;" />
+                              </button>
+                            </div>`;
+                          }
+                          initInnerEvents();
+                        });
+                    }
                   });
 
                 mask
@@ -531,12 +597,15 @@ const showModal = async (exist_token) => {
                         "https://chrome.google.com/webstore/detail/add-to-myregistrycom-butt/cnofkjmkojconhdimlkamdckmidfmoio?hl=en-US",
                         "_blank"
                       );
-                      mask.querySelector(
-                        "#giftlist_extension_popup_main_content"
-                      ).innerHTML = getAddGiftModal(listData);
-                      initInnerEvents();
+                      document.querySelector('#giftlist_extension_popup_container').remove();
                     });
                   });
+              });
+
+            mask
+              .querySelector("#giftlist_extension_continue_adding")
+              .addEventListener("click", () => {
+                document.querySelector('#giftlist_extension_popup_container').remove();
               });
           }
         });
@@ -655,19 +724,23 @@ const showModal = async (exist_token) => {
           mask.querySelector(
             "#giftlist_extension_popup_main_content"
           ).innerHTML = `
-			  <div id="giftlist_extension_popup_loading_container">
-				  <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-				  <div class="success-checkmark" style="display: none">
-					  <div class="check-icon">
-						  <span class="icon-line line-tip"></span>
-						  <span class="icon-line line-long"></span>
-						  <div class="icon-circle"></div>
-						  <div class="icon-fix"></div>
-					  </div>
-				  </div>
-				  <h2>Getting product data...</h2>
-			  </div>
-		  `;
+            <div id="giftlist_extension_popup_loading_container">
+              <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+              <div class="success-checkmark" style="display: none">
+                <div class="check-icon">
+                  <span class="icon-line line-tip"></span>
+                  <span class="icon-line line-long"></span>
+                  <div class="icon-circle"></div>
+                  <div class="icon-fix"></div>
+                </div>
+              </div>
+              <h2>Getting product data...</h2>
+            </div>
+          `;
+          document.querySelector(
+            "#giftlist_extension_popup_loading_container"
+          ).style.display = "flex";
+          
           const listData = await getAllList(result.token);
           chrome.storage.sync.set(
             {
@@ -683,10 +756,6 @@ const showModal = async (exist_token) => {
                 "#giftlist_extension_authenticated_header #giftlist_extension_logged_in_username"
               ).innerHTML =
                 result.data.first_name + " " + result.data.last_name;
-
-              document.querySelector(
-                "#giftlist_extension_popup_loading_container"
-              ).style.display = "flex";
 
               const productData = await getProductData();
 

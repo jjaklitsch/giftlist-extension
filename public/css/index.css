@@ -1,8 +1,8 @@
 @font-face {
-    font-family: "Poppins";
-    font-style: normal;
-    font-weight: 400;
-    src: url("chrome-extension://__MSG_@@extension_id__/public/fonts/Poppins-Regular.ttf"); 
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 400;
+  src: url("chrome-extension://__MSG_@@extension_id__/public/fonts/Poppins-Regular.ttf");
 }
 
 /** root container */
@@ -17,17 +17,17 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #101A34;
+  color: #101a34;
   font-family: Poppins;
 }
 
-#giftlist_extension_popup_loading_container{
-    display: none;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    padding-top: 15px;
-    min-width: 800px;
+#giftlist_extension_popup_loading_container {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding-top: 15px;
+  min-width: 800px;
 }
 
 #giftlist_extension_authenticated_header {
@@ -238,6 +238,18 @@
   margin-top: 16px;
 }
 
+#giftlist_extension_popup_content .form-group label {
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 18px;
+}
+
+#giftlist_extension_popup_content .form-control {
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 20px;
+}
+
 #giftlist_extension_popup_content .form-group input[type="text"],
 #giftlist_extension_popup_content .form-group input[type="password"],
 #giftlist_extension_popup_content .form-group input[type="email"],
@@ -263,9 +275,6 @@
 }
 
 #giftlist_extension_popup_content .form-control {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
   background: #fff;
   border-radius: 7px;
   width: 100%;
@@ -301,9 +310,17 @@
   margin-top: 10px;
 }
 
+#giftlist_extension_view_more_images {
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 18px;
+  color: #50bcd9;
+}
+
 #giftlist_extension_popup_content .btn {
   background: #50bcd9;
   border-radius: 7px;
+  font-weight: 600;
   font-size: 15px;
   line-height: 22px;
   color: #fff;
