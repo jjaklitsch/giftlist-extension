@@ -28,6 +28,17 @@
   font-family: Poppins;
 }
 
+#giftlist_extension_popup_container * {
+  font-family: Poppins!important;
+  letter-spacing: 0px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+#giftlist_extension_popup_container a {
+  color: #50BCD9!important;
+}
+
 #giftlist_extension_popup_loading_container {
   display: none;
   justify-content: center;
@@ -73,7 +84,7 @@
 #giftlist_extension_popup_container .giftlist-extension-login-content {
   padding-top: 15px;
   min-width: 350px;
-  min-height: 450px;
+  min-height: 380px;
 }
 
 #giftlist_extension_popup_container .giftlist-extension-login-content h2 {
@@ -232,6 +243,8 @@
 
 #giftlist_extension_popup_content hr {
   margin: 0rem 0rem;
+  border-top: 1px solid grey;
+  border-bottom: 1px solid grey;
 }
 
 #giftlist_extension_popup_content h2 {
@@ -258,6 +271,7 @@
   font-weight: 400;
   font-size: 15px;
   line-height: 20px;
+  appearance: auto;
 }
 
 #giftlist_extension_popup_content .form-group input[type="text"],
@@ -331,7 +345,7 @@
   background: #50bcd9;
   border-radius: 7px;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 15px!important;
   line-height: 22px;
   color: #fff;
   padding: 12px 30px;

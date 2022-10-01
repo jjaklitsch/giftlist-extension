@@ -1,10 +1,11 @@
 chrome.runtime.onMessage.addListener((request) => {
   if (request.type === "popup-modal") {
-    chrome.storage.sync.get(["giftlist_access_token"], async function (result) {
+    chrome.storage.sync.get(["giftlist_access_token", "is_first"], async function (result) {
+      const isFirst = result.is_first;
       if (result) {
         result = await checkTokenValid();
       }
-      showModal(result);
+      showModal(result, isFirst);
     });
   }
 });
@@ -18,6 +19,7 @@ let listData = [];
 let scrappedURL = "";
 let scrappedProduct = null;
 let isScraped = false;
+let tempListData = null;
 
 // left: 37, up: 38, right: 39, down: 40,
 // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
@@ -76,14 +78,14 @@ const getShareFeedbackModal = () => {
   );
   return `
 		<div class="giftlist-extension-share-feedback-content">
-			<h2>Share your feedback</h2>
-			<p>
+			<h2 style="font-weight: 600;font-size: 30px;line-height: 36px; margin-top: 32px;">Share your feedback</h2>
+			<p style="font-size: 15px;line-height: 20px;font-weight: 400;color: #818694;margin-top: 16px; margin-bottom: 0px">
 				We hope you are enjoying our Add to GiftList button.
 			</p>
-			<p>
+			<p style="font-size: 15px;line-height: 20px;font-weight: 400;color: #818694;margin-top: 5px; margin-bottom: 0px">
 				Please rate your experience by picking an emoji.
 			</p>
-			<div class="giftlist-extension-buttons-row">
+			<div class="giftlist-extension-buttons-row" style="margin-top: 32px;">
 				<div class="giftlist-extension-success-icon-container" id="thumb_up_btn">
 					<img src="${thumbUpIcon}" class="selected-item-image" />
 				</div>
@@ -96,17 +98,17 @@ const getShareFeedbackModal = () => {
 					<h3 style="font-size: 20px;line-height: 24px;color: #101A34; font-weight: 600;">We love that you love it</h3>
 					<img src="${raiseHandsIcon}" class="selected-item-image" style="width: 32px; height: 32px;" />
 				</div>
-				<p>
+				<p style="font-weight: 400;font-size: 15px;line-height: 20px;color: #818694;">
 					Have a moment to rate us?
 				</p>
-				<div class="giftlist-extension-buttons-row">
+				<div class="giftlist-extension-buttons-row" style="margin-top: 24px;">
 					<button class="btn" id="giftlist_extension_leave_good_feedback">Let's do it!</button>
-					<button class="btn btn-outline" id="giftlist_extension_maybe_later">Maybe later</button>
+					<button class="btn btn-outline" id="giftlist_extension_maybe_later" style="color: #0F7B9B;">Maybe later</button>
 				</div>
 			</div>
-			<div id="thumbdown_content_container">
+			<div id="thumbdown_content_container" style="margin-top: 24px;">
         <h3 style="font-size: 20px;line-height: 24px;color: #101A34; font-weight: 600;">Let us know how can we improve</h3>
-        <p style="margin-top: 10px; margin-bottom: 15px;">Send your feedback to <a href="mailto:support@giftlist.com" style="margin-left: 5px;">support@giftlist.com</a></p>
+        <p style="margin-top: 10px; margin-bottom: 5px;">Send your feedback to <a href="mailto:support@giftlist.com" style="margin-left: 2px;">support@giftlist.com</a></p>
 				<div class="giftlist-extension-buttons-row">
 					<button class="btn" id="giftlist_extension_leave_bad_feedback">Done</button>
 				</div>
@@ -172,7 +174,7 @@ const getAddGiftModal = (data) => {
 				<div class="form-group">
 					<label>Add to List</label>
 					<select class="form-control" id="giftlist_extension_list_id">
-						<option value="favourite">Favourites</option>
+						<option value="favourite">Favorites</option>
 						${(data || []).map(
               (item) =>
                 '<option value="' +
@@ -187,27 +189,27 @@ const getAddGiftModal = (data) => {
 				</div>
 				<div class="form-group">
 					<label>Item name</label>
-					<input type="text" placeholder="Item Name" value="${product[0].product.name}" />
+					<input type="text" placeholder="Item Name" value="${product[0].product.name}" id="giftlist_extension_selected_product_name" />
 				</div>
 				<div class="form-group" style="display: flex;">
 					<input type="checkbox" value="" id="giftlist_extension_most_wanted" />
-					<label style="margin-left: 8px;font-weight: 400;font-size: 15px; line-height: 20px;" for="giftlist_extension_most_wanted">Most wanted gift</label>
+					<label style="margin-left: 8px;font-weight: 400;font-size: 15px; line-height: 20px;margin-bottom: -1px;" for="giftlist_extension_most_wanted">Most wanted gift</label>
 				</div>
 				<div class="form-group">
 					<label>Item URL</label>
 					<input type="text" placeholder="Item URL" value="${
             window.location.href
-          }" readonly />
+          }" id="giftlist_extension_selected_product_url" />
 				</div>
 				<div class="form-group">
 					<label>Price<span style="color: #A8ACB3; margin-left: 6px;">(optional)</span></label>
 					<input type="text" placeholder="Price" value="${
             product[0].product.offers[0].currency
-          } ${product[0].product.offers[0].price}" />
+          } ${product[0].product.offers[0].price}" id="giftlist_extension_selected_product_price" />
 				</div>
 				<div class="form-group">
 					<label>Other details<span style="color: #A8ACB3; margin-left: 6px;">(optional)</span></label>
-					<textarea class="form-control" rows="3" placeholder="Other important details: Size, Colour etc."></textarea>
+					<textarea class="form-control" rows="3" placeholder="Other important details: size, color, etc." id="giftlist_extension_selected_product_others"></textarea>
 				</div>
 				<div class="form-actions">
 					<button class="btn" id="giftlist_extension_add_btn">
@@ -242,14 +244,14 @@ const getLoginModal = () => {
           <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
           Sign in
         </button>
-				<a href="https://www.giftlist.com/" style="padding-top: 15px; padding-bottom: 20px;">Forgot password?</a>
-				<span>New to GiftList? <a href="https://www.giftlist.com/">Sign up</a></span>
+				<a href="https://www.giftlist.com/" style="padding-top: 15px; padding-bottom: 20px;font-weight: 600;font-size: 15px;line-height: 20px;">Forgot password?</a>
+				<span style="font-size: 13px;line-height: 16px;">New to GiftList? <a href="https://www.giftlist.com/" style="font-weight: bold;">Sign up</a></span>
 			</div>
 		</div>
 	`;
 };
 
-const showModal = async (exist_token) => {
+const showModal = async (exist_token, isFirst) => {
   const isLogin = false;
   const shakeHandIcon = chrome.runtime.getURL("/public/images/shake_hand.svg");
   const closeIcon = chrome.runtime.getURL("/public/images/close.svg");
@@ -458,16 +460,16 @@ const showModal = async (exist_token) => {
           let url = "giftitem/add/favorite";
           mask.querySelector("#giftlist_extension_add_btn .lds-ring").style.display = "inline-block";
           const postData = {
-            gift_title: product[0].product.name,
+            gift_title: document.querySelector('#giftlist_extension_selected_product_name').value,
             image_url: selected_image,
-            price: product[0].product.offers[0].price,
-            details: product[0].product.description,
+            price: document.querySelector('#giftlist_extension_selected_product_price').value.replace(/[^0-9.-]+/g, ""),
+            details: document.querySelector('#giftlist_extension_selected_product_others').value,
             isMostWanted: document.getElementById(
               "giftlist_extension_most_wanted"
-            ).checked
+            ).checked === true
               ? true
               : false,
-            product_url: window.location.href,
+            product_url: document.querySelector('#giftlist_extension_selected_product_url').value,
             shop_product_id: null,
           };
           if (selected_list_id.indexOf("_list") > -1) {
@@ -484,9 +486,78 @@ const showModal = async (exist_token) => {
           mask.querySelector("#giftlist_extension_add_btn").disabled = false;
           mask.querySelector("#giftlist_extension_add_btn .lds-ring").style.display = "none";
           if (data.status === 200) {
-            mask.querySelector(
-              "#giftlist_extension_popup_main_content"
-            ).innerHTML = getSuccessAddedModal();
+            if (isFirst) {
+              mask.querySelector(
+                "#giftlist_extension_popup_main_content"
+              ).innerHTML = getSuccessAddedModal();
+            } else {
+              mask.querySelector(
+                "#giftlist_extension_popup_main_content"
+              ).innerHTML = getShareFeedbackModal();
+              chrome.storage.sync.set({ is_first: "yes", }, function () { });
+              mask
+                .querySelector("#thumb_up_btn")
+                .addEventListener("click", () => {
+                  mask.querySelector(
+                    "#thumbup_content_container"
+                  ).style.display = "flex";
+                  mask.querySelector(
+                    "#thumbdown_content_container"
+                  ).style.display = "none";
+                  mask.querySelector("#thumb_down_btn").style.opacity = 0.5;
+                  mask.querySelector("#thumb_up_btn").style.opacity = 1;
+
+                  
+                  if (mask.querySelector('#giftlist_extension_leave_good_feedback')) { 
+                    mask
+                      .querySelector("#giftlist_extension_leave_good_feedback")
+                      .addEventListener("click", () => {
+                        window.open(
+                          "https://chrome.google.com/webstore/detail/add-to-myregistrycom-butt/cnofkjmkojconhdimlkamdckmidfmoio?hl=en-US",
+                          "_blank"
+                        );
+                        mask.querySelector(
+                          "#giftlist_extension_popup_main_content"
+                        ).innerHTML = getAddGiftModal(listData);
+                        if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
+                          document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
+                            <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+                              <img src="${closeIcon}" style="width: 18px; height: 18px;" />
+                            </button>
+                          </div>`;
+                        }
+                        initInnerEvents();
+                      });
+                  }
+
+                  if (mask.querySelector('#giftlist_extension_maybe_later')) { 
+                    mask
+                      .querySelector("#giftlist_extension_maybe_later")
+                      .addEventListener("click", () => {
+                        document.querySelector('#giftlist_extension_popup_container').remove();
+                      });
+                  }
+                });
+
+              mask
+                .querySelector("#thumb_down_btn")
+                .addEventListener("click", () => {
+                  mask.querySelector(
+                    "#thumbup_content_container"
+                  ).style.display = "none";
+                  mask.querySelector(
+                    "#thumbdown_content_container"
+                  ).style.display = "flex";
+                  mask.querySelector("#thumb_down_btn").style.opacity = 1;
+                  mask.querySelector("#thumb_up_btn").style.opacity = 0.5;
+
+                  mask
+                  .querySelector("#giftlist_extension_leave_bad_feedback")
+                  .addEventListener("click", () => {
+                    document.querySelector('#giftlist_extension_popup_container').remove();
+                  });
+                });
+            }
             if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
               document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
                 <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
@@ -494,6 +565,8 @@ const showModal = async (exist_token) => {
                 </button>
               </div>`;
             }
+
+            initInnerEvents();
             mask
             .querySelector("#giftlist_extension_move_to_list")
             .addEventListener("click", () => {
@@ -508,7 +581,6 @@ const showModal = async (exist_token) => {
                   }
                 }
               }
-              document.querySelector('#giftlist_extension_popup_container').remove();
             });
 
             mask
@@ -524,6 +596,7 @@ const showModal = async (exist_token) => {
                     </button>
                   </div>`;
                 }
+                initInnerEvents();
 
                 mask
                   .querySelector("#thumb_up_btn")
@@ -564,21 +637,7 @@ const showModal = async (exist_token) => {
                       mask
                         .querySelector("#giftlist_extension_maybe_later")
                         .addEventListener("click", () => {
-                          window.open(
-                            "https://chrome.google.com/webstore/detail/add-to-myregistrycom-butt/cnofkjmkojconhdimlkamdckmidfmoio?hl=en-US",
-                            "_blank"
-                          );
-                          mask.querySelector(
-                            "#giftlist_extension_popup_main_content"
-                          ).innerHTML = getAddGiftModal(listData);
-                          if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
-                            document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
-                              <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
-                                <img src="${closeIcon}" style="width: 18px; height: 18px;" />
-                              </button>
-                            </div>`;
-                          }
-                          initInnerEvents();
+                          document.querySelector('#giftlist_extension_popup_container').remove();
                         });
                     }
                   });
@@ -626,6 +685,7 @@ const showModal = async (exist_token) => {
               </button>
             </div>`;
           }
+          initInnerEvents();
 
           mask
             .querySelectorAll(".giftlist-extension-item-image img")
@@ -636,7 +696,6 @@ const showModal = async (exist_token) => {
                   "#giftlist_extension_popup_main_content"
                 ).innerHTML = getAddGiftModal(listData);
                 
-                initInnerEvents();
                 if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
                   document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
                     <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
@@ -644,6 +703,7 @@ const showModal = async (exist_token) => {
                     </button>
                   </div>`;
                 }
+                initInnerEvents();
               });
             });
         });
@@ -789,6 +849,7 @@ const showModal = async (exist_token) => {
               initInnerEvents();
             }
           );
+          initInnerEvents();
         }
       });
   }
@@ -822,6 +883,7 @@ const showModal = async (exist_token) => {
       mask.querySelector(
         "#giftlist_extension_authenticated_header"
       ).style.display = "flex";
+      initInnerEvents();
     }
   });
 };
@@ -895,8 +957,11 @@ function checkTokenValid() {
 }
 
 async function getAllList(token) {
-  const listData = await fetch(BASE_URL + "/occasion/list", {
-    method: "GET",
+  if (tempListData && tempListData.length > 0) {
+    return tempListData;
+  }
+  const listData = await fetch(BASE_URL + "/giftlist/my/list/all", {
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
       "x-access-token": token,
@@ -913,14 +978,21 @@ async function getAllList(token) {
   })
     .then((res) => res.json())
     .then((res) => res.data);
-  return [
-    ...listData,
-    santaListData.map((item) => ({
+    
+  
+  const lists = [
+    ...listData.map((item) => ({
+      id: item.id,
+      name: item.list_name,
+    })),
+    ...santaListData.map((item) => ({
       id: item.id,
       name: item.event_name,
       isSanta: true,
     })),
   ];
+  tempListData = lists;
+  return lists;
 }
 
 const callback = () => {
@@ -953,18 +1025,22 @@ async function getProductData() {
     if (error) {
       document.querySelector('#giftlist_extension_popup_loading_container .lds-ellipsis').style.display = "none";
       document.querySelector('#giftlist_extension_popup_loading_container h2').innerHTML = 'Something went wrong <a href="#" id="try_scrape_again" style="margin-left: 15px;">Try Again</a>';
-  
+      
+      initInnerEvents();
       document.querySelector("#try_scrape_again")
         .addEventListener('click', function(evt) {
           document.querySelector('#giftlist_extension_popup_loading_container .lds-ellipsis').style.display = "inline-block";
           document.querySelector('#giftlist_extension_popup_loading_container h2').innerHTML = "Getting product data...";
           getProductData();
+          initInnerEvents();
         });
     }
   });
   isScraped = true;
-  scrappedURL = window.location.href;
-  scrappedProduct = productData;
+  if (productData.status === 200) {
+    scrappedProduct = productData;
+    scrappedURL = window.location.href;
+  }
 
   return productData;
 }
