@@ -59,7 +59,6 @@ function disableScroll() {
   window.addEventListener("DOMMouseScroll", preventDefault, false); // older FF
   window.addEventListener(wheelEvent, preventDefault, wheelOpt); // modern desktop
   window.addEventListener("touchmove", preventDefault, wheelOpt); // mobile
-  window.addEventListener("keydown", preventDefaultForScrollKeys, false);
 }
 
 // call this to Enable
@@ -67,7 +66,6 @@ function enableScroll() {
   window.removeEventListener("DOMMouseScroll", preventDefault, false);
   window.removeEventListener(wheelEvent, preventDefault, wheelOpt);
   window.removeEventListener("touchmove", preventDefault, wheelOpt);
-  window.removeEventListener("keydown", preventDefaultForScrollKeys, false);
 }
 
 const getShareFeedbackModal = () => {
@@ -203,9 +201,7 @@ const getAddGiftModal = (data) => {
 				</div>
 				<div class="form-group">
 					<label>Price<span style="color: #A8ACB3; margin-left: 6px;">(optional)</span></label>
-					<input type="text" placeholder="Price" value="${
-            product[0].product.offers[0].currency
-          } ${product[0].product.offers[0].price}" id="giftlist_extension_selected_product_price" />
+					<input type="text" placeholder="Price" value="${product[0].product.offers[0].price}" id="giftlist_extension_selected_product_price" />
 				</div>
 				<div class="form-group">
 					<label>Other details<span style="color: #A8ACB3; margin-left: 6px;">(optional)</span></label>
@@ -230,11 +226,11 @@ const getLoginModal = () => {
 			<hr>
 			<div class="form-group">
 				<label>Your email</label>
-				<input type="text" placeholder="Enter your email" id="giftlist-extension-login-email" />
+				<input type="text" placeholder="Enter your email" id="giftlist-extension-login-email" autocomplete="on" />
 			</div>
 			<div class="form-group" style="position: relative">
 				<label>Password</label>
-				<input type="password" placeholder="Enter password" id="giftlist-extension-login-input" style="padding-right: 20px;" />
+				<input type="password" placeholder="Enter password" id="giftlist-extension-login-input" style="padding-right: 20px;" autocomplete="on" />
 				<div style="position: absolute; right: 12px; bottom: 12px;" id="show_password_btn">
 					<img src="${eyeIcon}" style="width: 18px; height: 18px;" />
 				</div>
@@ -567,106 +563,112 @@ const showModal = async (exist_token, isFirst) => {
             }
 
             initInnerEvents();
-            mask
-            .querySelector("#giftlist_extension_move_to_list")
-            .addEventListener("click", () => {
-              if (selected_list_id == 'favourite') {
-                window.open("https://www.giftlist.com/lists/favorites", "_blank");
-              } else {
-                if (selected_list_id) {
-                  if (selected_list_id.indexOf("_list") > -1) {
-                    window.open("https://www.giftlist.com/lists/" + selected_list_id.split("_")[0], "_blank");
-                  } else if (selected_list_id.indexOf("_santa") > -1) {
-                    window.open("https://www.giftlist.com/gift-exchange/" + selected_list_id.split("_")[0], "_blank");
+            if (mask.querySelector("#giftlist_extension_move_to_list")) {
+              mask
+              .querySelector("#giftlist_extension_move_to_list")
+              .addEventListener("click", () => {
+                if (selected_list_id == 'favourite') {
+                  window.open("https://www.giftlist.com/lists/favorites", "_blank");
+                } else {
+                  if (selected_list_id) {
+                    if (selected_list_id.indexOf("_list") > -1) {
+                      window.open("https://www.giftlist.com/lists/" + selected_list_id.split("_")[0], "_blank");
+                    } else if (selected_list_id.indexOf("_santa") > -1) {
+                      window.open("https://www.giftlist.com/gift-exchange/" + selected_list_id.split("_")[0], "_blank");
+                    }
                   }
                 }
-              }
-            });
+              });
+            }
 
-            mask
-              .querySelector("#giftlist_extension_leave_feedback")
-              .addEventListener("click", () => {
-                mask.querySelector(
-                  "#giftlist_extension_popup_main_content"
-                ).innerHTML = getShareFeedbackModal();
-                if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
-                  document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
-                    <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
-                      <img src="${closeIcon}" style="width: 18px; height: 18px;" />
-                    </button>
-                  </div>`;
-                }
-                initInnerEvents();
-
-                mask
-                  .querySelector("#thumb_up_btn")
-                  .addEventListener("click", () => {
-                    mask.querySelector(
-                      "#thumbup_content_container"
-                    ).style.display = "flex";
-                    mask.querySelector(
-                      "#thumbdown_content_container"
-                    ).style.display = "none";
-                    mask.querySelector("#thumb_down_btn").style.opacity = 0.5;
-                    mask.querySelector("#thumb_up_btn").style.opacity = 1;
-
-                    
-                    if (mask.querySelector('#giftlist_extension_leave_good_feedback')) { 
-                      mask
-                        .querySelector("#giftlist_extension_leave_good_feedback")
-                        .addEventListener("click", () => {
-                          window.open(
-                            "https://chrome.google.com/webstore/detail/add-to-myregistrycom-butt/cnofkjmkojconhdimlkamdckmidfmoio?hl=en-US",
-                            "_blank"
-                          );
-                          mask.querySelector(
-                            "#giftlist_extension_popup_main_content"
-                          ).innerHTML = getAddGiftModal(listData);
-                          if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
-                            document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
-                              <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
-                                <img src="${closeIcon}" style="width: 18px; height: 18px;" />
-                              </button>
-                            </div>`;
-                          }
-                          initInnerEvents();
-                        });
-                    }
-
-                    if (mask.querySelector('#giftlist_extension_maybe_later')) { 
-                      mask
-                        .querySelector("#giftlist_extension_maybe_later")
-                        .addEventListener("click", () => {
-                          document.querySelector('#giftlist_extension_popup_container').remove();
-                        });
-                    }
-                  });
-
-                mask
-                  .querySelector("#thumb_down_btn")
-                  .addEventListener("click", () => {
-                    mask.querySelector(
-                      "#thumbup_content_container"
-                    ).style.display = "none";
-                    mask.querySelector(
-                      "#thumbdown_content_container"
-                    ).style.display = "flex";
-                    mask.querySelector("#thumb_down_btn").style.opacity = 1;
-                    mask.querySelector("#thumb_up_btn").style.opacity = 0.5;
-
-                    mask
-                    .querySelector("#giftlist_extension_leave_bad_feedback")
+            if (mask.querySelector("#giftlist_extension_leave_feedback")) {
+              mask
+                .querySelector("#giftlist_extension_leave_feedback")
+                .addEventListener("click", () => {
+                  mask.querySelector(
+                    "#giftlist_extension_popup_main_content"
+                  ).innerHTML = getShareFeedbackModal();
+                  if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
+                    document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
+                      <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+                        <img src="${closeIcon}" style="width: 18px; height: 18px;" />
+                      </button>
+                    </div>`;
+                  }
+                  initInnerEvents();
+  
+                  mask
+                    .querySelector("#thumb_up_btn")
                     .addEventListener("click", () => {
-                      document.querySelector('#giftlist_extension_popup_container').remove();
+                      mask.querySelector(
+                        "#thumbup_content_container"
+                      ).style.display = "flex";
+                      mask.querySelector(
+                        "#thumbdown_content_container"
+                      ).style.display = "none";
+                      mask.querySelector("#thumb_down_btn").style.opacity = 0.5;
+                      mask.querySelector("#thumb_up_btn").style.opacity = 1;
+  
+                      
+                      if (mask.querySelector('#giftlist_extension_leave_good_feedback')) { 
+                        mask
+                          .querySelector("#giftlist_extension_leave_good_feedback")
+                          .addEventListener("click", () => {
+                            window.open(
+                              "https://chrome.google.com/webstore/detail/add-to-myregistrycom-butt/cnofkjmkojconhdimlkamdckmidfmoio?hl=en-US",
+                              "_blank"
+                            );
+                            mask.querySelector(
+                              "#giftlist_extension_popup_main_content"
+                            ).innerHTML = getAddGiftModal(listData);
+                            if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
+                              document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
+                                <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+                                  <img src="${closeIcon}" style="width: 18px; height: 18px;" />
+                                </button>
+                              </div>`;
+                            }
+                            initInnerEvents();
+                          });
+                      }
+  
+                      if (mask.querySelector('#giftlist_extension_maybe_later')) { 
+                        mask
+                          .querySelector("#giftlist_extension_maybe_later")
+                          .addEventListener("click", () => {
+                            document.querySelector('#giftlist_extension_popup_container').remove();
+                          });
+                      }
                     });
-                  });
-              });
+  
+                  mask
+                    .querySelector("#thumb_down_btn")
+                    .addEventListener("click", () => {
+                      mask.querySelector(
+                        "#thumbup_content_container"
+                      ).style.display = "none";
+                      mask.querySelector(
+                        "#thumbdown_content_container"
+                      ).style.display = "flex";
+                      mask.querySelector("#thumb_down_btn").style.opacity = 1;
+                      mask.querySelector("#thumb_up_btn").style.opacity = 0.5;
+  
+                      mask
+                      .querySelector("#giftlist_extension_leave_bad_feedback")
+                      .addEventListener("click", () => {
+                        document.querySelector('#giftlist_extension_popup_container').remove();
+                      });
+                    });
+                });
+            }
 
-            mask
-              .querySelector("#giftlist_extension_continue_adding")
-              .addEventListener("click", () => {
-                document.querySelector('#giftlist_extension_popup_container').remove();
-              });
+            if (mask.querySelector("#giftlist_extension_continue_adding")) {
+              mask
+                .querySelector("#giftlist_extension_continue_adding")
+                .addEventListener("click", () => {
+                  document.querySelector('#giftlist_extension_popup_container').remove();
+                });
+            }
           }
         });
     }
@@ -695,7 +697,7 @@ const showModal = async (exist_token, isFirst) => {
                 mask.querySelector(
                   "#giftlist_extension_popup_main_content"
                 ).innerHTML = getAddGiftModal(listData);
-                
+                document.querySelector("#giftlist_extension_list_id").value = selected_list_id;
                 if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
                   document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
                     <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
@@ -856,10 +858,14 @@ const showModal = async (exist_token, isFirst) => {
   if (mask.querySelector("#giftlist-extension-login-email")) {
     mask.querySelector("#giftlist-extension-login-email")
       .addEventListener('input', function(evt) {
-        if (evt.target.value && mask.querySelector("#giftlist-extension-login-input").value) {
-          mask.querySelector("#giftlist_sign_in").disabled = false;
+        if (evt.keyCode === 13) {
+          mask.querySelector("#giftlist-extension-login-input").focus();
         } else {
-          mask.querySelector("#giftlist_sign_in").disabled = true;
+          if (evt.target.value && mask.querySelector("#giftlist-extension-login-input").value) {
+            mask.querySelector("#giftlist_sign_in").disabled = false;
+          } else {
+            mask.querySelector("#giftlist_sign_in").disabled = true;
+          }
         }
       });
   }
@@ -867,10 +873,14 @@ const showModal = async (exist_token, isFirst) => {
   if (mask.querySelector("#giftlist-extension-login-input")) {
     mask.querySelector("#giftlist-extension-login-input")
       .addEventListener('input', function(evt) {
-        if (evt.target.value && mask.querySelector("#giftlist-extension-login-email").value) {
-          mask.querySelector("#giftlist_sign_in").disabled = false;
+        if (evt.keyCode === 13) {
+          document.querySelector('#giftlist_sign_in').click();
         } else {
-          mask.querySelector("#giftlist_sign_in").disabled = true;
+          if (evt.target.value && mask.querySelector("#giftlist-extension-login-email").value) {
+            mask.querySelector("#giftlist_sign_in").disabled = false;
+          } else {
+            mask.querySelector("#giftlist_sign_in").disabled = true;
+          }
         }
       });
   }
@@ -1058,7 +1068,12 @@ function addProductToList(url, postData) {
       })
         .then((res) => res.json())
         .then(async (res) => {
-          resolve(res);
+          if (res.status == 200) {
+            resolve(res);
+          } else {
+            await refreshToken();
+            addProductToList(url, postData);
+          }
         })
         .catch((error) => {
           reject(error);
