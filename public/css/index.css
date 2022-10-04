@@ -46,6 +46,7 @@
   flex-direction: column;
   padding-top: 15px;
   min-width: 800px;
+  min-height: 210px;
 }
 
 #giftlist_extension_authenticated_header {

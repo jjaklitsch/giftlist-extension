@@ -15,6 +15,11 @@ const BASE_URL = "https://admin.giftlist.com/api";
 let product = null;
 let selected_image = null;
 let selected_list_id = "favourite";
+let item_title = '';
+let item_price = '';
+let is_most_wanted = false;
+let item_url = '';
+let item_description = '';
 let listData = [];
 let scrappedURL = "";
 let scrappedProduct = null;
@@ -59,6 +64,12 @@ function disableScroll() {
   window.addEventListener("DOMMouseScroll", preventDefault, false); // older FF
   window.addEventListener(wheelEvent, preventDefault, wheelOpt); // modern desktop
   window.addEventListener("touchmove", preventDefault, wheelOpt); // mobile
+
+  item_title = '';
+  item_price = '';
+  item_description = '';
+  is_most_wanted = false;
+  item_url = '';
 }
 
 // call this to Enable
@@ -172,14 +183,14 @@ const getAddGiftModal = (data) => {
 				<div class="form-group">
 					<label>Add to List</label>
 					<select class="form-control" id="giftlist_extension_list_id">
-						<option value="favourite">Favorites</option>
+						<option value="favourite" ${selected_list_id === 'favourite' ? 'selected' : ''}>Favorites</option>
 						${(data || []).map(
               (item) =>
                 '<option value="' +
                 item.id +
                 "_" +
                 (item.isSanta ? "santa" : "list") +
-                '">' +
+                '" ' + (selected_list_id === (item.id + "_" + (item.isSanta ? "santa" : "list")) ? 'selected' : '') + '>' +
                 item.name +
                 "</option>"
             )}
@@ -187,25 +198,25 @@ const getAddGiftModal = (data) => {
 				</div>
 				<div class="form-group">
 					<label>Item name</label>
-					<input type="text" placeholder="Item Name" value="${product[0].product.name}" id="giftlist_extension_selected_product_name" />
+					<input type="text" placeholder="Item Name" value="${item_title ?? product[0].product.name}" id="giftlist_extension_selected_product_name" />
 				</div>
 				<div class="form-group" style="display: flex;">
-					<input type="checkbox" value="" id="giftlist_extension_most_wanted" />
+					<input type="checkbox" value="" id="giftlist_extension_most_wanted" ${is_most_wanted ? 'checked' : ''}/>
 					<label style="margin-left: 8px;font-weight: 400;font-size: 15px; line-height: 20px;margin-bottom: -1px;" for="giftlist_extension_most_wanted">Most wanted gift</label>
 				</div>
 				<div class="form-group">
 					<label>Item URL</label>
 					<input type="text" placeholder="Item URL" value="${
-            window.location.href
+            item_url ?? window.location.href
           }" id="giftlist_extension_selected_product_url" />
 				</div>
 				<div class="form-group">
 					<label>Price<span style="color: #A8ACB3; margin-left: 6px;">(optional)</span></label>
-					<input type="text" placeholder="Price" value="${product[0].product.offers[0].price}" id="giftlist_extension_selected_product_price" />
+					<input type="text" placeholder="Price" value="${item_price ?? product[0].product.offers[0].price}" id="giftlist_extension_selected_product_price" />
 				</div>
 				<div class="form-group">
 					<label>Other details<span style="color: #A8ACB3; margin-left: 6px;">(optional)</span></label>
-					<textarea class="form-control" rows="3" placeholder="Other important details: size, color, etc." id="giftlist_extension_selected_product_others"></textarea>
+					<textarea class="form-control" rows="3" placeholder="Other important details: size, color, etc." id="giftlist_extension_selected_product_others">${item_description}</textarea>
 				</div>
 				<div class="form-actions">
 					<button class="btn" id="giftlist_extension_add_btn">
@@ -379,6 +390,7 @@ const showModal = async (exist_token, isFirst) => {
           if (document.querySelector('#giftlist_extension_popup_container')) {
             document.querySelector('#giftlist_extension_popup_container').remove();
           }
+          enableScroll();
       })
     });
   
@@ -456,16 +468,14 @@ const showModal = async (exist_token, isFirst) => {
           let url = "giftitem/add/favorite";
           mask.querySelector("#giftlist_extension_add_btn .lds-ring").style.display = "inline-block";
           const postData = {
-            gift_title: document.querySelector('#giftlist_extension_selected_product_name').value,
+            gift_title: item_title ?? document.querySelector('#giftlist_extension_selected_product_name').value,
             image_url: selected_image,
-            price: document.querySelector('#giftlist_extension_selected_product_price').value.replace(/[^0-9.-]+/g, ""),
-            details: document.querySelector('#giftlist_extension_selected_product_others').value,
-            isMostWanted: document.getElementById(
-              "giftlist_extension_most_wanted"
-            ).checked === true
+            price: item_price ?? document.querySelector('#giftlist_extension_selected_product_price').value.replace(/[^0-9.-]+/g, ""),
+            details: item_description ?? document.querySelector('#giftlist_extension_selected_product_others').value,
+            isMostWanted: is_most_wanted === true
               ? true
               : false,
-            product_url: document.querySelector('#giftlist_extension_selected_product_url').value,
+            product_url: item_url ?? document.querySelector('#giftlist_extension_selected_product_url').value,
             shop_product_id: null,
           };
           if (selected_list_id.indexOf("_list") > -1) {
@@ -479,8 +489,10 @@ const showModal = async (exist_token, isFirst) => {
           }
           mask.querySelector("#giftlist_extension_add_btn").disabled = true;
           const data = await addProductToList(url, postData);
-          mask.querySelector("#giftlist_extension_add_btn").disabled = false;
-          mask.querySelector("#giftlist_extension_add_btn .lds-ring").style.display = "none";
+          if (mask.querySelector("#giftlist_extension_add_btn")) {
+            mask.querySelector("#giftlist_extension_add_btn").disabled = false;
+            mask.querySelector("#giftlist_extension_add_btn .lds-ring").style.display = "none";
+          }
           if (data.status === 200) {
             if (isFirst) {
               mask.querySelector(
@@ -531,6 +543,7 @@ const showModal = async (exist_token, isFirst) => {
                       .querySelector("#giftlist_extension_maybe_later")
                       .addEventListener("click", () => {
                         document.querySelector('#giftlist_extension_popup_container').remove();
+                        enableScroll();
                       });
                   }
                 });
@@ -551,6 +564,7 @@ const showModal = async (exist_token, isFirst) => {
                   .querySelector("#giftlist_extension_leave_bad_feedback")
                   .addEventListener("click", () => {
                     document.querySelector('#giftlist_extension_popup_container').remove();
+                    enableScroll();
                   });
                 });
             }
@@ -637,6 +651,7 @@ const showModal = async (exist_token, isFirst) => {
                           .querySelector("#giftlist_extension_maybe_later")
                           .addEventListener("click", () => {
                             document.querySelector('#giftlist_extension_popup_container').remove();
+                            enableScroll();
                           });
                       }
                     });
@@ -657,6 +672,7 @@ const showModal = async (exist_token, isFirst) => {
                       .querySelector("#giftlist_extension_leave_bad_feedback")
                       .addEventListener("click", () => {
                         document.querySelector('#giftlist_extension_popup_container').remove();
+                        enableScroll();
                       });
                     });
                 });
@@ -667,6 +683,7 @@ const showModal = async (exist_token, isFirst) => {
                 .querySelector("#giftlist_extension_continue_adding")
                 .addEventListener("click", () => {
                   document.querySelector('#giftlist_extension_popup_container').remove();
+                  enableScroll();
                 });
             }
           }
@@ -727,6 +744,7 @@ const showModal = async (exist_token, isFirst) => {
           },
           function () {
             document.querySelector('#giftlist_extension_popup_container').remove();
+            enableScroll();
         })
       });
     }
@@ -736,6 +754,31 @@ const showModal = async (exist_token, isFirst) => {
       }
       enableScroll();
     });
+    if (document.querySelector('#giftlist_extension_selected_product_name')) {
+      document.querySelector('#giftlist_extension_selected_product_name').addEventListener('input', function(evt) {
+        item_title = evt.target.value;
+      });
+    }
+    if (document.querySelector('#giftlist_extension_selected_product_url')) {
+      document.querySelector('#giftlist_extension_selected_product_url').addEventListener('input', function(evt) {
+        item_url = evt.target.value;
+      });
+    }
+    if (document.querySelector('#giftlist_extension_selected_product_price')) {
+      document.querySelector('#giftlist_extension_selected_product_price').addEventListener('input', function(evt) {
+        item_price = evt.target.value;
+      });
+    }
+    if (document.querySelector('#giftlist_extension_selected_product_others')) {
+      document.querySelector('#giftlist_extension_selected_product_others').addEventListener('input', function(evt) {
+        item_description = evt.target.value;
+      });
+    }
+    if (document.querySelector('#giftlist_extension_most_wanted')) {
+      document.querySelector('#giftlist_extension_most_wanted').addEventListener('change', function(evt) {
+        is_most_wanted = evt.currentTarget.checked ? true : false;
+      });
+    }
   };
   if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
     document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
@@ -835,6 +878,10 @@ const showModal = async (exist_token, isFirst) => {
               document.querySelector(
                 "#giftlist_extension_popup_loading_container h2"
               ).style.display = "none";
+
+              item_title = product[0].product.name;
+              item_price = product[0].product.offers[0].price;
+              item_url = window.location.href;
 
               mask.querySelector(
                 "#giftlist_extension_popup_main_content"
