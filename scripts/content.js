@@ -26,6 +26,10 @@ let scrappedProduct = null;
 let isScraped = false;
 let tempListData = null;
 
+chrome.storage.sync.get(["last_selected_list_id"], function (result) {
+  selected_list_id = result.last_selected_list_id;
+});
+
 // left: 37, up: 38, right: 39, down: 40,
 // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
 var keys = { 37: 1, 38: 1, 39: 1, 40: 1 };
@@ -117,7 +121,7 @@ const getShareFeedbackModal = () => {
 			</div>
 			<div id="thumbdown_content_container" style="margin-top: 24px;">
         <h3 style="font-size: 20px;line-height: 24px;color: #101A34; font-weight: 600;">Let us know how can we improve</h3>
-        <p style="margin-top: 10px; margin-bottom: 5px;">Send your feedback to <a href="mailto:support@giftlist.com" style="margin-left: 2px;">support@giftlist.com</a></p>
+        <p style="margin-top: 10px; margin-bottom: 5px;color: #818694;font-weight: 400;">Send your feedback to <a href="mailto:support@giftlist.com" style="margin-left: 2px;">support@giftlist.com</a></p>
 				<div class="giftlist-extension-buttons-row">
 					<button class="btn" id="giftlist_extension_leave_bad_feedback">Done</button>
 				</div>
@@ -133,7 +137,7 @@ const getSuccessAddedModal = () => {
 			<div class="giftlist-extension-success-icon-container">
 				<img src="${giftIcon}" class="selected-item-image" />
 			</div>
-			<h2>Your item has been added to the list!</h2>
+			<h2>Your item has been added to your list!</h2>
       <div>
         <p>Have feedback? <a href="#" id="giftlist_extension_leave_feedback">Let us know!</a></p>
       </div>
@@ -153,7 +157,7 @@ const getShowMoreImageModal = () => {
 			</div>
 			<hr>
 			<div class="giftlist-extension-item-image-container">
-				${product[0].product.images.reduce((acc, item) => {
+				${product[0].product ? product[0].product.images.reduce((acc, item) => {
           return (
             acc +
             `
@@ -162,7 +166,7 @@ const getShowMoreImageModal = () => {
 						</div>
 					`
           );
-        }, "")}
+        }, "") : '<p style="margin-top: 10px; text-align: center; font-weight: bold;">No images</p>'}
 			</div>
 		</div>
 	`;
@@ -175,7 +179,7 @@ const getAddGiftModal = (data) => {
 		<div class="giftlist-extension-add-gift-content">
 			<div class="giftlist-extension-image-container">
 				<img src="${
-          selected_image ?? product[0].product.mainImage
+          selected_image ?? (product[0].product && product[0].product.mainImage ? product[0].product.mainImage : '')
         }" class="selected-item-image" />
 				<button id="giftlist_extension_view_more_images" class="btn btn-link">View more images</button>
 			</div>
@@ -198,7 +202,7 @@ const getAddGiftModal = (data) => {
 				</div>
 				<div class="form-group">
 					<label>Item name</label>
-					<input type="text" placeholder="Item Name" value="${item_title ?? product[0].product.name}" id="giftlist_extension_selected_product_name" />
+					<input type="text" placeholder="Item Name" value="${item_title || (product[0].product ? product[0].product.name : '')}" id="giftlist_extension_selected_product_name" />
 				</div>
 				<div class="form-group" style="display: flex;">
 					<input type="checkbox" value="" id="giftlist_extension_most_wanted" ${is_most_wanted ? 'checked' : ''}/>
@@ -207,12 +211,12 @@ const getAddGiftModal = (data) => {
 				<div class="form-group">
 					<label>Item URL</label>
 					<input type="text" placeholder="Item URL" value="${
-            item_url ?? window.location.href
+            item_url || window.location.href
           }" id="giftlist_extension_selected_product_url" />
 				</div>
 				<div class="form-group">
 					<label>Price<span style="color: #A8ACB3; margin-left: 6px;">(optional)</span></label>
-					<input type="text" placeholder="Price" value="${item_price ?? product[0].product.offers[0].price}" id="giftlist_extension_selected_product_price" />
+					<input type="text" placeholder="Price" value="${(item_price * 1).toFixed(2) || (product[0].product ? (product[0].product.offers[0].price * 1).toFixed(2) : '')}" id="giftlist_extension_selected_product_price" />
 				</div>
 				<div class="form-group">
 					<label>Other details<span style="color: #A8ACB3; margin-left: 6px;">(optional)</span></label>
@@ -276,7 +280,7 @@ const showModal = async (exist_token, isFirst) => {
 		border-radius:20px;
 		background-color:white;
 		position: fixed; box-shadow: 0px 12px 48px rgba(29, 5, 64, 0.32);
-		z-index: 9999;
+		z-index: 99999999;
 		`
   );
 
@@ -460,148 +464,66 @@ const showModal = async (exist_token, isFirst) => {
     </div>`;
   }
 
-  const initInnerEvents = () => {
+  const clickAddButtonHandler = async () => {
+    let url = "giftitem/add/favorite";
+    mask.querySelector("#giftlist_extension_add_btn .lds-ring").style.display = "inline-block";
+    const postData = {
+      gift_title: item_title || document.querySelector('#giftlist_extension_selected_product_name').value,
+      image_url: selected_image,
+      price: item_price || document.querySelector('#giftlist_extension_selected_product_price').value.replace(/[^0-9.-]+/g, ""),
+      details: item_description || document.querySelector('#giftlist_extension_selected_product_others').value,
+      isMostWanted: is_most_wanted === true
+        ? true
+        : false,
+      product_url: item_url || document.querySelector('#giftlist_extension_selected_product_url').value,
+      shop_product_id: null,
+    };
+    if (selected_list_id.indexOf("_list") > -1) {
+      url = "giftitem/create";
+      postData.giftlist_id = selected_list_id.split("_")[0];
+      delete postData.shop_product_id;
+    } else if (selected_list_id.indexOf("_santa") > -1) {
+      url = "giftitem/add/secret-santa/wish";
+      postData.secretsanta_id = selected_list_id.split("_")[0];
+      delete postData.shop_product_id;
+    }
+    mask.querySelector("#giftlist_extension_add_btn").disabled = true;
+    const data = await addProductToList(url, postData);
     if (mask.querySelector("#giftlist_extension_add_btn")) {
-      mask
-        .querySelector("#giftlist_extension_add_btn")
-        .addEventListener("click", async () => {
-          let url = "giftitem/add/favorite";
-          mask.querySelector("#giftlist_extension_add_btn .lds-ring").style.display = "inline-block";
-          const postData = {
-            gift_title: item_title ?? document.querySelector('#giftlist_extension_selected_product_name').value,
-            image_url: selected_image,
-            price: item_price ?? document.querySelector('#giftlist_extension_selected_product_price').value.replace(/[^0-9.-]+/g, ""),
-            details: item_description ?? document.querySelector('#giftlist_extension_selected_product_others').value,
-            isMostWanted: is_most_wanted === true
-              ? true
-              : false,
-            product_url: item_url ?? document.querySelector('#giftlist_extension_selected_product_url').value,
-            shop_product_id: null,
-          };
-          if (selected_list_id.indexOf("_list") > -1) {
-            url = "giftitem/create";
-            postData.giftlist_id = selected_list_id.split("_")[0];
-            delete postData.shop_product_id;
-          } else if (selected_list_id.indexOf("_santa") > -1) {
-            url = "giftitem/add/secret-santa/wish";
-            postData.secretsanta_id = selected_list_id.split("_")[0];
-            delete postData.shop_product_id;
-          }
-          mask.querySelector("#giftlist_extension_add_btn").disabled = true;
-          const data = await addProductToList(url, postData);
-          if (mask.querySelector("#giftlist_extension_add_btn")) {
-            mask.querySelector("#giftlist_extension_add_btn").disabled = false;
-            mask.querySelector("#giftlist_extension_add_btn .lds-ring").style.display = "none";
-          }
-          if (data.status === 200) {
-            if (isFirst) {
-              mask.querySelector(
-                "#giftlist_extension_popup_main_content"
-              ).innerHTML = getSuccessAddedModal();
-            } else {
-              mask.querySelector(
-                "#giftlist_extension_popup_main_content"
-              ).innerHTML = getShareFeedbackModal();
-              chrome.storage.sync.set({ is_first: "yes", }, function () { });
+      mask.querySelector("#giftlist_extension_add_btn").disabled = false;
+      mask.querySelector("#giftlist_extension_add_btn .lds-ring").style.display = "none";
+    }
+    if (data.status === 200) {
+      if (isFirst) {
+        mask.querySelector(
+          "#giftlist_extension_popup_main_content"
+        ).innerHTML = getSuccessAddedModal();
+      } else {
+        mask.querySelector(
+          "#giftlist_extension_popup_main_content"
+        ).innerHTML = getShareFeedbackModal();
+        chrome.storage.sync.set({ is_first: "yes", }, function () { });
+        mask
+          .querySelector("#thumb_up_btn")
+          .addEventListener("click", () => {
+            mask.querySelector(
+              "#thumbup_content_container"
+            ).style.display = "flex";
+            mask.querySelector(
+              "#thumbdown_content_container"
+            ).style.display = "none";
+            mask.querySelector("#thumb_down_btn").style.opacity = 0.5;
+            mask.querySelector("#thumb_up_btn").style.opacity = 1;
+
+            
+            if (mask.querySelector('#giftlist_extension_leave_good_feedback')) { 
               mask
-                .querySelector("#thumb_up_btn")
+                .querySelector("#giftlist_extension_leave_good_feedback")
                 .addEventListener("click", () => {
-                  mask.querySelector(
-                    "#thumbup_content_container"
-                  ).style.display = "flex";
-                  mask.querySelector(
-                    "#thumbdown_content_container"
-                  ).style.display = "none";
-                  mask.querySelector("#thumb_down_btn").style.opacity = 0.5;
-                  mask.querySelector("#thumb_up_btn").style.opacity = 1;
-
-                  
-                  if (mask.querySelector('#giftlist_extension_leave_good_feedback')) { 
-                    mask
-                      .querySelector("#giftlist_extension_leave_good_feedback")
-                      .addEventListener("click", () => {
-                        window.open(
-                          "https://chrome.google.com/webstore/detail/add-to-myregistrycom-butt/cnofkjmkojconhdimlkamdckmidfmoio?hl=en-US",
-                          "_blank"
-                        );
-                        mask.querySelector(
-                          "#giftlist_extension_popup_main_content"
-                        ).innerHTML = getAddGiftModal(listData);
-                        if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
-                          document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
-                            <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
-                              <img src="${closeIcon}" style="width: 18px; height: 18px;" />
-                            </button>
-                          </div>`;
-                        }
-                        initInnerEvents();
-                      });
-                  }
-
-                  if (mask.querySelector('#giftlist_extension_maybe_later')) { 
-                    mask
-                      .querySelector("#giftlist_extension_maybe_later")
-                      .addEventListener("click", () => {
-                        document.querySelector('#giftlist_extension_popup_container').remove();
-                        enableScroll();
-                      });
-                  }
-                });
-
-              mask
-                .querySelector("#thumb_down_btn")
-                .addEventListener("click", () => {
-                  mask.querySelector(
-                    "#thumbup_content_container"
-                  ).style.display = "none";
-                  mask.querySelector(
-                    "#thumbdown_content_container"
-                  ).style.display = "flex";
-                  mask.querySelector("#thumb_down_btn").style.opacity = 1;
-                  mask.querySelector("#thumb_up_btn").style.opacity = 0.5;
-
-                  mask
-                  .querySelector("#giftlist_extension_leave_bad_feedback")
-                  .addEventListener("click", () => {
-                    document.querySelector('#giftlist_extension_popup_container').remove();
-                    enableScroll();
-                  });
-                });
-            }
-            if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
-              document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
-                <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
-                  <img src="${closeIcon}" style="width: 18px; height: 18px;" />
-                </button>
-              </div>`;
-            }
-
-            initInnerEvents();
-            if (mask.querySelector("#giftlist_extension_move_to_list")) {
-              mask
-              .querySelector("#giftlist_extension_move_to_list")
-              .addEventListener("click", () => {
-                if (selected_list_id == 'favourite') {
-                  window.open("https://www.giftlist.com/lists/favorites", "_blank");
-                } else {
-                  if (selected_list_id) {
-                    if (selected_list_id.indexOf("_list") > -1) {
-                      window.open("https://www.giftlist.com/lists/" + selected_list_id.split("_")[0], "_blank");
-                    } else if (selected_list_id.indexOf("_santa") > -1) {
-                      window.open("https://www.giftlist.com/gift-exchange/" + selected_list_id.split("_")[0], "_blank");
-                    }
-                  }
-                }
-              });
-            }
-
-            if (mask.querySelector("#giftlist_extension_leave_feedback")) {
-              mask
-                .querySelector("#giftlist_extension_leave_feedback")
-                .addEventListener("click", () => {
-                  mask.querySelector(
-                    "#giftlist_extension_popup_main_content"
-                  ).innerHTML = getShareFeedbackModal();
+                  window.open(
+                    "https://chrome.google.com/webstore/detail/add-to-myregistrycom-butt/cnofkjmkojconhdimlkamdckmidfmoio?hl=en-US",
+                    "_blank"
+                  );
                   if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
                     document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
                       <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
@@ -609,94 +531,182 @@ const showModal = async (exist_token, isFirst) => {
                       </button>
                     </div>`;
                   }
-                  initInnerEvents();
-  
-                  mask
-                    .querySelector("#thumb_up_btn")
-                    .addEventListener("click", () => {
-                      mask.querySelector(
-                        "#thumbup_content_container"
-                      ).style.display = "flex";
-                      mask.querySelector(
-                        "#thumbdown_content_container"
-                      ).style.display = "none";
-                      mask.querySelector("#thumb_down_btn").style.opacity = 0.5;
-                      mask.querySelector("#thumb_up_btn").style.opacity = 1;
-  
-                      
-                      if (mask.querySelector('#giftlist_extension_leave_good_feedback')) { 
-                        mask
-                          .querySelector("#giftlist_extension_leave_good_feedback")
-                          .addEventListener("click", () => {
-                            window.open(
-                              "https://chrome.google.com/webstore/detail/add-to-myregistrycom-butt/cnofkjmkojconhdimlkamdckmidfmoio?hl=en-US",
-                              "_blank"
-                            );
-                            mask.querySelector(
-                              "#giftlist_extension_popup_main_content"
-                            ).innerHTML = getAddGiftModal(listData);
-                            if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
-                              document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
-                                <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
-                                  <img src="${closeIcon}" style="width: 18px; height: 18px;" />
-                                </button>
-                              </div>`;
-                            }
-                            initInnerEvents();
-                          });
-                      }
-  
-                      if (mask.querySelector('#giftlist_extension_maybe_later')) { 
-                        mask
-                          .querySelector("#giftlist_extension_maybe_later")
-                          .addEventListener("click", () => {
-                            document.querySelector('#giftlist_extension_popup_container').remove();
-                            enableScroll();
-                          });
-                      }
-                    });
-  
-                  mask
-                    .querySelector("#thumb_down_btn")
-                    .addEventListener("click", () => {
-                      mask.querySelector(
-                        "#thumbup_content_container"
-                      ).style.display = "none";
-                      mask.querySelector(
-                        "#thumbdown_content_container"
-                      ).style.display = "flex";
-                      mask.querySelector("#thumb_down_btn").style.opacity = 1;
-                      mask.querySelector("#thumb_up_btn").style.opacity = 0.5;
-  
-                      mask
-                      .querySelector("#giftlist_extension_leave_bad_feedback")
-                      .addEventListener("click", () => {
-                        document.querySelector('#giftlist_extension_popup_container').remove();
-                        enableScroll();
-                      });
-                    });
                 });
             }
 
-            if (mask.querySelector("#giftlist_extension_continue_adding")) {
+            if (mask.querySelector('#giftlist_extension_maybe_later')) { 
               mask
-                .querySelector("#giftlist_extension_continue_adding")
+                .querySelector("#giftlist_extension_maybe_later")
                 .addEventListener("click", () => {
                   document.querySelector('#giftlist_extension_popup_container').remove();
                   enableScroll();
                 });
             }
+          });
+
+        mask
+          .querySelector("#thumb_down_btn")
+          .addEventListener("click", () => {
+            mask.querySelector(
+              "#thumbup_content_container"
+            ).style.display = "none";
+            mask.querySelector(
+              "#thumbdown_content_container"
+            ).style.display = "flex";
+            mask.querySelector("#thumb_down_btn").style.opacity = 1;
+            mask.querySelector("#thumb_up_btn").style.opacity = 0.5;
+
+            mask
+            .querySelector("#giftlist_extension_leave_bad_feedback")
+            .addEventListener("click", () => {
+              document.querySelector('#giftlist_extension_popup_container').remove();
+              enableScroll();
+            });
+          });
+      }
+      if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
+        document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
+          <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+            <img src="${closeIcon}" style="width: 18px; height: 18px;" />
+          </button>
+        </div>`;
+      }
+
+      initInnerEvents();
+      if (mask.querySelector("#giftlist_extension_move_to_list")) {
+        mask
+        .querySelector("#giftlist_extension_move_to_list")
+        .addEventListener("click", () => {
+          if (selected_list_id == 'favourite') {
+            window.open("https://www.giftlist.com/lists/favorites", "_blank");
+          } else {
+            if (selected_list_id) {
+              if (selected_list_id.indexOf("_list") > -1) {
+                window.open("https://www.giftlist.com/lists/" + selected_list_id.split("_")[0], "_blank");
+              } else if (selected_list_id.indexOf("_santa") > -1) {
+                window.open("https://www.giftlist.com/gift-exchange/" + selected_list_id.split("_")[0], "_blank");
+              }
+            }
           }
         });
+      }
+
+      if (mask.querySelector("#giftlist_extension_leave_feedback")) {
+        mask
+          .querySelector("#giftlist_extension_leave_feedback")
+          .addEventListener("click", () => {
+            mask.querySelector(
+              "#giftlist_extension_popup_main_content"
+            ).innerHTML = getShareFeedbackModal();
+            if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
+              document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
+                <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+                  <img src="${closeIcon}" style="width: 18px; height: 18px;" />
+                </button>
+              </div>`;
+            }
+            initInnerEvents();
+
+            mask
+              .querySelector("#thumb_up_btn")
+              .addEventListener("click", () => {
+                mask.querySelector(
+                  "#thumbup_content_container"
+                ).style.display = "flex";
+                mask.querySelector(
+                  "#thumbdown_content_container"
+                ).style.display = "none";
+                mask.querySelector("#thumb_down_btn").style.opacity = 0.5;
+                mask.querySelector("#thumb_up_btn").style.opacity = 1;
+
+                
+                if (mask.querySelector('#giftlist_extension_leave_good_feedback')) { 
+                  mask
+                    .querySelector("#giftlist_extension_leave_good_feedback")
+                    .addEventListener("click", () => {
+                      window.open(
+                        "https://chrome.google.com/webstore/detail/add-to-myregistrycom-butt/cnofkjmkojconhdimlkamdckmidfmoio?hl=en-US",
+                        "_blank"
+                      );
+                      mask.querySelector(
+                        "#giftlist_extension_popup_main_content"
+                      ).innerHTML = getAddGiftModal(listData);
+                      if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
+                        document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
+                          <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+                            <img src="${closeIcon}" style="width: 18px; height: 18px;" />
+                          </button>
+                        </div>`;
+                      }
+                      initInnerEvents();
+                    });
+                }
+
+                if (mask.querySelector('#giftlist_extension_maybe_later')) { 
+                  mask
+                    .querySelector("#giftlist_extension_maybe_later")
+                    .addEventListener("click", () => {
+                      document.querySelector('#giftlist_extension_popup_container').remove();
+                      enableScroll();
+                    });
+                }
+              });
+
+            mask
+              .querySelector("#thumb_down_btn")
+              .addEventListener("click", () => {
+                mask.querySelector(
+                  "#thumbup_content_container"
+                ).style.display = "none";
+                mask.querySelector(
+                  "#thumbdown_content_container"
+                ).style.display = "flex";
+                mask.querySelector("#thumb_down_btn").style.opacity = 1;
+                mask.querySelector("#thumb_up_btn").style.opacity = 0.5;
+
+                mask
+                .querySelector("#giftlist_extension_leave_bad_feedback")
+                .addEventListener("click", () => {
+                  document.querySelector('#giftlist_extension_popup_container').remove();
+                  enableScroll();
+                });
+              });
+          });
+      }
+
+      if (mask.querySelector("#giftlist_extension_continue_adding")) {
+        mask
+          .querySelector("#giftlist_extension_continue_adding")
+          .addEventListener("click", () => {
+            document.querySelector('#giftlist_extension_popup_container').remove();
+            enableScroll();
+          });
+      }
     }
-    if (mask.querySelector("#giftlist_extension_view_more_images")) {
-      mask
-        .querySelector("#giftlist_extension_view_more_images")
-        .addEventListener("click", () => {
+  };
+  const handleViewMoreImages = () => {
+    mask.querySelector(
+      "#giftlist_extension_popup_main_content"
+    ).innerHTML = getShowMoreImageModal();
+
+    if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
+      document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
+        <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+          <img src="${closeIcon}" style="width: 18px; height: 18px;" />
+        </button>
+      </div>`;
+    }
+    initInnerEvents();
+
+    mask
+      .querySelectorAll(".giftlist-extension-item-image img")
+      .forEach((item) => {
+        item.addEventListener("click", (evt) => {
+          selected_image = evt.target.src;
           mask.querySelector(
             "#giftlist_extension_popup_main_content"
-          ).innerHTML = getShowMoreImageModal();
-
+          ).innerHTML = getAddGiftModal(listData);
+          document.querySelector("#giftlist_extension_list_id").value = selected_list_id;
           if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
             document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
               <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
@@ -705,33 +715,28 @@ const showModal = async (exist_token, isFirst) => {
             </div>`;
           }
           initInnerEvents();
-
-          mask
-            .querySelectorAll(".giftlist-extension-item-image img")
-            .forEach((item) => {
-              item.addEventListener("click", (evt) => {
-                selected_image = evt.target.src;
-                mask.querySelector(
-                  "#giftlist_extension_popup_main_content"
-                ).innerHTML = getAddGiftModal(listData);
-                document.querySelector("#giftlist_extension_list_id").value = selected_list_id;
-                if (!document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn')) {
-                  document.querySelector('#giftlist_extension_popup_container #giftlist_extension_popup_modal').innerHTML += `<div style="position:absolute; top:22px; right:5px;">
-                    <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
-                      <img src="${closeIcon}" style="width: 18px; height: 18px;" />
-                    </button>
-                  </div>`;
-                }
-                initInnerEvents();
-              });
-            });
         });
+      });
+  }
+  const initInnerEvents = () => {
+    if (mask.querySelector("#giftlist_extension_add_btn")) {
+      mask.querySelector("#giftlist_extension_add_btn").removeEventListener("click", clickAddButtonHandler);
+      mask
+        .querySelector("#giftlist_extension_add_btn")
+        .addEventListener("click", clickAddButtonHandler);
+    }
+    if (mask.querySelector("#giftlist_extension_view_more_images")) {
+      mask.querySelector("#giftlist_extension_view_more_images").removeEventListener("click", handleViewMoreImages);
+      mask
+        .querySelector("#giftlist_extension_view_more_images")
+        .addEventListener("click", handleViewMoreImages);
     }
     if (mask.querySelector("#giftlist_extension_list_id")) {
       mask
         .querySelector("#giftlist_extension_list_id")
         .addEventListener("change", (evt) => {
           selected_list_id = evt.target.value;
+          chrome.storage.sync.set({ last_selected_list_id: selected_list_id, }, function () { });
         });
     }
     if (document.querySelector("#giftlist_extension_logout_btn")) {
@@ -777,6 +782,11 @@ const showModal = async (exist_token, isFirst) => {
     if (document.querySelector('#giftlist_extension_most_wanted')) {
       document.querySelector('#giftlist_extension_most_wanted').addEventListener('change', function(evt) {
         is_most_wanted = evt.currentTarget.checked ? true : false;
+      });
+    }
+    if (document.querySelector('#giftlist_extension_support')) {
+      document.querySelector('#giftlist_extension_support').addEventListener('click', function(evt) {
+        window.open('', "_blank");
       });
     }
   };
@@ -847,7 +857,7 @@ const showModal = async (exist_token, isFirst) => {
             "#giftlist_extension_popup_loading_container"
           ).style.display = "flex";
           
-          const listData = await getAllList(result.token);
+          listData = await getAllList(result.token);
           chrome.storage.sync.set(
             {
               giftlist_access_token: result.token,
@@ -879,8 +889,9 @@ const showModal = async (exist_token, isFirst) => {
                 "#giftlist_extension_popup_loading_container h2"
               ).style.display = "none";
 
-              item_title = product[0].product.name;
-              item_price = product[0].product.offers[0].price;
+              item_title = product[0].product ? product[0].product.name : '';
+              selected_image = product[0].product ? product[0].product.mainImage : null;
+              item_price = product[0].product ? product[0].product.offers[0].price: '';
               item_url = window.location.href;
 
               mask.querySelector(
@@ -904,9 +915,13 @@ const showModal = async (exist_token, isFirst) => {
   }
   if (mask.querySelector("#giftlist-extension-login-email")) {
     mask.querySelector("#giftlist-extension-login-email")
-      .addEventListener('input', function(evt) {
+      .addEventListener('keyup', function(evt) {
         if (evt.keyCode === 13) {
-          mask.querySelector("#giftlist-extension-login-input").focus();
+          if (mask.querySelector("#giftlist-extension-login-input") && mask.querySelector("#giftlist-extension-login-input").value) {
+            document.querySelector('#giftlist_sign_in').click();
+          } else {
+            mask.querySelector("#giftlist-extension-login-input").focus();
+          }
         } else {
           if (evt.target.value && mask.querySelector("#giftlist-extension-login-input").value) {
             mask.querySelector("#giftlist_sign_in").disabled = false;
@@ -915,11 +930,19 @@ const showModal = async (exist_token, isFirst) => {
           }
         }
       });
+    mask.querySelector("#giftlist-extension-login-email")
+      .addEventListener('input', function(evt) {
+        if (evt.target.value && mask.querySelector("#giftlist-extension-login-input").value) {
+          mask.querySelector("#giftlist_sign_in").disabled = false;
+        } else {
+          mask.querySelector("#giftlist_sign_in").disabled = true;
+        }
+      });
   }
   
   if (mask.querySelector("#giftlist-extension-login-input")) {
     mask.querySelector("#giftlist-extension-login-input")
-      .addEventListener('input', function(evt) {
+      .addEventListener('keyup', function(evt) {
         if (evt.keyCode === 13) {
           document.querySelector('#giftlist_sign_in').click();
         } else {
@@ -928,6 +951,14 @@ const showModal = async (exist_token, isFirst) => {
           } else {
             mask.querySelector("#giftlist_sign_in").disabled = true;
           }
+        }
+      });
+    mask.querySelector("#giftlist-extension-login-input")
+      .addEventListener('input', function(evt) {
+        if (evt.target.value && mask.querySelector("#giftlist-extension-login-email").value) {
+          mask.querySelector("#giftlist_sign_in").disabled = false;
+        } else {
+          mask.querySelector("#giftlist_sign_in").disabled = true;
         }
       });
   }
@@ -1017,7 +1048,7 @@ async function getAllList(token) {
   if (tempListData && tempListData.length > 0) {
     return tempListData;
   }
-  const listData = await fetch(BASE_URL + "/giftlist/my/list/all", {
+  const mainListData = await fetch(BASE_URL + "/giftlist/my/list/all", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -1038,7 +1069,7 @@ async function getAllList(token) {
     
   
   const lists = [
-    ...listData.map((item) => ({
+    ...mainListData.map((item) => ({
       id: item.id,
       name: item.list_name,
     })),
@@ -1062,44 +1093,52 @@ const callback = () => {
 }
 
 async function getProductData() {
-  const postData = {
-    product_url: window.location.href,
-  };
-  if (scrappedURL === window.location.href && scrappedProduct && scrappedProduct.status === 200) {
-    isScraped = false;
-	  return scrappedProduct;
-  }
-  const productData = await fetch("https://admin.giftlist.com/api/scrape/url", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    mode: 'cors',
-    body: JSON.stringify(postData),
-  })
-  .then((res) => res.json())
-  .catch(error => {
-    if (error) {
-      document.querySelector('#giftlist_extension_popup_loading_container .lds-ellipsis').style.display = "none";
-      document.querySelector('#giftlist_extension_popup_loading_container h2').innerHTML = 'Something went wrong <a href="#" id="try_scrape_again" style="margin-left: 15px;">Try Again</a>';
-      
-      initInnerEvents();
-      document.querySelector("#try_scrape_again")
-        .addEventListener('click', function(evt) {
-          document.querySelector('#giftlist_extension_popup_loading_container .lds-ellipsis').style.display = "inline-block";
-          document.querySelector('#giftlist_extension_popup_loading_container h2').innerHTML = "Getting product data...";
-          getProductData();
-          initInnerEvents();
-        });
+  return new Promise(async (resolve, reject) => {
+    const postData = {
+      product_url: window.location.href,
+    };
+    if (scrappedURL === window.location.href && scrappedProduct && scrappedProduct.status === 200) {
+      isScraped = false;
+      resolve(scrappedProduct);
+      return;
     }
-  });
-  isScraped = true;
-  if (productData.status === 200) {
-    scrappedProduct = productData;
-    scrappedURL = window.location.href;
-  }
-
-  return productData;
+    const productData = await fetch("https://admin.giftlist.com/api/scrape/url", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      mode: 'cors',
+      body: JSON.stringify(postData),
+    })
+    .then((res) => res.json())
+    .catch(error => {
+      if (error) {
+        document.querySelector('#giftlist_extension_popup_loading_container .lds-ellipsis').style.display = "none";
+        document.querySelector('#giftlist_extension_popup_loading_container h2').innerHTML = 'Something went wrong <a href="#" id="try_scrape_again" style="margin-left: 15px;">Try Again</a>';
+        
+        document.querySelector("#try_scrape_again")
+          .addEventListener('click', function(evt) {
+            if (document.querySelector('#giftlist_extension_popup_container')) {
+              document.querySelector('#giftlist_extension_popup_container').remove();
+            }
+            chrome.storage.sync.get(["giftlist_access_token", "is_first"], async function (result) {
+              const isFirst = result.is_first;
+              if (result) {
+                result = await checkTokenValid();
+              }
+              showModal(result, isFirst);
+            });
+          });
+      }
+    });
+    isScraped = true;
+    if (productData && productData.status === 200) {
+      scrappedProduct = productData;
+      scrappedURL = window.location.href;
+    }
+  
+    resolve(productData);
+  })
 }
 
 function addProductToList(url, postData) {
@@ -1118,11 +1157,35 @@ function addProductToList(url, postData) {
           if (res.status == 200) {
             resolve(res);
           } else {
-            await refreshToken();
-            addProductToList(url, postData);
+            alert('Access token is expired! You need to re-launch the extension again.');
+            if (document.querySelector('#giftlist_extension_popup_container')) {
+              document.querySelector('#giftlist_extension_popup_container').remove();
+            }
+            chrome.storage.sync.get(["giftlist_access_token", "is_first"], async function (result) {
+              const isFirst = result.is_first;
+              if (result) {
+                result = await checkTokenValid();
+              }
+              showModal(result, isFirst);
+            });
           }
         })
         .catch((error) => {
+          if (document.querySelector("#giftlist_extension_add_btn")) {
+            document.querySelector("#giftlist_extension_add_btn").disabled = false;
+            document.querySelector("#giftlist_extension_add_btn .lds-ring").style.display = "none";
+          }
+          alert('Access token is expired! You need to re-launch the extension again.');
+          if (document.querySelector('#giftlist_extension_popup_container')) {
+            document.querySelector('#giftlist_extension_popup_container').remove();
+          }
+          chrome.storage.sync.get(["giftlist_access_token", "is_first"], async function (result) {
+            const isFirst = result.is_first;
+            if (result) {
+              result = await checkTokenValid();
+            }
+            showModal(result, isFirst);
+          });
           reject(error);
         });
     });
