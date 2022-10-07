@@ -28,6 +28,11 @@
   font-family: Poppins;
 }
 
+#giftlist_extension_popup_container #giftlist_extension_popup_main_content {
+  overflow-y: auto;
+  max-height: 88vh;
+}
+
 #giftlist_extension_popup_container * {
   font-family: Poppins !important;
   letter-spacing: 0px;
@@ -85,7 +90,7 @@
 #giftlist_extension_popup_container .giftlist-extension-login-content {
   padding-top: 15px;
   min-width: 350px;
-  min-height: 380px;
+  min-height: 400px;
 }
 
 #giftlist_extension_popup_container .giftlist-extension-login-content h2 {
@@ -112,8 +117,6 @@
   align-items: center;
   margin-right: 15px;
   flex: 1;
-  max-height: 500px;
-  overflow-y: auto;
 }
 
 #giftlist_extension_popup_container
@@ -145,6 +148,8 @@
   row-gap: 15px;
   padding: 15px;
   min-width: 800px;
+  max-height: 500px;
+  overflow-y: auto;
 }
 
 #giftlist_extension_popup_container
@@ -257,6 +262,7 @@
   margin: 0rem 0rem;
   border-top: 1px solid grey;
   border-bottom: 1px solid grey;
+  height: 0px;
 }
 
 #giftlist_extension_popup_content h2 {
@@ -268,11 +274,11 @@
   margin-bottom: 10px;
 }
 
-#giftlist_extension_popup_content .form-group {
+#giftlist_extension_popup_content .extension-form-group {
   margin-top: 16px;
 }
 
-#giftlist_extension_popup_content .form-group label {
+#giftlist_extension_popup_content .extension-form-group label {
   font-weight: 600;
   font-size: 15px;
   line-height: 18px;
@@ -285,7 +291,7 @@
   line-height: 20px;
 }
 
-#giftlist_extension_popup_content .form-control {
+#giftlist_extension_popup_content .extension-form-control {
   font-weight: 400;
   font-size: 15px;
   line-height: 20px;
@@ -299,9 +305,9 @@
   background-size: 1em !important;
 }
 
-#giftlist_extension_popup_content .form-group input[type="text"],
-#giftlist_extension_popup_content .form-group input[type="password"],
-#giftlist_extension_popup_content .form-group input[type="email"],
+#giftlist_extension_popup_content .extension-form-group input[type="text"],
+#giftlist_extension_popup_content .extension-form-group input[type="password"],
+#giftlist_extension_popup_content .extension-form-group input[type="email"],
 #giftlist_extension_popup_content textarea {
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -323,7 +329,7 @@
   box-sizing: border-box;
 }
 
-#giftlist_extension_popup_content .form-control {
+#giftlist_extension_popup_content .extension-form-control {
   background: #fff;
   border-radius: 7px;
   width: 100%;
@@ -366,7 +372,7 @@
   color: #50bcd9;
 }
 
-#giftlist_extension_popup_content .btn {
+#giftlist_extension_popup_content .extension-btn {
   background: #50bcd9;
   border-radius: 7px;
   font-weight: 600;
@@ -381,6 +387,11 @@
   margin-bottom: 8px;
   white-space: nowrap;
   box-shadow: none;
+  cursor: pointer !important;
+  text-transform: none !important;
+  justify-content: center;
+  align-items: center;
+  display: flex;
 }
 
 #giftlist_extension_popup_content input {
@@ -431,18 +442,18 @@
   transform: scale(1);
 }
 
-#giftlist_extension_popup_content .btn-link {
+#giftlist_extension_popup_content .extension-btn-link {
   background: none;
   color: rgb(80, 188, 217);
   border: none;
 }
 
-#giftlist_extension_popup_content .btn-outline {
+#giftlist_extension_popup_content .extension-btn-outline {
   background: none;
   color: rgb(80, 188, 217);
 }
 
-#giftlist_extension_popup_content .btn:disabled {
+#giftlist_extension_popup_content .extension-btn:disabled {
   border: 1px solid #e8ecf1;
   background: #f0f2f5;
   color: #a8acb3;
@@ -662,6 +673,7 @@
   width: 25px;
   height: 25px;
   margin-right: 20px;
+  margin-top: 3px;
 }
 .lds-ring div {
   box-sizing: border-box;
@@ -693,21 +705,92 @@
   }
 }
 
-#giftlist_extension_popup_container input { 
+#giftlist_extension_popup_container input {
   text-transform: none;
 }
-#giftlist_extension_popup_container ::-webkit-input-placeholder { /* WebKit browsers */
+#giftlist_extension_popup_container ::-webkit-input-placeholder {
+  /* WebKit browsers */
   text-transform: none;
 }
-#giftlist_extension_popup_container :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+#giftlist_extension_popup_container :-moz-placeholder {
+  /* Mozilla Firefox 4 to 18 */
   text-transform: none;
 }
-#giftlist_extension_popup_container ::-moz-placeholder { /* Mozilla Firefox 19+ */
+#giftlist_extension_popup_container ::-moz-placeholder {
+  /* Mozilla Firefox 19+ */
   text-transform: none;
 }
-#giftlist_extension_popup_container :-ms-input-placeholder { /* Internet Explorer 10+ */
+#giftlist_extension_popup_container :-ms-input-placeholder {
+  /* Internet Explorer 10+ */
   text-transform: none;
 }
-#giftlist_extension_popup_container ::placeholder { /* Recent browsers */
+#giftlist_extension_popup_container ::placeholder {
+  /* Recent browsers */
   text-transform: none;
+}
+
+/* do not group these rules */
+*::-webkit-input-placeholder {
+  color: #a8acb3!important;
+}
+*:-moz-placeholder {
+  /* FF 4-18 */
+  color: #a8acb3!important;
+  opacity: 1;
+}
+*::-moz-placeholder {
+  /* FF 19+ */
+  color: #a8acb3!important;
+  opacity: 1;
+}
+*:-ms-input-placeholder {
+  /* IE 10+ */
+  color: #a8acb3!important;
+}
+*::-ms-input-placeholder {
+  /* Microsoft Edge */
+  color: #a8acb3!important;
+}
+*::placeholder {
+  /* modern browser */
+  color: #a8acb3!important;
+}
+
+:focus-visible {
+  outline: none !important;
+  outline-offset: 0px !important;
+  transition: none !important;
+  z-index: 1 !important;
+}
+
+#giftlist_extension_add_gift_error_message {
+  background: #f5f7fa;
+  border: 1px solid #cad0dd;
+  border-radius: 7px;
+  height: 44px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 65%;
+}
+
+#giftlist_extension_add_gift_error_message_icon {
+  padding-left: 20px;
+  padding-right: 20px;
+  border-right: 1px solid #cad3dd;
+}
+
+#giftlist_extension_add_gift_error_title {
+  margin-left: 20px;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+#giftlist_extension_add_gift_error_message p {
+  color: #ff574d;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 20px;
 }

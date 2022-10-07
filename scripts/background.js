@@ -7,14 +7,15 @@ chrome.action.onClicked.addListener(function (tab) {
 let lifeline;
 
 keepAlive();
-
-chrome.runtime.onConnect.addListener(port => {
-  if (port.name === 'keepAlive') {
-    lifeline = port;
-    setTimeout(keepAliveForced, 295e3); // 5 minutes minus 5 seconds
-    port.onDisconnect.addListener(keepAliveForced);
-  }
-});
+if (chrome.runtime) {
+  chrome.runtime.onConnect.addListener(port => {
+    if (port.name === 'keepAlive') {
+      lifeline = port;
+      setTimeout(keepAliveForced, 295e3); // 5 minutes minus 5 seconds
+      port.onDisconnect.addListener(keepAliveForced);
+    }
+  });
+}
 
 function keepAliveForced() {
   lifeline?.disconnect();

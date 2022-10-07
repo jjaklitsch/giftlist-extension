@@ -1,6 +1,6 @@
 {
-  "short_name": "Add to GiftList button",
-  "name": "Add to GiftList button",
+  "short_name": "Add to GiftList Button",
+  "name": "Add to GiftList Button",
   "version": "1.0.0",
   "manifest_version": 3,
   "permissions": [
