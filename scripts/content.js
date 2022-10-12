@@ -1,5 +1,7 @@
+let isOpen = false;
 chrome.runtime.onMessage.addListener((request) => {
-  if (request.type === "popup-modal") {
+  if (request.type === "popup-modal" && !isOpen) {
+    isOpen = true;
     chrome.storage.sync.get(
       ["giftlist_access_token", "is_first"],
       async function (result) {
@@ -84,6 +86,7 @@ function enableScroll() {
   // window.removeEventListener("DOMMouseScroll", preventDefault, false);
   // window.removeEventListener(wheelEvent, preventDefault, wheelOpt);
   // window.removeEventListener("touchmove", preventDefault, wheelOpt);
+  isOpen = false;
 }
 
 const getShareFeedbackModal = () => {
@@ -542,7 +545,7 @@ const showModal = async (exist_token, isFirst) => {
 
   const handleGoodFeedback = () => {
     window.open(
-      "https://chrome.google.com/webstore/detail/add-to-myregistrycom-butt/cnofkjmkojconhdimlkamdckmidfmoio?hl=en-US",
+      "https://chrome.google.com/webstore/detail/add-to-giftlist-button/cndocbccgacbffaddcafekhkdikmamdi/reviews",
       "_blank"
     );
     if (
@@ -583,6 +586,7 @@ const showModal = async (exist_token, isFirst) => {
   };
 
   const clickAddButtonHandler = async () => {
+    await checkTokenValid();
     let url = "giftitem/add/favorite";
     mask.querySelector("#giftlist_extension_add_btn .lds-ring").style.display =
       "inline-block";
@@ -680,7 +684,7 @@ const showModal = async (exist_token, isFirst) => {
                     .querySelector("#giftlist_extension_leave_good_feedback")
                     .addEventListener("click", () => {
                       window.open(
-                        "https://chrome.google.com/webstore/detail/add-to-myregistrycom-butt/cnofkjmkojconhdimlkamdckmidfmoio?hl=en-US",
+                        "https://chrome.google.com/webstore/detail/add-to-giftlist-button/cndocbccgacbffaddcafekhkdikmamdi/reviews",
                         "_blank"
                       );
                       if (
@@ -776,7 +780,7 @@ const showModal = async (exist_token, isFirst) => {
                     .querySelector("#giftlist_extension_leave_good_feedback")
                     .addEventListener("click", () => {
                       window.open(
-                        "https://chrome.google.com/webstore/detail/add-to-myregistrycom-butt/cnofkjmkojconhdimlkamdckmidfmoio?hl=en-US",
+                        "https://chrome.google.com/webstore/detail/add-to-giftlist-button/cndocbccgacbffaddcafekhkdikmamdi/reviews",
                         "_blank"
                       );
                       if (
@@ -1555,53 +1559,10 @@ function addProductToList(url, postData) {
           if (res.status == 200) {
             resolve(res);
           } else {
-            alert(
-              "Access token is expired! You need to re-launch the extension again."
-            );
-            if (document.querySelector("#giftlist_extension_popup_container")) {
-              document
-                .querySelector("#giftlist_extension_popup_container")
-                .remove();
-            }
-            chrome.storage.sync.get(
-              ["giftlist_access_token", "is_first"],
-              async function (result) {
-                const isFirst = result.is_first;
-                if (result) {
-                  result = await checkTokenValid();
-                }
-                showModal(result, isFirst);
-              }
-            );
+            reject(res);
           }
         })
         .catch((error) => {
-          if (document.querySelector("#giftlist_extension_add_btn")) {
-            document.querySelector(
-              "#giftlist_extension_add_btn"
-            ).disabled = false;
-            document.querySelector(
-              "#giftlist_extension_add_btn .lds-ring"
-            ).style.display = "none";
-          }
-          alert(
-            "Access token is expired! You need to re-launch the extension again."
-          );
-          if (document.querySelector("#giftlist_extension_popup_container")) {
-            document
-              .querySelector("#giftlist_extension_popup_container")
-              .remove();
-          }
-          chrome.storage.sync.get(
-            ["giftlist_access_token", "is_first"],
-            async function (result) {
-              const isFirst = result.is_first;
-              if (result) {
-                result = await checkTokenValid();
-              }
-              showModal(result, isFirst);
-            }
-          );
           reject(error);
         });
     });
