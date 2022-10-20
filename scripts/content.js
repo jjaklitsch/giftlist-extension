@@ -32,7 +32,9 @@ let isScraped = false;
 let tempListData = null;
 
 chrome.storage.sync.get(["last_selected_list_id"], function (result) {
-  selected_list_id = result.last_selected_list_id;
+  if (result.last_selected_list_id) {
+    selected_list_id = result.last_selected_list_id;
+  }
 });
 
 // left: 37, up: 38, right: 39, down: 40,
@@ -1091,8 +1093,9 @@ const showModal = async (exist_token, isFirst) => {
           mask.querySelector(
             "#giftlist_extension_popup_main_content"
           ).innerHTML = getAddGiftModal(listData);
-          document.querySelector("#giftlist_extension_list_id").value =
-            selected_list_id;
+          if (selected_list_id) {
+            document.querySelector("#giftlist_extension_list_id").value = selected_list_id;
+          }
           if (
             !document.querySelector(
               "#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn"
@@ -1369,6 +1372,10 @@ const showModal = async (exist_token, isFirst) => {
             }
           );
           initInnerEvents();
+        } else {
+          if (result.message) {
+            alert(result.message);
+          }
         }
       });
   }
@@ -1727,7 +1734,7 @@ function getProductImages() {
   let result = [];
   for (let i = 0; i < images.length; i++) {
     const imageElement = images[i];
-    if (imageElement.naturalHeight > 100 && imageElement.naturalWidth > 100 && imageElement.style.display != 'none') {
+    if (imageElement.naturalHeight > 300 && imageElement.naturalWidth > 300 && imageElement.style.display != 'none') {
       result.push(imageElement.src);
     }
   }
