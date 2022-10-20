@@ -306,6 +306,7 @@ const getAddGiftModal = (data) => {
 
 const getLoginModal = () => {
   const eyeIcon = chrome.runtime.getURL("/public/images/eye.svg");
+  const errorIcon = chrome.runtime.getURL("/public/images/error.svg");
   return `
 		<div class="giftlist-extension-login-content">
 			<h2>Please login to add this item to your list</h2>
@@ -314,13 +315,25 @@ const getLoginModal = () => {
 				<label>Your email</label>
 				<input type="text" placeholder="Enter your email" id="giftlist-extension-login-email" autocomplete="on" />
 			</div>
-			<div class="extension-form-group" style="position: relative">
+			<div class="extension-form-group" style="position: relative;">
 				<label>Password</label>
 				<input type="password" placeholder="Enter password" id="giftlist-extension-login-input" style="padding-right: 20px;" autocomplete="on" />
 				<div style="position: absolute; right: 12px; bottom: 12px;z-index: 2;" id="show_password_btn">
 					<img src="${eyeIcon}" style="width: 18px; height: 18px;" />
 				</div>
 			</div>
+      <div class="extension-error-container" style="position: relative;height: 60px;display: none;">
+        <div style="position: absolute;width: 100%; height: 100%;display:flex;justify-content:center; align-items:center;top: 3px;">
+          <div id="giftlist_extension_add_gift_error_message" style="width: 100%;">
+            <div id="giftlist_extension_add_gift_error_message_icon" style="display: flex;">
+              <img src="${errorIcon}" style="width: 25px; height: 25px;" />
+            </div>
+            <div id="giftlist_extension_add_gift_error_title" style="font-size: 12px; color: background: #FF574D;">
+              
+            </div>
+          </div>
+        </div>
+      </div>
 			<div class="form-actions" style="margin-top: 24px;">
 				<button class="extension-btn" id="giftlist_sign_in" disabled>
           <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
@@ -360,7 +373,7 @@ const showModal = async (exist_token, isFirst) => {
 
   modal.innerHTML = `<div id="giftlist_extension_popup_content" style="height:100%">
 					<div class="giftlist_extension_popup_header">
-						<img src="${logo}" style="height: 18px" />
+						<img src="${logo}" style="height: 18px; width: 100px;" />
 					</div>
 					<div id="giftlist_extension_popup_main_content" style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
 						<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
@@ -388,11 +401,11 @@ const showModal = async (exist_token, isFirst) => {
   if (!exist_token) {
     modal.innerHTML = `<div id="giftlist_extension_popup_content" style="height:100%">
 					<div class="giftlist_extension_popup_header" style="border: none;">
-						<img src="${logo}" style="height: 18px" />
+						<img src="${logo}" style="height: 18px; width: 100px;" />
 						<div id="giftlist_extension_authenticated_header">
 							<div style="display: flex;margin-right: 20px;">
 								<span style="font-size: 15px; line-height: 20px; color: #101A34;margin-right: 5px;">Hey <span id="giftlist_extension_logged_in_username"></span></span>
-								<img src="${shakeHandIcon}" class="selected-item-image" />
+								<img src="${shakeHandIcon}" class="selected-item-image" style="width: 20px;height:20px"/>
 							</div>
 							<a href="#" style="font-weight: 600;font-size: 15px;line-height: 18px;color: #50BCD9;" id="giftlist_extension_logout_btn">Logout</a>
 						</div>
@@ -409,11 +422,11 @@ const showModal = async (exist_token, isFirst) => {
   } else {
     modal.innerHTML = `<div id="giftlist_extension_popup_content" style="height:100%">
 			<div class="giftlist_extension_popup_header">
-				<img src="${logo}" style="height: 18px" />
+				<img src="${logo}" style="height: 18px; width: 100px;" />
 				<div id="giftlist_extension_authenticated_header">
 					<div style="display: flex;margin-right: 20px;">
 						<span style="font-size: 15px; line-height: 20px; color: #101A34;margin-right: 5px;">Hey <span id="giftlist_extension_logged_in_username"></span></span>
-						<img src="${shakeHandIcon}" class="selected-item-image" />
+						<img src="${shakeHandIcon}" class="selected-item-image" style="width: 20px;height:20px"/>
 					</div>
 					<a href="#" style="font-weight: 600;font-size: 15px;line-height: 18px;color: #50BCD9;" id="giftlist_extension_logout_btn">Logout</a>
 				</div>
@@ -512,11 +525,11 @@ const showModal = async (exist_token, isFirst) => {
     }
     modal.innerHTML = `<div id="giftlist_extension_popup_content" style="height:100%">
 					<div class="giftlist_extension_popup_header">
-						<img src="${logo}" style="height: 18px" />
+						<img src="${logo}" style="height: 18px; width: 100px;" />
 						<div id="giftlist_extension_authenticated_header">
 							<div style="display: flex;margin-right: 20px;">
 								<span style="font-size: 15px; line-height: 20px; color: #101A34;margin-right: 5px;">Hey <span id="giftlist_extension_logged_in_username"></span></span>
-								<img src="${shakeHandIcon}" class="selected-item-image" />
+								<img src="${shakeHandIcon}" class="selected-item-image" style="width: 20px;height:20px" />
 							</div>
 							<a href="#" style="font-weight: 600;font-size: 15px;line-height: 18px;color: #50BCD9;" id="giftlist_extension_logout_btn">Logout</a>
 						</div>
@@ -1374,7 +1387,8 @@ const showModal = async (exist_token, isFirst) => {
           initInnerEvents();
         } else {
           if (result.message) {
-            alert(result.message);
+            mask.querySelector('.extension-error-container #giftlist_extension_add_gift_error_title').innerText = result.message;
+            mask.querySelector('.extension-error-container').style.display = "block";
           }
         }
       });
@@ -1406,6 +1420,7 @@ const showModal = async (exist_token, isFirst) => {
     mask
       .querySelector("#giftlist-extension-login-email")
       .addEventListener("input", function (evt) {
+        mask.querySelector('.extension-error-container').style.display = "none";
         if (
           evt.target.value &&
           mask.querySelector("#giftlist-extension-login-input").value
@@ -1437,6 +1452,7 @@ const showModal = async (exist_token, isFirst) => {
     mask
       .querySelector("#giftlist-extension-login-input")
       .addEventListener("input", function (evt) {
+        mask.querySelector('.extension-error-container').style.display = "none";
         if (
           evt.target.value &&
           mask.querySelector("#giftlist-extension-login-email").value
@@ -1584,9 +1600,6 @@ const callback = () => {
 
 async function getProductData() {
   return new Promise(async (resolve, reject) => {
-    // const postData = {
-    //   product_url: window.location.href,
-    // };
     
     if (
       scrappedURL === window.location.href &&
@@ -1607,7 +1620,8 @@ async function getProductData() {
     window.scrollTo(0, 0);
     const { images, mainImage } = getProductImages();
     const productPrice = getProductPrice();
-    const productData = {
+
+    let productData = {
       status: productPrice ? 200 : 400,
       data: [{
         product: productPrice ? {
@@ -1623,23 +1637,30 @@ async function getProductData() {
         } : null
       }]
     }
-    // const productData = await fetch(
-    //   "https://admin.giftlist.com/api/scrape/url",
-    //   {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     mode: "cors",
-    //     body: JSON.stringify(postData),
-    //   }
-    // )
-    //   .then((res) => res.json())
-    //   .catch((error) => {
-    //     scrappedProduct = null;
-    //     scrappedURL = "";
-    //     resolve(error);
-    //   });
+
+    if (!productPrice) {
+      const postData = {
+        product_url: window.location.href,
+      };
+      productData = await fetch(
+        "https://admin.giftlist.com/api/scrape/url",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          mode: "cors",
+          body: JSON.stringify(postData),
+        }
+      )
+      .then((res) => res.json())
+      .catch((error) => {
+        scrappedProduct = null;
+        scrappedURL = "";
+        resolve(error);
+      });
+    }
+    
     isScraped = true;
     if (productData && productData.status === 200) {
       scrappedProduct = productData;
@@ -1687,21 +1708,37 @@ function getProductPrice() {
     }
     record["y"] = bBox.y;
     record["x"] = bBox.x;
-    record["text"] = text.split(" ")[0];
+    record["text"] = text;
+    if(text.indexOf('Price') > -1) {
+      record["text"] = text.replace('Price', '');
+    }
+    if(text.indexOf('USD') > -1) {
+      record["text"] = text.replace(' USD', '');
+    }
+    if(text.indexOf('CAD') > -1) {
+      record["text"] = text.replace(' CAD', '');
+    }
+    if(text.indexOf('Now') > -1) {
+      record["text"] = text.replace('Now ', '');
+    }
+    if(text.indexOf(',') > -1) {
+      record["text"] = text.replace(/,([^,]*)$/, ".$1");
+    }
     return record;
   }
   let records = elements.map(createRecordFromElement);
   function canBePrice(record) {
     if (
-      record["y"] > 600 ||
+      record["y"] > 1300 ||
       record["fontSize"] == undefined ||
       !record["text"].match(
-        /(^(US ){0,1}(rs\.|Rs\.|RS\.|\$|₹|INR|USD|CAD|C\$){0,1}(\s){0,1}[\d,]+(\.\d+){0,1}(\s){0,1}(AED){0,1}$)/
+        /(^(US ){0,1}(rs\.|Rs\.|RS\.|\$|€|£|₹|INR|RP|Rp|USD|CAD|C\$){0,1}(\s){0,1}[\d,]+(\.\d+){0,1}(\s){0,1}(AED){0,1}(€){0,1}(£){0,1}$)/
       )
     )
       return false;
     else {
-      if (record["y"] > 100 && record['fontSize'] > 15) return true;
+      let scRe = /[\$\xA2-\xA5\u058F\u060B\u09F2\u09F3\u09FB\u0AF1\u0BF9\u0E3F\u17DB\u20A0-\u20BD\uA838\uFDFC\uFE69\uFF04\uFFE0\uFFE1\uFFE5\uFFE6]/;
+      if (record["y"] > 90 && record['fontSize'] >= 13 && (scRe.test(record['text']))) return true;
     }
   }
   let possiblePriceRecords = records.filter(canBePrice);

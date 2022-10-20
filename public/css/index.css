@@ -20,7 +20,7 @@
   top: 0px;
   background-color: rgba(0, 0, 0, 0.6);
   position: fixed;
-  z-index: 9998;
+  z-index: 9999998;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -90,7 +90,7 @@
 #giftlist_extension_popup_container .giftlist-extension-login-content {
   padding-top: 15px;
   min-width: 350px;
-  min-height: 400px;
+  min-height: 450px;
 }
 
 #giftlist_extension_popup_container .giftlist-extension-login-content h2 {
@@ -114,9 +114,11 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: end;
   margin-right: 15px;
   flex: 1;
+  max-height: 600px;
+  overflow: hidden;
 }
 
 #giftlist_extension_popup_container
@@ -379,10 +381,10 @@
   font-size: 15px !important;
   line-height: 22px;
   color: #fff;
-  padding: 12px 30px;
+  padding: 12px 0px;
   display: inline-block;
   border: 1px solid #50bcd9;
-  width: 100%;
+  width: 99%;
   text-align: center;
   margin-bottom: 8px;
   white-space: nowrap;
@@ -472,8 +474,9 @@
   width: 13px;
   height: 13px;
   border-radius: 50%;
-  background: #000;
+  background: #000!important;
   animation-timing-function: cubic-bezier(0, 1, 1, 0);
+  display: block!important;
 }
 .lds-ellipsis div:nth-child(1) {
   left: 8px;
