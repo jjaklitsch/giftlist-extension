@@ -163,7 +163,12 @@ const getShowMoreImageModal = () => {
 			</div>
 			<hr>
 			<div class="giftlist-extension-item-image-container">
-				${product && product[0] && product[0].product && product[0].product.images && product[0].product.images.length > 0
+				${
+          product &&
+          product[0] &&
+          product[0].product &&
+          product[0].product.images &&
+          product[0].product.images.length > 0
             ? product[0].product.images.reduce((acc, item) => {
                 return (
                   acc +
@@ -187,7 +192,9 @@ const getAddGiftModal = (data) => {
   return `
     <div style="position: relative;">
       <h2>Add gift</h2>
-      ${(!product || (product && product.length > 0 && !product[0].product)) ? `
+      ${
+        !product || (product && product.length > 0 && !product[0].product)
+          ? `
       <div style="position: absolute;width: 100%; height: 100%;display:flex;justify-content:center; align-items:center;top: 3px;">
         <div id="giftlist_extension_add_gift_error_message">
           <div id="giftlist_extension_add_gift_error_message_icon">
@@ -198,13 +205,16 @@ const getAddGiftModal = (data) => {
             <p>Please add your item details manually.</p>
           </div>
         </div>
-      </div>` : ''
-    }
+      </div>`
+          : ""
+      }
     </div>
     <hr>
 		<div class="giftlist-extension-add-gift-content">
 			<div class="giftlist-extension-image-container">
-        ${product && product[0] && product[0].product ? `
+        ${
+          product && product[0] && product[0].product
+            ? `
           <img src="${
             selected_image ??
             (product[0].product && product[0].product.mainImage
@@ -218,10 +228,12 @@ const getAddGiftModal = (data) => {
               ? '<button id="giftlist_extension_view_more_images" class="extension-btn extension-btn-link">View more images</button>'
               : ""
           }
-        ` : `
+        `
+            : `
           <img src="${noneImage}" class="selected-item-image" />
           <p style="width: 70%;color: #818694;text-align:center;font-size: 15px;line-height:20px;font-weight:400;">You can add an image manually from the GiftList website.</p>
-        `}
+        `
+        }
 			</div>
 			<div class="giftlist-extension-add-gift-form">
 				<div class="extension-form-group">
@@ -250,7 +262,8 @@ const getAddGiftModal = (data) => {
 				<div class="extension-form-group">
 					<label>Item name</label>
 					<input type="text" placeholder="Item Name" value="${
-            item_title || (product && product[0].product ? product[0].product.name : "")
+            item_title ||
+            (product && product[0].product ? product[0].product.name : "")
           }" id="giftlist_extension_selected_product_name" />
 				</div>
 				<div class="extension-form-group" style="display: flex;">
@@ -322,6 +335,7 @@ const showModal = async (exist_token, isFirst) => {
   const isLogin = false;
   const shakeHandIcon = chrome.runtime.getURL("/public/images/shake_hand.svg");
   const closeIcon = chrome.runtime.getURL("/public/images/close.svg");
+  const logo = chrome.runtime.getURL("/public/images/logo.png");
 
   const mask = document.createElement("div");
   mask.setAttribute("id", "giftlist_extension_popup_container");
@@ -344,7 +358,7 @@ const showModal = async (exist_token, isFirst) => {
 
   modal.innerHTML = `<div id="giftlist_extension_popup_content" style="height:100%">
 					<div class="giftlist_extension_popup_header">
-						<h3>GIFT<span style="font-weight: 400;">LIST</span></h3>
+						<img src="${logo}" style="height: 18px" />
 					</div>
 					<div id="giftlist_extension_popup_main_content" style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
 						<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
@@ -372,7 +386,7 @@ const showModal = async (exist_token, isFirst) => {
   if (!exist_token) {
     modal.innerHTML = `<div id="giftlist_extension_popup_content" style="height:100%">
 					<div class="giftlist_extension_popup_header" style="border: none;">
-						<h3>GIFT<span style="font-weight: 400">LIST</span></h3>
+						<img src="${logo}" style="height: 18px" />
 						<div id="giftlist_extension_authenticated_header">
 							<div style="display: flex;margin-right: 20px;">
 								<span style="font-size: 15px; line-height: 20px; color: #101A34;margin-right: 5px;">Hey <span id="giftlist_extension_logged_in_username"></span></span>
@@ -393,7 +407,7 @@ const showModal = async (exist_token, isFirst) => {
   } else {
     modal.innerHTML = `<div id="giftlist_extension_popup_content" style="height:100%">
 			<div class="giftlist_extension_popup_header">
-				<h3>GIFT<span style="font-weight: 400">LIST</span></h3>
+				<img src="${logo}" style="height: 18px" />
 				<div id="giftlist_extension_authenticated_header">
 					<div style="display: flex;margin-right: 20px;">
 						<span style="font-size: 15px; line-height: 20px; color: #101A34;margin-right: 5px;">Hey <span id="giftlist_extension_logged_in_username"></span></span>
@@ -472,10 +486,12 @@ const showModal = async (exist_token, isFirst) => {
       productData = await getProductData();
     } catch (err) {
       productData = {
-        data: [{
-          product: null,
-        }]
-      }
+        data: [
+          {
+            product: null,
+          },
+        ],
+      };
     }
     product = productData.data;
 
@@ -494,7 +510,7 @@ const showModal = async (exist_token, isFirst) => {
     }
     modal.innerHTML = `<div id="giftlist_extension_popup_content" style="height:100%">
 					<div class="giftlist_extension_popup_header">
-						<h3>GIFT<span style="font-weight: 400">LIST</span></h3>
+						<img src="${logo}" style="height: 18px" />
 						<div id="giftlist_extension_authenticated_header">
 							<div style="display: flex;margin-right: 20px;">
 								<span style="font-size: 15px; line-height: 20px; color: #101A34;margin-right: 5px;">Hey <span id="giftlist_extension_logged_in_username"></span></span>
@@ -570,8 +586,7 @@ const showModal = async (exist_token, isFirst) => {
       if (selected_list_id) {
         if (selected_list_id.indexOf("_list") > -1) {
           window.open(
-            "https://www.giftlist.com/lists/" +
-              selected_list_id.split("_")[0],
+            "https://www.giftlist.com/lists/" + selected_list_id.split("_")[0],
             "_blank"
           );
         } else if (selected_list_id.indexOf("_santa") > -1) {
@@ -631,9 +646,12 @@ const showModal = async (exist_token, isFirst) => {
     }
     if (data.status === 200) {
       mask.querySelector("#giftlist_extension_popup_main_content").innerHTML =
-          getSuccessAddedModal();
-      chrome.storage.sync.get(['is_first'], function(result) {
-        chrome.storage.sync.set({ is_first: (result.is_first || 1) * 1 + 1 }, function () {});
+        getSuccessAddedModal();
+      chrome.storage.sync.get(["is_first"], function (result) {
+        chrome.storage.sync.set(
+          { is_first: (result.is_first || 1) * 1 + 1 },
+          function () {}
+        );
       });
       if (
         !document.querySelector(
@@ -851,32 +869,76 @@ const showModal = async (exist_token, isFirst) => {
           .querySelector("#giftlist_extension_continue_adding")
           .addEventListener("click", () => {
             if (isFirst == 3) {
-              mask.querySelector("#giftlist_extension_popup_main_content").innerHTML =
-              getShareFeedbackModal();
-            
-              document.querySelector("#thumb_up_btn").addEventListener("click", () => {
-                mask.querySelector("#thumbup_content_container").style.display =
-                  "flex";
-                mask.querySelector("#thumbdown_content_container").style.display =
-                  "none";
-                mask.querySelector("#thumb_down_btn").style.opacity = 0.5;
-                mask.querySelector("#thumb_up_btn").style.opacity = 1;
+              mask.querySelector(
+                "#giftlist_extension_popup_main_content"
+              ).innerHTML = getShareFeedbackModal();
 
-                if (document.querySelector("#giftlist_extension_leave_good_feedback")) {
-                  document
-                    .querySelector("#giftlist_extension_leave_good_feedback")
-                    .removeEventListener("click", handleGoodFeedback);
-                  document
-                    .querySelector("#giftlist_extension_leave_good_feedback")
-                    .addEventListener("click", handleGoodFeedback);
-                }
+              document
+                .querySelector("#thumb_up_btn")
+                .addEventListener("click", () => {
+                  mask.querySelector(
+                    "#thumbup_content_container"
+                  ).style.display = "flex";
+                  mask.querySelector(
+                    "#thumbdown_content_container"
+                  ).style.display = "none";
+                  mask.querySelector("#thumb_down_btn").style.opacity = 0.5;
+                  mask.querySelector("#thumb_up_btn").style.opacity = 1;
 
-                if (document.querySelector("#giftlist_extension_maybe_later")) {
-                  document
-                    .querySelector("#giftlist_extension_maybe_later")
+                  if (
+                    document.querySelector(
+                      "#giftlist_extension_leave_good_feedback"
+                    )
+                  ) {
+                    document
+                      .querySelector("#giftlist_extension_leave_good_feedback")
+                      .removeEventListener("click", handleGoodFeedback);
+                    document
+                      .querySelector("#giftlist_extension_leave_good_feedback")
+                      .addEventListener("click", handleGoodFeedback);
+                  }
+
+                  if (
+                    document.querySelector("#giftlist_extension_maybe_later")
+                  ) {
+                    document
+                      .querySelector("#giftlist_extension_maybe_later")
+                      .addEventListener("click", () => {
+                        if (
+                          document.querySelector(
+                            "#giftlist_extension_popup_container"
+                          )
+                        ) {
+                          document
+                            .querySelector(
+                              "#giftlist_extension_popup_container"
+                            )
+                            .remove();
+                        }
+                        enableScroll();
+                      });
+                  }
+                });
+
+              document
+                .querySelector("#thumb_down_btn")
+                .addEventListener("click", () => {
+                  mask.querySelector(
+                    "#thumbup_content_container"
+                  ).style.display = "none";
+                  mask.querySelector(
+                    "#thumbdown_content_container"
+                  ).style.display = "flex";
+                  mask.querySelector("#thumb_down_btn").style.opacity = 1;
+                  mask.querySelector("#thumb_up_btn").style.opacity = 0.5;
+
+                  mask
+                    .querySelector("#giftlist_extension_leave_bad_feedback")
                     .addEventListener("click", () => {
                       if (
-                        document.querySelector("#giftlist_extension_popup_container")
+                        document.querySelector(
+                          "#giftlist_extension_popup_container"
+                        )
                       ) {
                         document
                           .querySelector("#giftlist_extension_popup_container")
@@ -884,32 +946,11 @@ const showModal = async (exist_token, isFirst) => {
                       }
                       enableScroll();
                     });
-                }
-              });
-
-              document.querySelector("#thumb_down_btn").addEventListener("click", () => {
-                mask.querySelector("#thumbup_content_container").style.display =
-                  "none";
-                mask.querySelector("#thumbdown_content_container").style.display =
-                  "flex";
-                mask.querySelector("#thumb_down_btn").style.opacity = 1;
-                mask.querySelector("#thumb_up_btn").style.opacity = 0.5;
-
-                mask
-                  .querySelector("#giftlist_extension_leave_bad_feedback")
-                  .addEventListener("click", () => {
-                    if (
-                      document.querySelector("#giftlist_extension_popup_container")
-                    ) {
-                      document
-                        .querySelector("#giftlist_extension_popup_container")
-                        .remove();
-                    }
-                    enableScroll();
-                  });
-              });
+                });
             } else {
-              if (document.querySelector("#giftlist_extension_popup_container")) {
+              if (
+                document.querySelector("#giftlist_extension_popup_container")
+              ) {
                 document
                   .querySelector("#giftlist_extension_popup_container")
                   .remove();
@@ -922,72 +963,103 @@ const showModal = async (exist_token, isFirst) => {
             "#giftlist_extension_popup_container #giftlist_extension_popup_modal #close_dialog_btn"
           )
           .addEventListener("click", () => {
-            chrome.storage.sync.get(['is_first'], function(result) {
+            chrome.storage.sync.get(["is_first"], function (result) {
               if (result.is_first === 3) {
-                mask.querySelector("#giftlist_extension_popup_main_content").innerHTML =
-                getShareFeedbackModal();
-              
-                document.querySelector("#thumb_up_btn").addEventListener("click", () => {
-                  mask.querySelector("#thumbup_content_container").style.display =
-                    "flex";
-                  mask.querySelector("#thumbdown_content_container").style.display =
-                    "none";
-                  mask.querySelector("#thumb_down_btn").style.opacity = 0.5;
-                  mask.querySelector("#thumb_up_btn").style.opacity = 1;
-  
-                  if (document.querySelector("#giftlist_extension_leave_good_feedback")) {
-                    document
-                      .querySelector("#giftlist_extension_leave_good_feedback")
-                      .removeEventListener("click", handleGoodFeedback);
-                    document
-                      .querySelector("#giftlist_extension_leave_good_feedback")
-                      .addEventListener("click", handleGoodFeedback);
-                  }
-  
-                  if (document.querySelector("#giftlist_extension_maybe_later")) {
-                    document
-                      .querySelector("#giftlist_extension_maybe_later")
+                mask.querySelector(
+                  "#giftlist_extension_popup_main_content"
+                ).innerHTML = getShareFeedbackModal();
+
+                document
+                  .querySelector("#thumb_up_btn")
+                  .addEventListener("click", () => {
+                    mask.querySelector(
+                      "#thumbup_content_container"
+                    ).style.display = "flex";
+                    mask.querySelector(
+                      "#thumbdown_content_container"
+                    ).style.display = "none";
+                    mask.querySelector("#thumb_down_btn").style.opacity = 0.5;
+                    mask.querySelector("#thumb_up_btn").style.opacity = 1;
+
+                    if (
+                      document.querySelector(
+                        "#giftlist_extension_leave_good_feedback"
+                      )
+                    ) {
+                      document
+                        .querySelector(
+                          "#giftlist_extension_leave_good_feedback"
+                        )
+                        .removeEventListener("click", handleGoodFeedback);
+                      document
+                        .querySelector(
+                          "#giftlist_extension_leave_good_feedback"
+                        )
+                        .addEventListener("click", handleGoodFeedback);
+                    }
+
+                    if (
+                      document.querySelector("#giftlist_extension_maybe_later")
+                    ) {
+                      document
+                        .querySelector("#giftlist_extension_maybe_later")
+                        .addEventListener("click", () => {
+                          if (
+                            document.querySelector(
+                              "#giftlist_extension_popup_container"
+                            )
+                          ) {
+                            document
+                              .querySelector(
+                                "#giftlist_extension_popup_container"
+                              )
+                              .remove();
+                          }
+                          enableScroll();
+                        });
+                    }
+                  });
+
+                document
+                  .querySelector("#thumb_down_btn")
+                  .addEventListener("click", () => {
+                    mask.querySelector(
+                      "#thumbup_content_container"
+                    ).style.display = "none";
+                    mask.querySelector(
+                      "#thumbdown_content_container"
+                    ).style.display = "flex";
+                    mask.querySelector("#thumb_down_btn").style.opacity = 1;
+                    mask.querySelector("#thumb_up_btn").style.opacity = 0.5;
+
+                    mask
+                      .querySelector("#giftlist_extension_leave_bad_feedback")
                       .addEventListener("click", () => {
                         if (
-                          document.querySelector("#giftlist_extension_popup_container")
+                          document.querySelector(
+                            "#giftlist_extension_popup_container"
+                          )
                         ) {
                           document
-                            .querySelector("#giftlist_extension_popup_container")
+                            .querySelector(
+                              "#giftlist_extension_popup_container"
+                            )
                             .remove();
                         }
                         enableScroll();
                       });
-                  }
-                });
-  
-                document.querySelector("#thumb_down_btn").addEventListener("click", () => {
-                  mask.querySelector("#thumbup_content_container").style.display =
-                    "none";
-                  mask.querySelector("#thumbdown_content_container").style.display =
-                    "flex";
-                  mask.querySelector("#thumb_down_btn").style.opacity = 1;
-                  mask.querySelector("#thumb_up_btn").style.opacity = 0.5;
-  
-                  mask
-                    .querySelector("#giftlist_extension_leave_bad_feedback")
-                    .addEventListener("click", () => {
-                      if (
-                        document.querySelector("#giftlist_extension_popup_container")
-                      ) {
-                        document
-                          .querySelector("#giftlist_extension_popup_container")
-                          .remove();
-                      }
-                      enableScroll();
-                    });
-                });
+                  });
               } else {
-                if (document.querySelector("#giftlist_extension_popup_container")) {
-                  document.querySelector("#giftlist_extension_popup_container").remove();
+                if (
+                  document.querySelector("#giftlist_extension_popup_container")
+                ) {
+                  document
+                    .querySelector("#giftlist_extension_popup_container")
+                    .remove();
                 }
                 enableScroll();
               }
-            })
+            });
           });
       }
     }
@@ -1244,10 +1316,12 @@ const showModal = async (exist_token, isFirst) => {
                 productData = await getProductData();
               } catch (err) {
                 productData = {
-                  data: [{
-                    product: null,
-                  }]
-                }
+                  data: [
+                    {
+                      product: null,
+                    },
+                  ],
+                };
               }
 
               // if (!productData || productData.status !== 200) {
@@ -1261,13 +1335,16 @@ const showModal = async (exist_token, isFirst) => {
                 "#giftlist_extension_popup_loading_container h2"
               ).style.display = "none";
 
-              item_title = product && product[0].product ? product[0].product.name : "";
-              selected_image = product && product[0].product
-                ? product[0].product.mainImage
-                : null;
-              item_price = product && product[0].product
-                ? product[0].product.offers[0].price
-                : "";
+              item_title =
+                product && product[0].product ? product[0].product.name : "";
+              selected_image =
+                product && product[0].product
+                  ? product[0].product.mainImage
+                  : null;
+              item_price =
+                product && product[0].product
+                  ? product[0].product.offers[0].price
+                  : "";
               item_url = window.location.href;
 
               mask.querySelector(
@@ -1500,13 +1577,17 @@ const callback = () => {
 
 async function getProductData() {
   return new Promise(async (resolve, reject) => {
-    const postData = {
-      product_url: window.location.href,
-    };
+    // const postData = {
+    //   product_url: window.location.href,
+    // };
+    
     if (
       scrappedURL === window.location.href &&
       scrappedProduct &&
-      scrappedProduct.status === 200 && scrappedProduct.data && scrappedProduct.data.length > 0 && scrappedProduct.data[0].product
+      scrappedProduct.status === 200 &&
+      scrappedProduct.data &&
+      scrappedProduct.data.length > 0 &&
+      scrappedProduct.data[0].product
     ) {
       isScraped = false;
       resolve(scrappedProduct);
@@ -1514,25 +1595,44 @@ async function getProductData() {
     } else {
       isScraped = false;
       scrappedProduct = null;
-      scrappedURL = '';
+      scrappedURL = "";
     }
-    const productData = await fetch(
-      "https://admin.giftlist.com/api/scrape/url",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        mode: "cors",
-        body: JSON.stringify(postData),
-      }
-    )
-      .then((res) => res.json())
-      .catch((error) => {
-        scrappedProduct = null;
-        scrappedURL = '';
-        resolve(error);
-      });
+    window.scrollTo(0, 0);
+    const images = getProductImages();
+    const productPrice = getProductPrice();
+    const productData = {
+      status: productPrice ? 200 : 400,
+      data: [{
+        product: productPrice ? {
+          name: productPrice ? getProductTitle() : '',
+          description: productPrice ? getProductDescription() : '',
+          mainImage: productPrice ? images[0] : null,
+          images: productPrice ? images : [],
+          url: productPrice ? window.location.href : '',
+          offers: productPrice ? [{
+            price: productPrice.replace(/[^\d\.]*/g, '') * 1,
+            currency: productPrice.replace(/[\d\., ]/g, ''),
+          }] : null,
+        } : null
+      }]
+    }
+    // const productData = await fetch(
+    //   "https://admin.giftlist.com/api/scrape/url",
+    //   {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     mode: "cors",
+    //     body: JSON.stringify(postData),
+    //   }
+    // )
+    //   .then((res) => res.json())
+    //   .catch((error) => {
+    //     scrappedProduct = null;
+    //     scrappedURL = "";
+    //     resolve(error);
+    //   });
     isScraped = true;
     if (productData && productData.status === 200) {
       scrappedProduct = productData;
@@ -1567,4 +1667,69 @@ function addProductToList(url, postData) {
         });
     });
   });
+}
+
+function getProductPrice() {
+  elements = [...document.querySelectorAll(" body *")];
+  function createRecordFromElement(element) {
+    const text = element.textContent.trim();
+    var record = {};
+    const bBox = element.getBoundingClientRect();
+    if (text.length <= 30 && !(bBox.x == 0 && bBox.y == 0)) {
+      record["fontSize"] = parseInt(getComputedStyle(element)["fontSize"]);
+    }
+    record["y"] = bBox.y;
+    record["x"] = bBox.x;
+    record["text"] = text.split(" ")[0];
+    return record;
+  }
+  let records = elements.map(createRecordFromElement);
+  function canBePrice(record) {
+    if (
+      record["y"] > 600 ||
+      record["fontSize"] == undefined ||
+      !record["text"].match(
+        /(^(US ){0,1}(rs\.|Rs\.|RS\.|\$|₹|INR|USD|CAD|C\$){0,1}(\s){0,1}[\d,]+(\.\d+){0,1}(\s){0,1}(AED){0,1}$)/
+      )
+    )
+      return false;
+    else {
+      if (record["y"] > 100 && record['fontSize'] > 15) return true;
+    }
+  }
+  let possiblePriceRecords = records.filter(canBePrice);
+  let priceRecordsSortedByFontSize = possiblePriceRecords.sort(function (a, b) {
+    if (a["fontSize"] == b["fontSize"]) return a["y"] > b["y"];
+    return a["fontSize"] < b["fontSize"];
+  });
+  return priceRecordsSortedByFontSize && priceRecordsSortedByFontSize[0] ? priceRecordsSortedByFontSize[0]['text'] : 0;
+}
+
+function getProductTitle() {
+  return document.getElementsByTagName('title')[0].innerText.trim().replace(/\t/g, '');
+}
+
+function getProductDescription() {
+  const metas = document.getElementsByTagName('meta');
+  let description = "";
+
+  for (let i = 0; i < metas.length; i++) {
+    if (metas[i].name === 'description') {
+      description = metas[i].content;
+      break;
+    }
+  }
+  return description;
+}
+
+function getProductImages() {
+  const images = document.getElementsByTagName('img');
+  let result = [];
+  for (let i = 0; i < images.length; i++) {
+    const imageElement = images[i];
+    if (imageElement.naturalHeight > 100 && imageElement.naturalWidth > 100 && imageElement.style.display != 'none') {
+      result.push(imageElement.src);
+    }
+  }
+  return result;
 }
