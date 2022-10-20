@@ -1605,7 +1605,7 @@ async function getProductData() {
       scrappedURL = "";
     }
     window.scrollTo(0, 0);
-    const images = getProductImages();
+    const { images, mainImage } = getProductImages();
     const productPrice = getProductPrice();
     const productData = {
       status: productPrice ? 200 : 400,
@@ -1613,7 +1613,7 @@ async function getProductData() {
         product: productPrice ? {
           name: productPrice ? getProductTitle() : '',
           description: productPrice ? getProductDescription() : '',
-          mainImage: productPrice ? images[0] : null,
+          mainImage: productPrice && mainImage ? mainImage : (images && images.length > 0 ? images[0] : null),
           images: productPrice ? images : [],
           url: productPrice ? window.location.href : '',
           offers: productPrice ? [{
@@ -1732,11 +1732,16 @@ function getProductDescription() {
 function getProductImages() {
   const images = document.getElementsByTagName('img');
   let result = [];
+  let mainImage = null;
   for (let i = 0; i < images.length; i++) {
     const imageElement = images[i];
-    if (imageElement.naturalHeight > 300 && imageElement.naturalWidth > 300 && imageElement.style.display != 'none') {
+    if (imageElement.naturalHeight > 100 && imageElement.naturalWidth > 100 && imageElement.style.display != 'none') {
       result.push(imageElement.src);
+
+      if (imageElement.naturalHeight > 300 && imageElement.naturalWidth > 300 && !mainImage) {
+        mainImage = imageElement.src;
+      }
     }
   }
-  return result;
+  return { images: result, mainImage };
 }
