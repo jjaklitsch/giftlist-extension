@@ -94,7 +94,7 @@
 }
 
 #giftlist_extension_popup_container .giftlist-extension-login-content h2 {
-  font-weight: 600;
+  font-weight: 500;
   font-size: 20px;
   line-height: 24px;
   font-family: Poppins-Semibold;
@@ -281,7 +281,7 @@
 }
 
 #giftlist_extension_popup_content .extension-form-group label {
-  font-weight: 600;
+  font-weight: 500;
   font-size: 15px;
   line-height: 18px;
   font-family: Poppins-Semibold;
@@ -381,10 +381,10 @@
   font-size: 15px !important;
   line-height: 22px;
   color: #fff;
-  padding: 12px 0px;
+  padding: 12px 20px;
   display: inline-block;
   border: 1px solid #50bcd9;
-  width: 99%;
+  width: 95%;
   text-align: center;
   margin-bottom: 8px;
   white-space: nowrap;

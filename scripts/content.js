@@ -30,6 +30,10 @@ let scrappedURL = "";
 let scrappedProduct = null;
 let isScraped = false;
 let tempListData = null;
+let tempData = {
+  user_token: null,
+  lists: [],
+};
 
 chrome.storage.sync.get(["last_selected_list_id"], function (result) {
   if (result.last_selected_list_id) {
@@ -389,7 +393,7 @@ const showModal = async (exist_token, isFirst) => {
 					</div>
 				</div>
 				<div style="position:absolute; top: 18px; right:5px;">
-				<button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+				<button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
 					<img src="${closeIcon}" style="width: 18px; height: 18px;" />
 				</button>
 			</div>`;
@@ -415,7 +419,7 @@ const showModal = async (exist_token, isFirst) => {
 					</div>
 				</div>
 				<div style="position:absolute; top: 18px; right:5px;">
-				<button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+				<button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
 					<img src="${closeIcon}" style="width: 18px; height: 18px;" />
 				</button>
 			</div>`;
@@ -447,7 +451,7 @@ const showModal = async (exist_token, isFirst) => {
 			</div>
 		</div>
 		<div style="position:absolute; top: 18px; right:5px;">
-		<button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+		<button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
 			<img src="${closeIcon}" style="width: 18px; height: 18px;" />
 		</button>
 	</div>`;
@@ -461,7 +465,7 @@ const showModal = async (exist_token, isFirst) => {
       document.querySelector(
         "#giftlist_extension_popup_container #giftlist_extension_popup_modal"
       ).innerHTML += `<div style="position:absolute; top: 18px; right:5px;">
-        <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+        <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
           <img src="${closeIcon}" style="width: 18px; height: 18px;" />
         </button>
       </div>`;
@@ -551,7 +555,7 @@ const showModal = async (exist_token, isFirst) => {
 					</div>
 				</div>
 				<div style="position:absolute; top: 18px; right:5px;">
-          <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+          <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
             <img src="${closeIcon}" style="width: 18px; height: 18px;" />
           </button>
         </div>`;
@@ -568,7 +572,7 @@ const showModal = async (exist_token, isFirst) => {
     document.querySelector(
       "#giftlist_extension_popup_container #giftlist_extension_popup_modal"
     ).innerHTML += `<div style="position:absolute; top: 18px; right:5px;">
-      <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+      <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
         <img src="${closeIcon}" style="width: 18px; height: 18px;" />
       </button>
     </div>`;
@@ -587,7 +591,7 @@ const showModal = async (exist_token, isFirst) => {
       document.querySelector(
         "#giftlist_extension_popup_container #giftlist_extension_popup_modal"
       ).innerHTML += `<div style="position:absolute; top: 18px; right:5px;">
-          <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+          <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
             <img src="${closeIcon}" style="width: 18px; height: 18px;" />
           </button>
         </div>`;
@@ -676,7 +680,7 @@ const showModal = async (exist_token, isFirst) => {
         document.querySelector(
           "#giftlist_extension_popup_container #giftlist_extension_popup_modal"
         ).innerHTML += `<div style="position:absolute; top: 18px; right:5px;">
-          <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+          <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
             <img src="${closeIcon}" style="width: 18px; height: 18px;" />
           </button>
         </div>`;
@@ -728,7 +732,7 @@ const showModal = async (exist_token, isFirst) => {
                         document.querySelector(
                           "#giftlist_extension_popup_container #giftlist_extension_popup_modal"
                         ).innerHTML += `<div style="position:absolute; top: 18px; right:5px;">
-                      <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+                      <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
                         <img src="${closeIcon}" style="width: 18px; height: 18px;" />
                       </button>
                     </div>`;
@@ -788,7 +792,7 @@ const showModal = async (exist_token, isFirst) => {
               document.querySelector(
                 "#giftlist_extension_popup_container #giftlist_extension_popup_modal"
               ).innerHTML += `<div style="position:absolute; top: 18px; right:5px;">
-                <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+                <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
                   <img src="${closeIcon}" style="width: 18px; height: 18px;" />
                 </button>
               </div>`;
@@ -824,7 +828,7 @@ const showModal = async (exist_token, isFirst) => {
                         document.querySelector(
                           "#giftlist_extension_popup_container #giftlist_extension_popup_modal"
                         ).innerHTML += `<div style="position:absolute; top: 18px; right:5px;">
-                          <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+                          <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
                             <img src="${closeIcon}" style="width: 18px; height: 18px;" />
                           </button>
                         </div>`;
@@ -1091,7 +1095,7 @@ const showModal = async (exist_token, isFirst) => {
       document.querySelector(
         "#giftlist_extension_popup_container #giftlist_extension_popup_modal"
       ).innerHTML += `<div style="position:absolute; top: 18px; right:5px;">
-        <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+        <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
           <img src="${closeIcon}" style="width: 18px; height: 18px;" />
         </button>
       </div>`;
@@ -1117,7 +1121,7 @@ const showModal = async (exist_token, isFirst) => {
             document.querySelector(
               "#giftlist_extension_popup_container #giftlist_extension_popup_modal"
             ).innerHTML += `<div style="position:absolute; top: 18px; right:5px;">
-              <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+              <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
                 <img src="${closeIcon}" style="width: 18px; height: 18px;" />
               </button>
             </div>`;
@@ -1240,7 +1244,7 @@ const showModal = async (exist_token, isFirst) => {
     document.querySelector(
       "#giftlist_extension_popup_container #giftlist_extension_popup_modal"
     ).innerHTML += `<div style="position:absolute; top: 18px; right:5px;">
-      <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+      <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
         <img src="${closeIcon}" style="width: 18px; height: 18px;" />
       </button>
     </div>`;
@@ -1375,7 +1379,7 @@ const showModal = async (exist_token, isFirst) => {
                 document.querySelector(
                   "#giftlist_extension_popup_container #giftlist_extension_popup_modal"
                 ).innerHTML += `<div style="position:absolute; top: 18px; right:5px;">
-                  <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;margin-left: 32px">
+                  <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
                     <img src="${closeIcon}" style="width: 18px; height: 18px;" />
                   </button>
                 </div>`;
@@ -1552,7 +1556,7 @@ function checkTokenValid() {
 }
 
 async function getAllList(token) {
-  if (tempListData && tempListData.length > 0) {
+  if (tempData.user_token === token && tempListData && tempListData.length > 0) {
     return tempListData;
   }
   const mainListData = await fetch(BASE_URL + "/giftlist/my/list/all", {
@@ -1585,6 +1589,10 @@ async function getAllList(token) {
       isSanta: true,
     })),
   ];
+  tempData = {
+    user_token: token, 
+    lists,
+  };
   tempListData = lists;
   return lists;
 }
@@ -1619,47 +1627,50 @@ async function getProductData() {
     }
     window.scrollTo(0, 0);
     const { images, mainImage } = getProductImages();
+    if (mainImage) {
+      images.unshift(mainImage);
+    }
     const productPrice = getProductPrice();
 
     let productData = {
-      status: productPrice ? 200 : 400,
+      status: 200,
       data: [{
-        product: productPrice ? {
-          name: productPrice ? getProductTitle() : '',
-          description: productPrice ? getProductDescription() : '',
-          mainImage: productPrice && mainImage ? mainImage : (images && images.length > 0 ? images[0] : null),
-          images: productPrice ? images : [],
-          url: productPrice ? window.location.href : '',
-          offers: productPrice ? [{
+        product: {
+          name: getProductTitle(),
+          description: getProductDescription(),
+          mainImage: mainImage ? mainImage : (images && images.length > 0 ? images[0] : null),
+          images: images,
+          url: window.location.href,
+          offers: [{
             price: productPrice.replace(/[^\d\.]*/g, '') * 1,
             currency: productPrice.replace(/[\d\., ]/g, ''),
-          }] : null,
-        } : null
+          }],
+        }
       }]
     }
 
-    if (!productPrice) {
-      const postData = {
-        product_url: window.location.href,
-      };
-      productData = await fetch(
-        "https://admin.giftlist.com/api/scrape/url",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          mode: "cors",
-          body: JSON.stringify(postData),
-        }
-      )
-      .then((res) => res.json())
-      .catch((error) => {
-        scrappedProduct = null;
-        scrappedURL = "";
-        resolve(error);
-      });
-    }
+    // if (!productPrice) {
+    //   const postData = {
+    //     product_url: window.location.href,
+    //   };
+    //   productData = await fetch(
+    //     "https://admin.giftlist.com/api/scrape/url",
+    //     {
+    //       method: "POST",
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //       mode: "cors",
+    //       body: JSON.stringify(postData),
+    //     }
+    //   )
+    //   .then((res) => res.json())
+    //   .catch((error) => {
+    //     scrappedProduct = null;
+    //     scrappedURL = "";
+    //     resolve(error);
+    //   });
+    // }
     
     isScraped = true;
     if (productData && productData.status === 200) {
@@ -1722,7 +1733,10 @@ function getProductPrice() {
       record["text"] = text.replace('Now ', '');
     }
     if(text.indexOf(',') > -1) {
-      record["text"] = text.replace(/,([^,]*)$/, ".$1");
+      const textArys = text.split(',');
+      if (textArys[textArys.length - 1].length == 2) {
+        record["text"] = text.replace(/,([^,]*)$/, ".$1");
+      }
     }
     return record;
   }
@@ -1772,10 +1786,11 @@ function getProductImages() {
   let mainImage = null;
   for (let i = 0; i < images.length; i++) {
     const imageElement = images[i];
-    if (imageElement.naturalHeight > 100 && imageElement.naturalWidth > 100 && imageElement.style.display != 'none') {
+    const bBox = imageElement.getBoundingClientRect();
+    if (imageElement.naturalHeight > 300 && imageElement.naturalWidth > 300 && imageElement.style.display != 'none' && bBox.y < 2500) {
       result.push(imageElement.src);
 
-      if (imageElement.naturalHeight > 300 && imageElement.naturalWidth > 300 && !mainImage) {
+      if (imageElement.naturalHeight > 400 && imageElement.naturalWidth > 400 && !mainImage) {
         mainImage = imageElement.src;
       }
     }
