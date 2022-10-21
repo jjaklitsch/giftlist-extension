@@ -103,7 +103,7 @@ const getShareFeedbackModal = () => {
   );
   return `
 		<div class="giftlist-extension-share-feedback-content">
-			<h2 style="font-weight: 600;font-size: 30px;line-height: 36px; margin-top: 32px;">Share your feedback</h2>
+			<h2 style="font-weight: 500;font-size: 30px;line-height: 36px; margin-top: 32px;">Share your feedback</h2>
 			<p style="font-size: 15px;line-height: 20px;font-weight: 400;color: #818694;margin-top: 16px; margin-bottom: 0px">
 				We hope you are enjoying our Add to GiftList button.
 			</p>
@@ -120,7 +120,7 @@ const getShareFeedbackModal = () => {
 			</div>
 			<div id="thumbup_content_container">
 				<div style="display: flex; flex-direction: row; margin-top: 20px; margin-bottom: 15px;align-items: center;">
-					<h3 style="font-size: 20px;line-height: 24px;color: #101A34; font-weight: 600;">We love that you love it</h3>
+					<h3 style="font-size: 20px;line-height: 24px;color: #101A34; font-weight: 500;">We love that you love it</h3>
 					<img src="${raiseHandsIcon}" class="selected-item-image" style="width: 32px; height: 32px;" />
 				</div>
 				<p style="font-weight: 400;font-size: 15px;line-height: 20px;color: #818694;">
@@ -132,7 +132,7 @@ const getShareFeedbackModal = () => {
 				</div>
 			</div>
 			<div id="thumbdown_content_container" style="margin-top: 24px;">
-        <h3 style="font-size: 20px;line-height: 24px;color: #101A34; font-weight: 600;">Let us know how can we improve</h3>
+        <h3 style="font-size: 20px;line-height: 24px;color: #101A34; font-weight: 500;">Let us know how can we improve</h3>
         <p style="margin-top: 10px; margin-bottom: 5px;color: #818694;font-weight: 400;">Send your feedback to <a href="mailto:support@giftlist.com" style="margin-left: 2px;" target="_blank">support@giftlist.com</a></p>
 				<div class="giftlist-extension-buttons-row">
 					<button class="extension-btn" id="giftlist_extension_leave_bad_feedback">Done</button>
@@ -343,7 +343,7 @@ const getLoginModal = () => {
           <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
           Sign in
         </button>
-				<a href="https://www.giftlist.com/" style="padding-top: 15px; padding-bottom: 20px;font-weight: 600;font-size: 15px;line-height: 20px;">Forgot password?</a>
+				<a href="https://www.giftlist.com/" style="padding-top: 15px; padding-bottom: 20px;font-weight: 500;font-size: 15px;line-height: 20px;">Forgot password?</a>
 				<span style="font-size: 13px;line-height: 16px;">New to GiftList? <a href="https://www.giftlist.com/" style="font-weight: bold;">Sign up</a></span>
 			</div>
 		</div>
@@ -411,7 +411,7 @@ const showModal = async (exist_token, isFirst) => {
 								<span style="font-size: 15px; line-height: 20px; color: #101A34;margin-right: 5px;">Hey <span id="giftlist_extension_logged_in_username"></span></span>
 								<img src="${shakeHandIcon}" class="selected-item-image" style="width: 20px;height:20px"/>
 							</div>
-							<a href="#" style="font-weight: 600;font-size: 15px;line-height: 18px;color: #50BCD9;" id="giftlist_extension_logout_btn">Logout</a>
+							<a href="#" style="font-weight: 500;font-size: 15px;line-height: 18px;color: #50BCD9;" id="giftlist_extension_logout_btn">Logout</a>
 						</div>
 					</div>
 					<div id="giftlist_extension_popup_main_content">
@@ -432,7 +432,7 @@ const showModal = async (exist_token, isFirst) => {
 						<span style="font-size: 15px; line-height: 20px; color: #101A34;margin-right: 5px;">Hey <span id="giftlist_extension_logged_in_username"></span></span>
 						<img src="${shakeHandIcon}" class="selected-item-image" style="width: 20px;height:20px"/>
 					</div>
-					<a href="#" style="font-weight: 600;font-size: 15px;line-height: 18px;color: #50BCD9;" id="giftlist_extension_logout_btn">Logout</a>
+					<a href="#" style="font-weight: 500;font-size: 15px;line-height: 18px;color: #50BCD9;" id="giftlist_extension_logout_btn">Logout</a>
 				</div>
 			</div>
 			<div id="giftlist_extension_popup_main_content">
@@ -535,7 +535,7 @@ const showModal = async (exist_token, isFirst) => {
 								<span style="font-size: 15px; line-height: 20px; color: #101A34;margin-right: 5px;">Hey <span id="giftlist_extension_logged_in_username"></span></span>
 								<img src="${shakeHandIcon}" class="selected-item-image" style="width: 20px;height:20px" />
 							</div>
-							<a href="#" style="font-weight: 600;font-size: 15px;line-height: 18px;color: #50BCD9;" id="giftlist_extension_logout_btn">Logout</a>
+							<a href="#" style="font-weight: 500;font-size: 15px;line-height: 18px;color: #50BCD9;" id="giftlist_extension_logout_btn">Logout</a>
 						</div>
 					</div>
 					<div id="giftlist_extension_popup_main_content">
