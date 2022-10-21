@@ -33,6 +33,15 @@
   max-height: 88vh;
 }
 
+#giftlist_extension_popup_container #close_dialog_btn{
+  padding: 8px 12px;
+  font-size: 16px;
+  border: none;
+  border-radius: 20px;
+  background-color: #fff;
+  cursor: pointer;
+}
+
 #giftlist_extension_popup_container * {
   font-family: Poppins !important;
   letter-spacing: 0px;
@@ -62,7 +71,7 @@
 }
 
 #giftlist_extension_popup_container .giftlist_extension_popup_header {
-  font-weight: 600;
+  font-weight: 500;
   font-size: 20px;
   line-height: 24px;
   color: #101a34;
@@ -77,13 +86,14 @@
 }
 
 #giftlist_extension_popup_container .giftlist_extension_popup_header h3 {
-  font-weight: 600;
+  font-weight: 500;
   font-size: 20px;
   line-height: 24px;
   color: #101a34;
   margin-bottom: 0px;
   padding-bottom: 0px;
   margin-right: 30px;
+  text-transform: initial!important;
 }
 
 /** login container */
@@ -98,6 +108,7 @@
   font-size: 20px;
   line-height: 24px;
   font-family: Poppins-Semibold;
+  text-transform: initial!important;
 }
 
 /** add gift container */
@@ -199,10 +210,11 @@
 #giftlist_extension_popup_container
   .giftlist-extension-success-added-content
   h2 {
-  font-weight: 600;
+  font-weight: 500;
   font-size: 30px;
   line-height: 36px;
   color: #101a34;
+  text-transform: initial!important;
 }
 
 #giftlist_extension_popup_container
@@ -240,6 +252,7 @@
   margin-bottom: 0px;
   margin-right: 10px;
   font-family: Poppins-Semibold;
+  text-transform: initial!important;
 }
 
 /** share feedback modal */
@@ -268,12 +281,13 @@
 }
 
 #giftlist_extension_popup_content h2 {
-  font-weight: 600;
+  font-weight: 500;
   font-size: 20px;
   line-height: 24px;
   color: #101a34;
   margin-top: 10px;
   margin-bottom: 10px;
+  text-transform: initial!important;
 }
 
 #giftlist_extension_popup_content .extension-form-group {
@@ -288,7 +302,7 @@
 }
 
 #giftlist_extension_popup_content p {
-  font-weight: 600;
+  font-weight: 500;
   font-size: 15px;
   line-height: 20px;
 }
@@ -356,7 +370,7 @@
   margin-bottom: 5px;
   word-break: break-all;
   font-family: Poppins-Semibold, sans-serif;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 #giftlist_extension_popup_content .form-actions {
@@ -368,7 +382,7 @@
 }
 
 #giftlist_extension_view_more_images {
-  font-weight: 600;
+  font-weight: 500;
   font-size: 15px;
   line-height: 18px;
   color: #50bcd9;
@@ -377,7 +391,7 @@
 #giftlist_extension_popup_content .extension-btn {
   background: #50bcd9;
   border-radius: 7px;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 15px !important;
   line-height: 22px;
   color: #fff;
@@ -793,7 +807,7 @@
 
 #giftlist_extension_add_gift_error_message p {
   color: #ff574d;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 15px;
   line-height: 20px;
 }

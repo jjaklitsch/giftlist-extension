@@ -393,7 +393,7 @@ const showModal = async (exist_token, isFirst) => {
 					</div>
 				</div>
 				<div style="position:absolute; top: 18px; right:5px;">
-				<button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
+				<button id="close_dialog_btn">
 					<img src="${closeIcon}" style="width: 18px; height: 18px;" />
 				</button>
 			</div>`;
@@ -419,7 +419,7 @@ const showModal = async (exist_token, isFirst) => {
 					</div>
 				</div>
 				<div style="position:absolute; top: 18px; right:5px;">
-				<button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
+				<button id="close_dialog_btn">
 					<img src="${closeIcon}" style="width: 18px; height: 18px;" />
 				</button>
 			</div>`;
@@ -451,7 +451,7 @@ const showModal = async (exist_token, isFirst) => {
 			</div>
 		</div>
 		<div style="position:absolute; top: 18px; right:5px;">
-		<button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
+		<button id="close_dialog_btn">
 			<img src="${closeIcon}" style="width: 18px; height: 18px;" />
 		</button>
 	</div>`;
@@ -465,7 +465,7 @@ const showModal = async (exist_token, isFirst) => {
       document.querySelector(
         "#giftlist_extension_popup_container #giftlist_extension_popup_modal"
       ).innerHTML += `<div style="position:absolute; top: 18px; right:5px;">
-        <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
+        <button id="close_dialog_btn">
           <img src="${closeIcon}" style="width: 18px; height: 18px;" />
         </button>
       </div>`;
@@ -555,7 +555,7 @@ const showModal = async (exist_token, isFirst) => {
 					</div>
 				</div>
 				<div style="position:absolute; top: 18px; right:5px;">
-          <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
+          <button id="close_dialog_btn">
             <img src="${closeIcon}" style="width: 18px; height: 18px;" />
           </button>
         </div>`;
@@ -572,7 +572,7 @@ const showModal = async (exist_token, isFirst) => {
     document.querySelector(
       "#giftlist_extension_popup_container #giftlist_extension_popup_modal"
     ).innerHTML += `<div style="position:absolute; top: 18px; right:5px;">
-      <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
+      <button id="close_dialog_btn">
         <img src="${closeIcon}" style="width: 18px; height: 18px;" />
       </button>
     </div>`;
@@ -591,7 +591,7 @@ const showModal = async (exist_token, isFirst) => {
       document.querySelector(
         "#giftlist_extension_popup_container #giftlist_extension_popup_modal"
       ).innerHTML += `<div style="position:absolute; top: 18px; right:5px;">
-          <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
+          <button id="close_dialog_btn">
             <img src="${closeIcon}" style="width: 18px; height: 18px;" />
           </button>
         </div>`;
@@ -680,7 +680,7 @@ const showModal = async (exist_token, isFirst) => {
         document.querySelector(
           "#giftlist_extension_popup_container #giftlist_extension_popup_modal"
         ).innerHTML += `<div style="position:absolute; top: 18px; right:5px;">
-          <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
+          <button id="close_dialog_btn">
             <img src="${closeIcon}" style="width: 18px; height: 18px;" />
           </button>
         </div>`;
@@ -732,7 +732,7 @@ const showModal = async (exist_token, isFirst) => {
                         document.querySelector(
                           "#giftlist_extension_popup_container #giftlist_extension_popup_modal"
                         ).innerHTML += `<div style="position:absolute; top: 18px; right:5px;">
-                      <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
+                      <button id="close_dialog_btn">
                         <img src="${closeIcon}" style="width: 18px; height: 18px;" />
                       </button>
                     </div>`;
@@ -792,7 +792,7 @@ const showModal = async (exist_token, isFirst) => {
               document.querySelector(
                 "#giftlist_extension_popup_container #giftlist_extension_popup_modal"
               ).innerHTML += `<div style="position:absolute; top: 18px; right:5px;">
-                <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
+                <button id="close_dialog_btn">
                   <img src="${closeIcon}" style="width: 18px; height: 18px;" />
                 </button>
               </div>`;
@@ -828,7 +828,7 @@ const showModal = async (exist_token, isFirst) => {
                         document.querySelector(
                           "#giftlist_extension_popup_container #giftlist_extension_popup_modal"
                         ).innerHTML += `<div style="position:absolute; top: 18px; right:5px;">
-                          <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
+                          <button id="close_dialog_btn">
                             <img src="${closeIcon}" style="width: 18px; height: 18px;" />
                           </button>
                         </div>`;
@@ -1095,7 +1095,7 @@ const showModal = async (exist_token, isFirst) => {
       document.querySelector(
         "#giftlist_extension_popup_container #giftlist_extension_popup_modal"
       ).innerHTML += `<div style="position:absolute; top: 18px; right:5px;">
-        <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
+        <button id="close_dialog_btn">
           <img src="${closeIcon}" style="width: 18px; height: 18px;" />
         </button>
       </div>`;
@@ -1121,7 +1121,7 @@ const showModal = async (exist_token, isFirst) => {
             document.querySelector(
               "#giftlist_extension_popup_container #giftlist_extension_popup_modal"
             ).innerHTML += `<div style="position:absolute; top: 18px; right:5px;">
-              <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
+              <button id="close_dialog_btn">
                 <img src="${closeIcon}" style="width: 18px; height: 18px;" />
               </button>
             </div>`;
@@ -1244,7 +1244,7 @@ const showModal = async (exist_token, isFirst) => {
     document.querySelector(
       "#giftlist_extension_popup_container #giftlist_extension_popup_modal"
     ).innerHTML += `<div style="position:absolute; top: 18px; right:5px;">
-      <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
+      <button id="close_dialog_btn">
         <img src="${closeIcon}" style="width: 18px; height: 18px;" />
       </button>
     </div>`;
@@ -1379,7 +1379,7 @@ const showModal = async (exist_token, isFirst) => {
                 document.querySelector(
                   "#giftlist_extension_popup_container #giftlist_extension_popup_modal"
                 ).innerHTML += `<div style="position:absolute; top: 18px; right:5px;">
-                  <button id="close_dialog_btn" style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;background-color: #fff;">
+                  <button id="close_dialog_btn">
                     <img src="${closeIcon}" style="width: 18px; height: 18px;" />
                   </button>
                 </div>`;
