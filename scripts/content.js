@@ -1746,7 +1746,7 @@ function getProductPrice() {
       record["y"] > 1300 ||
       record["fontSize"] == undefined ||
       !record["text"].match(
-        /(^(US ){0,1}(rs\.|Rs\.|RS\.|\$|€|£|₹|INR|RP|Rp|USD|CAD|C\$){0,1}(\s){0,1}[\d,]+(\.\d+){0,1}(\s){0,1}(AED){0,1}(€){0,1}(£){0,1}$)/
+        /(^(US ){0,1}(rs\.|Rs\.|RS\.|\$|€|£|₹|INR|RP|Rp|USD|US\$|CAD|C\$){0,1}(\s){0,1}[\d,]+(\.\d+){0,1}(\s){0,1}(AED){0,1}(€){0,1}(£){0,1}$)/
       )
     )
       return false;
@@ -1760,7 +1760,7 @@ function getProductPrice() {
     if (a["fontSize"] == b["fontSize"]) return a["y"] > b["y"];
     return a["fontSize"] < b["fontSize"];
   });
-  return priceRecordsSortedByFontSize && priceRecordsSortedByFontSize[0] ? priceRecordsSortedByFontSize[0]['text'] : 0;
+  return priceRecordsSortedByFontSize && priceRecordsSortedByFontSize[0] ? priceRecordsSortedByFontSize[0]['text'] : '';
 }
 
 function getProductTitle() {
