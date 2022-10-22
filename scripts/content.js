@@ -1629,6 +1629,11 @@ async function getProductData() {
     const { images, mainImage } = getProductImages();
     if (mainImage) {
       images.unshift(mainImage);
+      selected_image = mainImage;
+    } else {
+      if (images && images.length > 0) {
+        selected_image = images[0];
+      }
     }
     const productPrice = getProductPrice();
 
