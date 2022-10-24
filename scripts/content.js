@@ -1817,7 +1817,7 @@ function getProductImages() {
         const imageUrl = divs[i].style.backgroundImage;
         const url = imageUrl.slice(4, -1).replace(/"/g, "");
         const divBox = divs[i].getBoundingClientRect();
-        if (url) {
+        if (url & url.indexOf('http') > -1) {
           if (divBox.height > 300 && divBox.width > 300 && divs[i].style.display != 'none' && divBox.y < 2500) {
             result.push(url);
       
@@ -1833,7 +1833,7 @@ function getProductImages() {
   for (let i = 0; i < images.length; i++) {
     const imageElement = images[i];
     const bBox = imageElement.getBoundingClientRect();
-    if (imageElement.naturalHeight > 300 && imageElement.naturalWidth > 200 && imageElement.style.display != 'none' && bBox.y < 2500) {
+    if (imageElement.naturalHeight > 300 && imageElement.naturalWidth > 200 && imageElement.style.display != 'none' && bBox.y < 2500 && imageElement.src.indexOf('http') > -1) {
       result.push(imageElement.src);
 
       if (imageElement.naturalHeight > 400 && bBox.y < 600 && bBox.y > 80) {
