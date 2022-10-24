@@ -1503,7 +1503,7 @@ function refreshToken() {
         .then((res) => {
           if (res.status === 200) {
             chrome.storage.sync.set(
-              { giftlist_refresh_token: res.token },
+              { giftlist_access_token: res.token },
               function (result) {}
             );
             resolve(res.token);
@@ -1716,6 +1716,7 @@ function addProductToList(url, postData) {
 function getProductPrice() {
   elements = [...document.querySelectorAll(" body *")];
   function createRecordFromElement(element) {
+    const elementStyle = getComputedStyle(element);
     const text = element.textContent.trim();
     var record = {};
     const bBox = element.getBoundingClientRect();
@@ -1725,6 +1726,15 @@ function getProductPrice() {
     record["y"] = bBox.y;
     record["x"] = bBox.x;
     record["text"] = text;
+    if(text.indexOf('Sale Price:') > -1 && text.length > 11) {
+      record["text"] = text.replace('Sale Price:', '');
+    }
+    if(text.indexOf('Sale :') > -1) {
+      record["text"] = text.replace('Sale :', '');
+    }
+    if(text.indexOf('Standard Price:') > -1) {
+      record["text"] = text.replace('Standard Price:', '');
+    }
     if(text.indexOf('Price') > -1) {
       record["text"] = text.replace('Price', '');
     }
@@ -1739,24 +1749,33 @@ function getProductPrice() {
     }
     if(text.indexOf(',') > -1) {
       const textArys = text.split(',');
-      if (textArys[textArys.length - 1].length == 2) {
+      if ((parseInt(textArys[textArys.length - 1]) + "").length == 2) {
         record["text"] = text.replace(/,([^,]*)$/, ".$1");
       }
+    }
+    if (elementStyle.textDecorationLine != 'none') {
+      record['textDecoration'] = true;
+    } else {
+      record['textDecoration'] = false;
     }
     return record;
   }
   let records = elements.map(createRecordFromElement);
   function canBePrice(record) {
+    if(record["text"].indexOf('Sale :') > -1 && record["text"].length > 6) {
+      record["text"] = record["text"] .replace('Sale :', '');
+    }
     if (
       record["y"] > 1300 ||
       record["fontSize"] == undefined ||
       !record["text"].match(
-        /(^(US ){0,1}(rs\.|Rs\.|RS\.|\$|€|£|₹|INR|RP|Rp|USD|US\$|CAD|C\$){0,1}(\s){0,1}[\d,]+(\.\d+){0,1}(\s){0,1}(AED){0,1}(€){0,1}(£){0,1}$)/
-      )
+        /(^(US ){0,1}(rs\.|Rs\.|RS\.|\$|€|£|₹|INR|RP|Rp|USD|US\$|CAD|C\$){0,1}(\s){0,1}[\d,]+(\.\d+){0,1}(\s){0,1}(AED){0,1}(€){0,1}(£){0,1}(Rp){0,1}$)/
+      ) ||
+      record["textDecoration"]
     )
       return false;
     else {
-      let scRe = /[\$\xA2-\xA5\u058F\u060B\u09F2\u09F3\u09FB\u0AF1\u0BF9\u0E3F\u17DB\u20A0-\u20BD\uA838\uFDFC\uFE69\uFF04\uFFE0\uFFE1\uFFE5\uFFE6]/;
+      let scRe = /[\$\xA2-\xA5\u058F\u060B\u09F2\u09F3\u09FB\u0AF1\u0BF9\u0E3F\u17DB\u20A0-\u20BD\uA838\uFDFC\uFE69\uFF04\uFFE0\uFFE1\uFFE5\uFFE6Rp]/;
       if (record["y"] > 90 && record['fontSize'] >= 13 && (scRe.test(record['text']))) return true;
     }
   }
@@ -1786,16 +1805,38 @@ function getProductDescription() {
 }
 
 function getProductImages() {
-  const images = document.getElementsByTagName('img');
+  let images = document.getElementsByTagName('img');
+  const divs = document.querySelectorAll('div[style]');
+
   let result = [];
   let mainImage = null;
+  
+  if (divs && divs.length) {
+    for (let i = 0; i < divs.length; i++) {
+      if (divs[i].style.backgroundImage) {
+        const imageUrl = divs[i].style.backgroundImage;
+        const url = imageUrl.slice(4, -1).replace(/"/g, "");
+        const divBox = divs[i].getBoundingClientRect();
+        if (url) {
+          if (divBox.height > 300 && divBox.width > 300 && divs[i].style.display != 'none' && divBox.y < 2500) {
+            result.push(url);
+      
+            if (divBox.height > 400 && divBox.width > 400 && !mainImage && divBox.y < 600) {
+              mainImage = url;
+            }
+          }
+        }
+      }
+    }
+  }
+
   for (let i = 0; i < images.length; i++) {
     const imageElement = images[i];
     const bBox = imageElement.getBoundingClientRect();
-    if (imageElement.naturalHeight > 300 && imageElement.naturalWidth > 300 && imageElement.style.display != 'none' && bBox.y < 2500) {
+    if (imageElement.naturalHeight > 300 && imageElement.naturalWidth > 200 && imageElement.style.display != 'none' && bBox.y < 2500) {
       result.push(imageElement.src);
 
-      if (imageElement.naturalHeight > 400 && imageElement.naturalWidth > 400 && !mainImage) {
+      if (imageElement.naturalHeight > 400 && bBox.y < 600 && bBox.y > 80) {
         mainImage = imageElement.src;
       }
     }

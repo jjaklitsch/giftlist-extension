@@ -149,6 +149,10 @@
   max-width: 100%;
   border-radius: 15px;
   margin-bottom: 20px;
+  max-height: 80%;
+}
+#giftlist_extension_popup_container *:focus-visible {
+  box-shadow: none!important;
 }
 
 /** show more image container */
