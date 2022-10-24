@@ -1765,6 +1765,14 @@ function getProductPrice() {
     if(record["text"].indexOf('Sale :') > -1 && record["text"].length > 6) {
       record["text"] = record["text"] .replace('Sale :', '');
     }
+    if(record["text"].indexOf(' Standard Price') > -1 && record["text"].length > 15) {
+      record["text"] = record["text"] .replace(' Standard Price', '');
+    }
+    if(record["text"].indexOf('Standard ') > -1 && record["text"].length > 9) {
+      record["text"] = record["text"] .replace('Standard ', '');
+    }
+    record["text"] = record['text'].trim();
+
     if (
       record["y"] > 1300 ||
       record["fontSize"] == undefined ||
@@ -1772,9 +1780,9 @@ function getProductPrice() {
         /(^(US ){0,1}(rs\.|Rs\.|RS\.|\$|€|£|₹|INR|RP|Rp|USD|US\$|CAD|C\$){0,1}(\s){0,1}[\d,]+(\.\d+){0,1}(\s){0,1}(AED){0,1}(€){0,1}(£){0,1}(Rp){0,1}$)/
       ) ||
       record["textDecoration"]
-    )
+    ) {
       return false;
-    else {
+    } else {
       let scRe = /[\$\xA2-\xA5\u058F\u060B\u09F2\u09F3\u09FB\u0AF1\u0BF9\u0E3F\u17DB\u20A0-\u20BD\uA838\uFDFC\uFE69\uFF04\uFFE0\uFFE1\uFFE5\uFFE6Rp]/;
       if (record["y"] > 90 && record['fontSize'] >= 13 && (scRe.test(record['text']))) return true;
     }
