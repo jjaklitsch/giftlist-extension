@@ -303,6 +303,7 @@
   font-size: 15px;
   line-height: 18px;
   font-family: Poppins-Semibold;
+  text-transform: initial!important;
 }
 
 #giftlist_extension_popup_content p {
