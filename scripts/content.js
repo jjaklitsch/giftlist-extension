@@ -96,11 +96,9 @@ function enableScroll() {
 }
 
 const getShareFeedbackModal = () => {
-  const thumbUpIcon = chrome.runtime.getURL("/public/images/thumb_up.svg");
-  const thumbDownIcon = chrome.runtime.getURL("/public/images/thumb_down.svg");
-  const raiseHandsIcon = chrome.runtime.getURL(
-    "/public/images/raise_hands.svg"
-  );
+  const thumbUpIcon = "https://www.giftlist.com/assets/extension-icons/thumb_up.svg";
+  const thumbDownIcon = "https://www.giftlist.com/assets/extension-icons/thumb_down.svg";
+  const raiseHandsIcon = "https://www.giftlist.com/assets/extension-icons/raise_hands.svg";
   return `
 		<div class="giftlist-extension-share-feedback-content">
 			<h2 style="font-weight: 500;font-size: 30px;line-height: 36px; margin-top: 32px;">Share your feedback</h2>
@@ -143,7 +141,7 @@ const getShareFeedbackModal = () => {
 };
 
 const getSuccessAddedModal = () => {
-  const giftIcon = chrome.runtime.getURL("/public/images/gift_box.svg");
+  const giftIcon = "https://www.giftlist.com/assets/extension-icons/gift_box.svg";
   return `
 		<div class="giftlist-extension-success-added-content">
 			<div class="giftlist-extension-success-icon-container">
@@ -193,8 +191,8 @@ const getShowMoreImageModal = () => {
 };
 
 const getAddGiftModal = (data) => {
-  const cryIcon = chrome.runtime.getURL("/public/images/cry.svg");
-  const noneImage = chrome.runtime.getURL("/public/images/none-image.png");
+  const cryIcon = "https://www.giftlist.com/assets/extension-icons/cry.svg";
+  const noneImage = "https://www.giftlist.com/assets/extension-icons/none-image.png";
   return `
     <div style="position: relative;">
       <h2>Add gift</h2>
@@ -309,8 +307,8 @@ const getAddGiftModal = (data) => {
 };
 
 const getLoginModal = () => {
-  const eyeIcon = chrome.runtime.getURL("/public/images/eye.svg");
-  const errorIcon = chrome.runtime.getURL("/public/images/error.svg");
+  const eyeIcon = "https://www.giftlist.com/assets/extension-icons/eye.svg";
+  const errorIcon = "https://www.giftlist.com/assets/extension-icons/error.svg";
   return `
 		<div class="giftlist-extension-login-content">
 			<h2>Please login to add this item to your list</h2>
@@ -352,9 +350,9 @@ const getLoginModal = () => {
 
 const showModal = async (exist_token, isFirst) => {
   const isLogin = false;
-  const shakeHandIcon = chrome.runtime.getURL("/public/images/shake_hand.svg");
-  const closeIcon = chrome.runtime.getURL("/public/images/close.svg");
-  const logo = chrome.runtime.getURL("/public/images/logo.png");
+  const shakeHandIcon = "https://www.giftlist.com/assets/extension-icons/shake_hand.svg";
+  const closeIcon = "https://www.giftlist.com/assets/extension-icons/close.svg";
+  const logo = "https://www.giftlist.com/assets/extension-icons/logo.png";
 
   const mask = document.createElement("div");
   mask.setAttribute("id", "giftlist_extension_popup_container");
