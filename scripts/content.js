@@ -178,7 +178,7 @@ const getShowMoreImageModal = () => {
                   acc +
                   `
 						<div class="giftlist-extension-item-image">
-							<img src="${item}" class="selected-item-image" />
+							<img src='${item}' class="selected-item-image" />
 						</div>
 					`
                 );
@@ -341,8 +341,8 @@ const getLoginModal = () => {
           <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
           Sign in
         </button>
-				<a href="https://www.giftlist.com/" style="padding-top: 15px; padding-bottom: 20px;font-weight: 500;font-size: 15px;line-height: 20px;">Forgot password?</a>
-				<span style="font-size: 13px;line-height: 16px;">New to GiftList? <a href="https://www.giftlist.com/" style="font-weight: bold;">Sign up</a></span>
+				<a href="https://www.giftlist.com/forgot-password" target="_blank" style="padding-top: 15px; padding-bottom: 20px;font-weight: 500;font-size: 15px;line-height: 20px;">Forgot password?</a>
+				<span style="font-size: 13px;line-height: 16px;">New to GiftList? <a href="https://www.giftlist.com/signup" style="font-weight: bold;" target="_blank">Sign up</a></span>
 			</div>
 		</div>
 	`;
@@ -1606,23 +1606,6 @@ const callback = () => {
 
 async function getProductData() {
   return new Promise(async (resolve, reject) => {
-    
-    if (
-      scrappedURL === window.location.href &&
-      scrappedProduct &&
-      scrappedProduct.status === 200 &&
-      scrappedProduct.data &&
-      scrappedProduct.data.length > 0 &&
-      scrappedProduct.data[0].product
-    ) {
-      isScraped = false;
-      resolve(scrappedProduct);
-      return;
-    } else {
-      isScraped = false;
-      scrappedProduct = null;
-      scrappedURL = "";
-    }
     window.scrollTo(0, 0);
     const { images, mainImage } = getProductImages();
     if (mainImage) {
@@ -1712,7 +1695,17 @@ function addProductToList(url, postData) {
 }
 
 function getProductPrice() {
+  let defaultFontSize = 13;
   elements = [...document.querySelectorAll(" body *")];
+  if (window.location.href.indexOf('bedbathandbeyond.com') > -1) {
+    elements = [...document.querySelector("#wmHostPdp").shadowRoot.querySelectorAll('*')];
+  }
+  if (window.location.href.indexOf('homedepot.com') > -1) {
+    elements = [...document.querySelector("div[name='zone-a']").querySelectorAll('*')];
+  }
+  if (window.location.href.indexOf('rh.com') > -1) {
+    defaultFontSize = 11;
+  }
   function createRecordFromElement(element) {
     const elementStyle = getComputedStyle(element);
     const text = element.textContent.trim();
@@ -1736,11 +1729,14 @@ function getProductPrice() {
     if(text.indexOf('Price') > -1) {
       record["text"] = text.replace('Price', '');
     }
+    if(text.indexOf('Limited Time Offer') > -1) {
+      record["text"] = text.replace('Limited Time Offer', '');
+    }
     if(text.indexOf('USD') > -1) {
-      record["text"] = text.replace(' USD', '');
+      record["text"] = text.replace('USD', '');
     }
     if(text.indexOf('CAD') > -1) {
-      record["text"] = text.replace(' CAD', '');
+      record["text"] = text.replace('CAD', '');
     }
     if(text.indexOf('Now') > -1) {
       record["text"] = text.replace('Now ', '');
@@ -1750,6 +1746,12 @@ function getProductPrice() {
       if ((parseInt(textArys[textArys.length - 1]) + "").length == 2) {
         record["text"] = text.replace(/,([^,]*)$/, ".$1");
       }
+    }
+    if(text.includes('Sale \n\n') && text.length > 10) {
+      record["text"] = text.replace('Sale \n\n', '');
+    }
+    if(text.indexOf('off - ') > -1) {
+      record["text"] = text.split('off - ')[1];
     }
     if (elementStyle.textDecorationLine != 'none') {
       record['textDecoration'] = true;
@@ -1761,13 +1763,25 @@ function getProductPrice() {
   let records = elements.map(createRecordFromElement);
   function canBePrice(record) {
     if(record["text"].indexOf('Sale :') > -1 && record["text"].length > 6) {
-      record["text"] = record["text"] .replace('Sale :', '');
+      record["text"] = record["text"].replace('Sale :', '');
     }
     if(record["text"].indexOf(' Standard Price') > -1 && record["text"].length > 15) {
-      record["text"] = record["text"] .replace(' Standard Price', '');
+      record["text"] = record["text"].replace(' Standard Price', '');
     }
     if(record["text"].indexOf('Standard ') > -1 && record["text"].length > 9) {
-      record["text"] = record["text"] .replace('Standard ', '');
+      record["text"] = record["text"].replace('Standard ', '');
+    }
+    if(record["text"].indexOf('Chewy') > -1 && record["text"].length > 5) {
+      record["text"] = record["text"].replace('Chewy', '');
+    }
+    if(record["text"].indexOf('current price: ') > -1 && record["text"].length > 15) {
+      record["text"] = record["text"].replace('current price: ', '');
+    }
+    if(record["text"].indexOf(' USD') > -1 && record["text"].length > 4) {
+      record["text"] = record["text"].replace(' USD', '');
+    }
+    if(record["text"].indexOf('Sale \n\n') > -1) {
+      record["text"] = record["text"].replace('Sale \n\n', '');
     }
     record["text"] = record['text'].trim();
 
@@ -1782,7 +1796,7 @@ function getProductPrice() {
       return false;
     } else {
       let scRe = /[\$\xA2-\xA5\u058F\u060B\u09F2\u09F3\u09FB\u0AF1\u0BF9\u0E3F\u17DB\u20A0-\u20BD\uA838\uFDFC\uFE69\uFF04\uFFE0\uFFE1\uFFE5\uFFE6Rp]/;
-      if (record["y"] > 90 && record['fontSize'] >= 13 && (scRe.test(record['text']))) return true;
+      if (record["y"] > 90 && record['fontSize'] >= defaultFontSize && (scRe.test(record['text']))) return true;
     }
   }
   let possiblePriceRecords = records.filter(canBePrice);
@@ -1790,11 +1804,20 @@ function getProductPrice() {
     if (a["fontSize"] == b["fontSize"]) return a["y"] > b["y"];
     return a["fontSize"] < b["fontSize"];
   });
+  if (window.location.href.indexOf('homedepot.com') > -1) {
+    return '$' + (parseFloat(priceRecordsSortedByFontSize[3]['text'].match(/-?(?:\d+(?:\.\d*)?|\.\d+)/)[0]) - parseFloat(priceRecordsSortedByFontSize[4]['text'].match(/-?(?:\d+(?:\.\d*)?|\.\d+)/)[0]));
+  }
+  if (window.location.href.indexOf('victoriassecret.com') > -1 || window.location.href.indexOf('bedbathandbeyond.com') > -1 || window.location.href.indexOf('jcrew.com') > -1) {
+    return priceRecordsSortedByFontSize && priceRecordsSortedByFontSize[1] ? priceRecordsSortedByFontSize[1]['text'] : (priceRecordsSortedByFontSize && priceRecordsSortedByFontSize[0] ? priceRecordsSortedByFontSize[0]['text'] : '');
+  }
+  if (window.location.href.indexOf('sears.com') > -1 || window.location.href.indexOf('landsend.com') > -1 || window.location.href.indexOf('tommybahama.com') > -1) {
+    return priceRecordsSortedByFontSize && priceRecordsSortedByFontSize[3] ? priceRecordsSortedByFontSize[3]['text'] : (priceRecordsSortedByFontSize && priceRecordsSortedByFontSize[0] ? priceRecordsSortedByFontSize[0]['text'] : '');
+  }
   return priceRecordsSortedByFontSize && priceRecordsSortedByFontSize[0] ? priceRecordsSortedByFontSize[0]['text'] : '';
 }
 
 function getProductTitle() {
-  return document.getElementsByTagName('title')[0].innerText.trim().replace(/\t/g, '');
+  return document.getElementsByTagName('title')[0].innerText.trim().replace(/\t/g, '').replace(/\s\s/g, '').split('–')[0];
 }
 
 function getProductDescription() {
@@ -1812,6 +1835,63 @@ function getProductDescription() {
 
 function getProductImages() {
   let images = document.getElementsByTagName('img');
+  let limitHeight = 100;
+  let limitWidth = 100;
+  let removeQuery = false;
+  let httpOnly = false;
+  let useSrcset = false;
+  if (window.location.href.indexOf('chewy.com') > -1 || window.location.href.indexOf('cvs.com') > -1) {
+    images = document.querySelectorAll("main img");
+  }
+  if (window.location.href.indexOf('costco.com') > -1) {
+    images = document.querySelectorAll("#product-page img");
+  }
+  if (window.location.href.indexOf('samsclub.com') > -1) {
+    images = document.querySelectorAll(".sc-pc-large-desktop-layout-columns img");
+  }
+  if (window.location.href.indexOf('suitsupply.com') > -1) {
+    images = document.querySelectorAll(".pdp-images img");
+  }
+  if (window.location.href.indexOf('therealreal.com') > -1) {
+    images = document.querySelectorAll(".pdp-desktop-images img");
+    httpOnly = true;
+  }
+  if (window.location.href.indexOf('westelm.com') > -1) {
+    images = document.querySelectorAll("#pip-hero-container-WE img");
+    httpOnly = true;
+  }
+  if (window.location.href.indexOf('hillhousehome.com') > -1) {
+    images = document.querySelectorAll(".pdpCarousel img");
+    useSrcset = true;
+  }
+  if (window.location.href.indexOf('jcrew.com') > -1) {
+    images = document.querySelectorAll("#c-product__photos img");
+    limitHeight = 70;
+    limitWidth = 70;
+    removeQuery = true;
+    httpOnly = true;
+  }
+
+  if (window.location.href.indexOf('shop.lululemon.com') > -1) {
+    images = document.querySelectorAll(".pdp-carousel-images-offset img");
+    limitHeight = 70;
+    limitWidth = 70;
+    removeQuery = true;
+    httpOnly = true;
+  }
+
+  if (window.location.href.indexOf('staples.com') > -1) {
+    images = document.querySelectorAll("#image_gallery_container img");
+    limitHeight = 70;
+    limitWidth = 70;
+    removeQuery = true;
+  }
+  
+  if (window.location.href.indexOf('bedbathandbeyond.com') > -1) {
+    const shadowInside = document.querySelector("#wmHostPdp").shadowRoot;
+    images = shadowInside.querySelectorAll('img');
+  }
+
   const divs = document.querySelectorAll('div[style]');
 
   let result = [];
@@ -1839,13 +1919,56 @@ function getProductImages() {
   for (let i = 0; i < images.length; i++) {
     const imageElement = images[i];
     const bBox = imageElement.getBoundingClientRect();
-    if (imageElement.naturalHeight > 300 && imageElement.naturalWidth > 200 && imageElement.style.display != 'none' && bBox.y < 2500 && imageElement.src.indexOf('http') > -1) {
-      result.push(imageElement.src);
+    if (!useSrcset && imageElement.naturalHeight >= limitHeight && imageElement.naturalWidth >= limitWidth && imageElement.style.display != 'none' && bBox.y < 2000 && imageElement.src.indexOf('/flags/') === -1 && imageElement.src) {
+      if (httpOnly) {
+        if (imageElement.src.indexOf('http') > -1 && imageElement.src.indexOf('http') != 0) {
+          continue;
+        } else {
+          if (imageElement.src.indexOf('http') < 0) {
+            continue;
+          }
+        }
+      }
+      if (removeQuery) {
+        result.push(imageElement.src.split("?")[0]);
+      } else {
+        result.push(imageElement.src);
+      }
 
-      if (imageElement.naturalHeight > 400 && bBox.y < 600 && bBox.y > 80) {
-        mainImage = imageElement.src;
+      if (imageElement.naturalHeight > 400 && bBox.y < 600 && bBox.y > 80 && !mainImage && imageElement.src.indexOf('null') < 0) {
+        if (removeQuery) {
+          mainImage = imageElement.src.split("?")[0];
+        } else {
+          mainImage = imageElement.src;
+        }
       }
     }
   }
+  
+  if (!result.length || useSrcset) {
+    for (let i = 0; i < images.length; i++) {
+      const imageElement = images[i];
+      if (imageElement.srcset) {
+        if (window.location.href.indexOf('shop.lululemon.com') > -1) {
+          result = [...result, imageElement.srcset.split(",\n")[0]];
+        } else {
+          result = [...result, imageElement.srcset.split(", ")[0]];
+        }
+        result = result.map(item => {
+          if (removeQuery) {
+            return item.trim().split("?")[0];
+          } else {
+            return item.trim();
+          }
+        })
+        mainImage = result[0];
+      }
+    }
+  }
+
+  if (result.length && !mainImage) {
+    mainImage = result[0];
+  }
+  
   return { images: result, mainImage };
 }

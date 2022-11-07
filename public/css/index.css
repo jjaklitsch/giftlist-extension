@@ -104,11 +104,13 @@
 }
 
 #giftlist_extension_popup_container .giftlist-extension-login-content h2 {
-  font-weight: 500;
   font-size: 20px;
   line-height: 24px;
   font-family: Poppins-Semibold;
   text-transform: initial!important;
+  border-bottom: 0px!important;
+  font-weight: bold;
+  text-align: left;
 }
 
 /** add gift container */
@@ -214,11 +216,13 @@
 #giftlist_extension_popup_container
   .giftlist-extension-success-added-content
   h2 {
-  font-weight: 500;
+  font-weight: bold;
   font-size: 30px;
   line-height: 36px;
   color: #101a34;
   text-transform: initial!important;
+  border-bottom: 0px!important;
+  text-align: left;
 }
 
 #giftlist_extension_popup_container
@@ -285,13 +289,46 @@
 }
 
 #giftlist_extension_popup_content h2 {
-  font-weight: 500;
+  font-weight: bold;
   font-size: 20px;
   line-height: 24px;
   color: #101a34;
   margin-top: 10px;
   margin-bottom: 10px;
   text-transform: initial!important;
+  border-bottom: 0px!important;
+  text-align: left;
+}
+
+#giftlist_extension_popup_content input[type=checkbox] {
+  text-rendering: auto;
+    color: fieldtext;
+    letter-spacing: normal;
+    word-spacing: normal;
+    line-height: normal;
+    text-transform: none;
+    text-indent: 0px;
+    text-shadow: none;
+    display: inline-block;
+    text-align: start;
+    appearance: auto;
+    -webkit-rtl-ordering: logical;
+    cursor: text;
+    background-color: field;
+    margin: 0em;
+    padding: 1px 2px;
+    border-width: 2px;
+    border-style: inset;
+    border-color: -internal-light-dark(rgb(118, 118, 118), rgb(133, 133, 133));
+    border-image: initial;
+    width: 13px;
+    height: 19px;
+    opacity: 1!important;
+    z-index: inherit!important;
+}
+
+#giftlist_extension_popup_content input:active, #giftlist_extension_popup_content input:focus, #giftlist_extension_popup_content input:hover {
+  outline: none!important;
 }
 
 #giftlist_extension_popup_content .extension-form-group {
@@ -304,6 +341,11 @@
   line-height: 18px;
   font-family: Poppins-Semibold;
   text-transform: initial!important;
+  outline: none!important;
+  background-color: white!important;
+  font-weight: bold;
+  display: flex;
+  flex: 1;
 }
 
 #giftlist_extension_popup_content p {
