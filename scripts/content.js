@@ -1697,11 +1697,14 @@ function addProductToList(url, postData) {
 function getProductPrice() {
   let defaultFontSize = 13;
   elements = [...document.querySelectorAll(" body *")];
-  if (window.location.href.indexOf('bedbathandbeyond.com') > -1) {
+  if (window.location.href.indexOf('bedbathandbeyond.com') > -1 || window.location.href.indexOf('buybuybaby.com') > -1) {
     elements = [...document.querySelector("#wmHostPdp").shadowRoot.querySelectorAll('*')];
   }
   if (window.location.href.indexOf('homedepot.com') > -1) {
     elements = [...document.querySelector("div[name='zone-a']").querySelectorAll('*')];
+  }
+  if (window.location.href.indexOf('somethingnavy.com') > -1) {
+    elements = [...document.querySelector("#wm_content").querySelectorAll('*')];
   }
   if (window.location.href.indexOf('rh.com') > -1) {
     defaultFontSize = 11;
@@ -1743,7 +1746,7 @@ function getProductPrice() {
     }
     if(text.indexOf(',') > -1) {
       const textArys = text.split(',');
-      if ((parseInt(textArys[textArys.length - 1]) + "").length == 2) {
+      if (textArys.length > 2 && (parseInt(textArys[textArys.length - 1]) + "").length == 2) {
         record["text"] = text.replace(/,([^,]*)$/, ".$1");
       }
     }
@@ -1852,6 +1855,10 @@ function getProductImages() {
   if (window.location.href.indexOf('suitsupply.com') > -1) {
     images = document.querySelectorAll(".pdp-images img");
   }
+  if (window.location.href.indexOf('somethingnavy.com') > -1) {
+    images = document.querySelectorAll(".block-images source[type='image/jpg']");
+    useSrcset = true;
+  }
   if (window.location.href.indexOf('therealreal.com') > -1) {
     images = document.querySelectorAll(".pdp-desktop-images img");
     httpOnly = true;
@@ -1887,7 +1894,7 @@ function getProductImages() {
     removeQuery = true;
   }
   
-  if (window.location.href.indexOf('bedbathandbeyond.com') > -1) {
+  if (window.location.href.indexOf('bedbathandbeyond.com') > -1 || window.location.href.indexOf('buybuybaby.com') > -1) {
     const shadowInside = document.querySelector("#wmHostPdp").shadowRoot;
     images = shadowInside.querySelectorAll('img');
   }
