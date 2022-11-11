@@ -1697,6 +1697,7 @@ function addProductToList(url, postData) {
 function getProductPrice() {
   let defaultFontSize = 13;
   let defaultHeight = 90;
+  let checkFontSize = true;
   elements = [...document.querySelectorAll(" body *")];
   if (window.location.href.indexOf('bedbathandbeyond.com') > -1 || window.location.href.indexOf('buybuybaby.com') > -1) {
     elements = [...document.querySelector("#wmHostPdp").shadowRoot.querySelectorAll('*')];
@@ -1710,6 +1711,10 @@ function getProductPrice() {
   if (window.location.href.indexOf('lulus.com') > -1) {
     elements = [...document.querySelector(".c-prod-price").querySelectorAll('*')];
   }
+  if (window.location.href.indexOf('etsy.com') > -1) {
+    elements = [...document.querySelectorAll('div[class="wt-grid__item-xs-12"]')[0].querySelectorAll('*')];
+    checkFontSize = false;
+  }
   if (window.location.href.indexOf('rh.com') > -1) {
     defaultFontSize = 11;
   }
@@ -1722,8 +1727,10 @@ function getProductPrice() {
     const text = element.textContent.trim();
     var record = {};
     const bBox = element.getBoundingClientRect();
-    if (text.length <= 30 && !(bBox.x == 0 && bBox.y == 0)) {
+    if (checkFontSize && text.length <= 30 && !(bBox.x == 0 && bBox.y == 0)) {
       record["fontSize"] = parseInt(getComputedStyle(element)["fontSize"]);
+    } else {
+      record["fontSize"] = 16;
     }
     record["y"] = bBox.y;
     record["x"] = bBox.x;
@@ -1776,6 +1783,9 @@ function getProductPrice() {
     if(record["text"].indexOf('Add to your cart — ') > -1) {
       record["text"] = record["text"].replace('Add to your cart — ', '');
     }
+    if(record["text"].indexOf('FREE delivery') > -1) {
+      record["text"] = record["text"].replace('FREE delivery', '');
+    }
     if (elementStyle.textDecorationLine != 'none') {
       record['textDecoration'] = true;
     } else {
@@ -1815,7 +1825,7 @@ function getProductPrice() {
       record["y"] > 1300 ||
       record["fontSize"] == undefined ||
       !record["text"].match(
-        /(^(US ){0,1}(rs\.|Rs\.|RS\.|\$|€|£|₹|INR|RP|Rp|USD|US\$|CAD|C\$){0,1}(\s){0,1}[\d,]+(\.\d+){0,1}(\s){0,1}(AED){0,1}(€){0,1}(£){0,1}(Rp){0,1}(CAD)$)/
+        /(^(US ){0,1}(rs\.|Rs\.|RS\.|\$|€|£|₹|INR|RP|Rp|USD|US\$|CAD|C\$){0,1}(\s){0,1}[\d,]+(\.\d+){0,1}(\s){0,1}(AED){0,1}(€){0,1}(£){0,1}(Rp){0,1}$)/
       ) ||
       record["textDecoration"]
     ) {
@@ -1988,7 +1998,10 @@ function getProductImages() {
     images = shadowInside.querySelectorAll('img');
   }
 
-  const divs = document.querySelectorAll('div[style]');
+  let divs = document.querySelectorAll('div[style]');
+  if (window.location.href.indexOf('etsy.com') > -1) {
+    divs = document.querySelectorAll('div[class="wt-grid__item-xs-12"] div[style]');
+  }
 
   let result = [];
   let mainImage = null;
@@ -1999,11 +2012,11 @@ function getProductImages() {
         const imageUrl = divs[i].style.backgroundImage;
         const url = imageUrl.slice(4, -1).replace(/"/g, "");
         const divBox = divs[i].getBoundingClientRect();
-        if (url & url.indexOf('http') > -1) {
+        if (url && url.indexOf('http') > -1) {
           if (divBox.height > 300 && divBox.width > 300 && divs[i].style.display != 'none' && divBox.y < 2500) {
             result.push(url);
       
-            if (divBox.height > 400 && divBox.width > 400 && !mainImage && divBox.y < 600) {
+            if (divBox.height > 300 && divBox.width > 300 && !mainImage && divBox.y < 600) {
               mainImage = url;
             }
           }
