@@ -40,6 +40,8 @@
   border-radius: 20px;
   background-color: #fff;
   cursor: pointer;
+  background: none!important;
+  box-shadow: none!important;
 }
 
 #giftlist_extension_popup_container * {
@@ -51,6 +53,7 @@
 
 #giftlist_extension_popup_container a {
   color: #50bcd9 !important;
+  border: none!important;
 }
 
 #giftlist_extension_popup_loading_container {
@@ -152,6 +155,7 @@
   border-radius: 15px;
   margin-bottom: 20px;
   max-height: 80%;
+  border: 1px solid #dbdbdb;
 }
 #giftlist_extension_popup_container *:focus-visible {
   box-shadow: none!important;
@@ -343,9 +347,10 @@
   text-transform: initial!important;
   outline: none!important;
   background-color: white!important;
-  font-weight: bold;
+  font-weight: 600;
   display: flex;
   flex: 1;
+  border: none!important;
 }
 
 #giftlist_extension_popup_content p {
@@ -380,7 +385,7 @@
   width: 100%;
   padding: 8px 15px;
   font-weight: 400;
-  font-size: 16px;
+  font-size: 16px!important;
   line-height: 20px;
   background-clip: padding-box;
   color: #101a34;
@@ -390,15 +395,19 @@
   min-height: auto;
   height: auto;
   box-sizing: border-box;
+  max-width: 100%!important;
+  border-radius: 5px!important;
 }
 
 #giftlist_extension_popup_content .extension-form-control {
   background: #fff;
   border-radius: 7px;
   width: 100%;
+  max-width: 100%!important;
+  border-radius: 5px!important;
   padding: 8px 15px;
   font-weight: 400;
-  font-size: 16px;
+  font-size: 16px!important;
   line-height: 20px;
   background-clip: padding-box;
   color: #101a34;
@@ -408,6 +417,7 @@
   min-height: auto;
   height: auto;
   box-sizing: border-box;
+  text-decoration: none!important;
 }
 
 #giftlist_extension_popup_content label {
@@ -455,6 +465,10 @@
   justify-content: center;
   align-items: center;
   display: flex;
+  border-radius: 5px!important;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  height: 48px;
 }
 
 #giftlist_extension_popup_content input {
@@ -534,7 +548,7 @@
   top: 33px;
   width: 13px;
   height: 13px;
-  border-radius: 50%;
+  border-radius: 50%!important;
   background: #000!important;
   animation-timing-function: cubic-bezier(0, 1, 1, 0);
   display: block!important;
@@ -747,7 +761,7 @@
   height: 20px;
   margin: 8px;
   border: 4px solid #fff;
-  border-radius: 50%;
+  border-radius: 50%!important;
   animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
   border-color: #fff transparent transparent transparent;
 }

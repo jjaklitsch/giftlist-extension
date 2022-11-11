@@ -267,7 +267,7 @@ const getAddGiftModal = (data) => {
 					<label>Item name</label>
 					<input type="text" placeholder="Item Name" value="${
             item_title ||
-            (product && product[0].product ? product[0].product.name : "")
+            (product && product[0].product ? product[0].product.name.replace(/"/g, "'") : "")
           }" id="giftlist_extension_selected_product_name" />
 				</div>
 				<div class="extension-form-group" style="display: flex;">
@@ -1696,6 +1696,7 @@ function addProductToList(url, postData) {
 
 function getProductPrice() {
   let defaultFontSize = 13;
+  let defaultHeight = 90;
   elements = [...document.querySelectorAll(" body *")];
   if (window.location.href.indexOf('bedbathandbeyond.com') > -1 || window.location.href.indexOf('buybuybaby.com') > -1) {
     elements = [...document.querySelector("#wmHostPdp").shadowRoot.querySelectorAll('*')];
@@ -1704,10 +1705,17 @@ function getProductPrice() {
     elements = [...document.querySelector("div[name='zone-a']").querySelectorAll('*')];
   }
   if (window.location.href.indexOf('somethingnavy.com') > -1) {
-    elements = [...document.querySelector("#wm_content").querySelectorAll('*')];
+    elements = [...document.querySelector(".price").querySelectorAll('*')];
+  }
+  if (window.location.href.indexOf('lulus.com') > -1) {
+    elements = [...document.querySelector(".c-prod-price").querySelectorAll('*')];
   }
   if (window.location.href.indexOf('rh.com') > -1) {
     defaultFontSize = 11;
+  }
+  if (window.location.href.indexOf('zitsticka.com') > -1) {
+    defaultHeight = 0;
+    defaultFontSize = 12;
   }
   function createRecordFromElement(element) {
     const elementStyle = getComputedStyle(element);
@@ -1720,41 +1728,53 @@ function getProductPrice() {
     record["y"] = bBox.y;
     record["x"] = bBox.x;
     record["text"] = text;
-    if(text.indexOf('Sale Price:') > -1 && text.length > 11) {
-      record["text"] = text.replace('Sale Price:', '');
+    if(record["text"].indexOf('Sale Price:') > -1 && record["text"].length > 11) {
+      record["text"] = record["text"].replace('Sale Price:', '');
     }
-    if(text.indexOf('Sale :') > -1) {
-      record["text"] = text.replace('Sale :', '');
+    if(record["text"].indexOf('Sale :') > -1) {
+      record["text"] = record["text"].replace('Sale :', '');
     }
-    if(text.indexOf('Standard Price:') > -1) {
-      record["text"] = text.replace('Standard Price:', '');
+    if(record["text"].indexOf('Standard Price:') > -1) {
+      record["text"] = record["text"].replace('Standard Price:', '');
     }
-    if(text.indexOf('Price') > -1) {
-      record["text"] = text.replace('Price', '');
+    if(record["text"].indexOf('Price') > -1) {
+      record["text"] = record["text"].replace('Price', '');
     }
-    if(text.indexOf('Limited Time Offer') > -1) {
-      record["text"] = text.replace('Limited Time Offer', '');
+    if(record["text"].indexOf('Limited Time Offer') > -1) {
+      record["text"] = record["text"].replace('Limited Time Offer', '');
     }
-    if(text.indexOf('USD') > -1) {
-      record["text"] = text.replace('USD', '');
+    if(record["text"].indexOf('USD ') > -1) {
+      record["text"] = record["text"].replace('USD ', '');
     }
-    if(text.indexOf('CAD') > -1) {
-      record["text"] = text.replace('CAD', '');
+    if(record["text"].indexOf('CAD ') > -1) {
+      record["text"] = record["text"].replace('CAD ', '');
     }
-    if(text.indexOf('Now') > -1) {
-      record["text"] = text.replace('Now ', '');
+    if(record["text"].indexOf('Now') > -1) {
+      record["text"] = record["text"].replace('Now ', '');
     }
-    if(text.indexOf(',') > -1) {
-      const textArys = text.split(',');
+    if(record["text"].indexOf('Save') > -1) {
+      record["text"] = record["text"].replace('Save ', '');
+    }
+    if(record["text"].indexOf('CA$') > -1) {
+      record["text"] = record["text"].replace('CA', '');
+    }
+    if(record["text"].indexOf(',') > -1) {
+      const textArys = record["text"].split(',');
       if (textArys.length > 2 && (parseInt(textArys[textArys.length - 1]) + "").length == 2) {
-        record["text"] = text.replace(/,([^,]*)$/, ".$1");
+        record["text"] = record["text"].replace(/,([^,]*)$/, ".$1");
       }
     }
-    if(text.includes('Sale \n\n') && text.length > 10) {
-      record["text"] = text.replace('Sale \n\n', '');
+    if(record["text"].includes('Sale \n\n') && record["text"].length > 10) {
+      record["text"] = record["text"].replace('Sale \n\n', '');
     }
-    if(text.indexOf('off - ') > -1) {
-      record["text"] = text.split('off - ')[1];
+    if(record["text"].indexOf('off - ') > -1) {
+      record["text"] = record["text"].split('off - ')[1];
+    }
+    if(record["text"].indexOf('-') > -1) {
+      record["text"] = record["text"].split('-')[0].trim();
+    }
+    if(record["text"].indexOf('Add to your cart — ') > -1) {
+      record["text"] = record["text"].replace('Add to your cart — ', '');
     }
     if (elementStyle.textDecorationLine != 'none') {
       record['textDecoration'] = true;
@@ -1786,20 +1806,23 @@ function getProductPrice() {
     if(record["text"].indexOf('Sale \n\n') > -1) {
       record["text"] = record["text"].replace('Sale \n\n', '');
     }
+    if(record["text"].indexOf('-') > -1 && record["text"].indexOf('$') > -1) {
+      record["text"] = record["text"].split('-')[1].trim();
+    }
     record["text"] = record['text'].trim();
 
     if (
       record["y"] > 1300 ||
       record["fontSize"] == undefined ||
       !record["text"].match(
-        /(^(US ){0,1}(rs\.|Rs\.|RS\.|\$|€|£|₹|INR|RP|Rp|USD|US\$|CAD|C\$){0,1}(\s){0,1}[\d,]+(\.\d+){0,1}(\s){0,1}(AED){0,1}(€){0,1}(£){0,1}(Rp){0,1}$)/
+        /(^(US ){0,1}(rs\.|Rs\.|RS\.|\$|€|£|₹|INR|RP|Rp|USD|US\$|CAD|C\$){0,1}(\s){0,1}[\d,]+(\.\d+){0,1}(\s){0,1}(AED){0,1}(€){0,1}(£){0,1}(Rp){0,1}(CAD)$)/
       ) ||
       record["textDecoration"]
     ) {
       return false;
     } else {
-      let scRe = /[\$\xA2-\xA5\u058F\u060B\u09F2\u09F3\u09FB\u0AF1\u0BF9\u0E3F\u17DB\u20A0-\u20BD\uA838\uFDFC\uFE69\uFF04\uFFE0\uFFE1\uFFE5\uFFE6Rp]/;
-      if (record["y"] > 90 && record['fontSize'] >= defaultFontSize && (scRe.test(record['text']))) return true;
+      let scRe = /[\$\xA2-\xA5\u058F\u060B\u09F2\u09F3\u09FB\u0AF1\u0BF9\u0E3F\u17DB\u20A0-\u20BD\uA838\uFDFC\uFE69\uFF04\uFFE0\uFFE1\uFFE5\uFFE6RpCAD]/;
+      if (record["y"] > defaultHeight && record['fontSize'] >= defaultFontSize && (scRe.test(record['text']))) return true;
     }
   }
   let possiblePriceRecords = records.filter(canBePrice);
@@ -1810,17 +1833,29 @@ function getProductPrice() {
   if (window.location.href.indexOf('homedepot.com') > -1) {
     return '$' + (parseFloat(priceRecordsSortedByFontSize[3]['text'].match(/-?(?:\d+(?:\.\d*)?|\.\d+)/)[0]) - parseFloat(priceRecordsSortedByFontSize[4]['text'].match(/-?(?:\d+(?:\.\d*)?|\.\d+)/)[0]));
   }
+  if (window.location.href.indexOf('zitsticka.com') > -1 && priceRecordsSortedByFontSize.length > 1) {
+    return '$' + (parseFloat(priceRecordsSortedByFontSize[1]['text'].match(/-?(?:\d+(?:\.\d*)?|\.\d+)/)[0]) - parseFloat(priceRecordsSortedByFontSize[0]['text'].match(/-?(?:\d+(?:\.\d*)?|\.\d+)/)[0]));
+  }
   if (window.location.href.indexOf('victoriassecret.com') > -1 || window.location.href.indexOf('bedbathandbeyond.com') > -1 || window.location.href.indexOf('jcrew.com') > -1) {
     return priceRecordsSortedByFontSize && priceRecordsSortedByFontSize[1] ? priceRecordsSortedByFontSize[1]['text'] : (priceRecordsSortedByFontSize && priceRecordsSortedByFontSize[0] ? priceRecordsSortedByFontSize[0]['text'] : '');
   }
   if (window.location.href.indexOf('sears.com') > -1 || window.location.href.indexOf('landsend.com') > -1 || window.location.href.indexOf('tommybahama.com') > -1) {
     return priceRecordsSortedByFontSize && priceRecordsSortedByFontSize[3] ? priceRecordsSortedByFontSize[3]['text'] : (priceRecordsSortedByFontSize && priceRecordsSortedByFontSize[0] ? priceRecordsSortedByFontSize[0]['text'] : '');
   }
+  if ((window.location.href.indexOf('unitedbyblue.com') > -1 || window.location.href.indexOf('zitsticka.com') > -1) && priceRecordsSortedByFontSize.length > 1) {
+    return priceRecordsSortedByFontSize && priceRecordsSortedByFontSize[1] ? priceRecordsSortedByFontSize[1]['text'] : (priceRecordsSortedByFontSize && priceRecordsSortedByFontSize[0] ? priceRecordsSortedByFontSize[0]['text'] : '');
+  }
+  if (window.location.href.indexOf('aesop.com') > -1) {
+    return priceRecordsSortedByFontSize && priceRecordsSortedByFontSize[priceRecordsSortedByFontSize.length - 1] ? priceRecordsSortedByFontSize[priceRecordsSortedByFontSize.length - 1]['text'] : '';
+  }
+  if (window.location.href.indexOf('harrypottershop.com') > -1 && priceRecordsSortedByFontSize.length > 1) {
+    return priceRecordsSortedByFontSize && priceRecordsSortedByFontSize[1] ? priceRecordsSortedByFontSize[1]['text'] : (priceRecordsSortedByFontSize && priceRecordsSortedByFontSize[0] ? priceRecordsSortedByFontSize[0]['text'] : '');
+  }
   return priceRecordsSortedByFontSize && priceRecordsSortedByFontSize[0] ? priceRecordsSortedByFontSize[0]['text'] : '';
 }
 
 function getProductTitle() {
-  return document.getElementsByTagName('title')[0].innerText.trim().replace(/\t/g, '').replace(/\s\s/g, '').split('–')[0];
+  return document.getElementsByTagName('title')[0].innerText.trim().replace(/\t/g, '').replace(/\s\s/g, '').split('–')[0].replace('/"/g', '\\"');
 }
 
 function getProductDescription() {
@@ -1843,6 +1878,7 @@ function getProductImages() {
   let removeQuery = false;
   let httpOnly = false;
   let useSrcset = false;
+  let mainImageIndex = 0;
   if (window.location.href.indexOf('chewy.com') > -1 || window.location.href.indexOf('cvs.com') > -1) {
     images = document.querySelectorAll("main img");
   }
@@ -1855,9 +1891,62 @@ function getProductImages() {
   if (window.location.href.indexOf('suitsupply.com') > -1) {
     images = document.querySelectorAll(".pdp-images img");
   }
+  if (window.location.href.indexOf('lulus.com') > -1) {
+    images = document.querySelectorAll(".c-prod img");
+  }
+  if (window.location.href.indexOf('12thtribe.com') > -1) {
+    images = document.querySelectorAll(".product__main-photos img");
+  }
+  if (window.location.href.indexOf('tommybahama.com') > -1) {
+    images = document.querySelectorAll("#product-details img");
+    mainImageIndex = 1;
+  }
+  if (window.location.href.indexOf('josephjoseph.com') > -1) {
+    images = document.querySelectorAll("#template-cart-items img");
+  }
+  if (window.location.href.indexOf('lonecone.com') > -1) {
+    images = document.querySelectorAll("#ProductPhoto img");
+    useSrcset = true;
+  }
   if (window.location.href.indexOf('somethingnavy.com') > -1) {
     images = document.querySelectorAll(".block-images source[type='image/jpg']");
     useSrcset = true;
+  }
+  if (window.location.href.indexOf('ghost-official.com') > -1) {
+    images = document.querySelectorAll(".product-single source");
+    useSrcset = true;
+  }
+  if (window.location.href.indexOf('louisvuitton.com') > -1) {
+    images = document.querySelectorAll(".lv-product img");
+    useSrcset = true;
+  }
+  if (window.location.href.indexOf('williams-sonoma.com') > -1) {
+    images = document.querySelectorAll(".sticky-left-river img");
+    useSrcset = true;
+  }
+  if (window.location.href.indexOf('bombas.com') > -1) {
+    images = document.querySelectorAll("#react-product img");
+    useSrcset = true;
+  }
+  if (window.location.href.indexOf('rolex.com') > -1) {
+    images = document.querySelectorAll("#page source[media='']");
+    useSrcset = true;
+    mainImageIndex = 1;
+  }
+  if (window.location.href.indexOf('noodleandboo.com') > -1 || window.location.href.indexOf('bellalunatoys.com') > -1 || window.location.href.indexOf('manhattantoy.com') > -1) {
+    images = document.querySelectorAll(".product__photos img");
+    useSrcset = true;
+  }
+  if (window.location.href.indexOf('kytebaby.com') > -1) {
+    images = document.querySelectorAll(".product img");
+    useSrcset = true;
+  }
+  if (window.location.href.indexOf('aesop.com') > -1) {
+    images = document.querySelectorAll("div[data-component='PDPHeaderSection'] img");
+  }
+  if (window.location.href.indexOf('oliverbonas.com') > -1) {
+    images = document.querySelectorAll(".product-media img");
+    httpOnly = true;
   }
   if (window.location.href.indexOf('therealreal.com') > -1) {
     images = document.querySelectorAll(".pdp-desktop-images img");
@@ -1922,7 +2011,7 @@ function getProductImages() {
       }
     }
   }
-
+  let mainIndex = 0;
   for (let i = 0; i < images.length; i++) {
     const imageElement = images[i];
     const bBox = imageElement.getBoundingClientRect();
@@ -1943,11 +2032,14 @@ function getProductImages() {
       }
 
       if (imageElement.naturalHeight > 400 && bBox.y < 600 && bBox.y > 80 && !mainImage && imageElement.src.indexOf('null') < 0) {
-        if (removeQuery) {
-          mainImage = imageElement.src.split("?")[0];
-        } else {
-          mainImage = imageElement.src;
+        if (mainIndex === mainImageIndex) {
+          if (removeQuery) {
+            mainImage = imageElement.src.split("?")[0];
+          } else {
+            mainImage = imageElement.src;
+          }
         }
+        mainIndex++;
       }
     }
   }
@@ -1968,13 +2060,13 @@ function getProductImages() {
             return item.trim();
           }
         })
-        mainImage = result[0];
+        mainImage = result[mainImageIndex || 0];
       }
     }
   }
 
   if (result.length && !mainImage) {
-    mainImage = result[0];
+    mainImage = result[mainImageIndex || 0];
   }
   
   return { images: result, mainImage };
