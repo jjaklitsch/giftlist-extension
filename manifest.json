@@ -2,7 +2,7 @@
   "short_name": "Add to GiftList Button",
   "name": "Add to GiftList Button",
   "description": "Add to GiftList Button",
-  "version": "1.1.0",
+  "version": "1.2",
   "manifest_version": 3,
   "permissions": [
     "storage",
@@ -19,7 +19,7 @@
     "matches": ["<all_urls>"],
     "extension_ids": []
   }],
-  "host_permissions": ["https://giftlist.dedicateddevelopers.us/api/*"],
+  "host_permissions": ["https://admin.giftlist.com/api/*"],
   "content_scripts": [{
     "js": ["scripts/content.js"],
     "css": ["public/css/index.css"],
