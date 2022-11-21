@@ -666,7 +666,7 @@ const showModal = async (exist_token, isFirst) => {
         getSuccessAddedModal();
       chrome.storage.sync.get(["is_first"], function (result) {
         chrome.storage.sync.set(
-          { is_first: (result.is_first || 1) * 1 + 1 },
+          { is_first: (result.is_first || 0) * 1 + 1 },
           function () {}
         );
       });
@@ -2134,7 +2134,7 @@ function getProductImages() {
   for (let i = 0; i < images.length; i++) {
     const imageElement = images[i];
     const bBox = imageElement.getBoundingClientRect();
-    if (!useSrcset && imageElement.naturalHeight >= limitHeight && imageElement.naturalWidth >= limitWidth && imageElement.style.display != 'none' && bBox.y < 2000 && imageElement.src.indexOf('/flags/') === -1 && imageElement.src) {
+    if (!useSrcset && imageElement.naturalHeight >= limitHeight && imageElement.naturalWidth >= limitWidth && imageElement.style.display != 'none' && bBox.y < 2000 && imageElement.src.indexOf('flag') === -1 && imageElement.src.indexOf('transparent') === -1 && imageElement.src.indexOf('chrome-extension') === -1 && imageElement.src.indexOf('giftlist.com') === -1 && imageElement.src) {
       if (httpOnly) {
         if (imageElement.src.indexOf('http') > -1 && imageElement.src.indexOf('http') != 0) {
           continue;
