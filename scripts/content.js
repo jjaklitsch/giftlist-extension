@@ -1814,7 +1814,9 @@ function getProductPrice() {
     record["text"] = record["text"].replace(/\n        /g, '');
     record["text"] = record["text"].replace("Discounted price", '');
     record["text"] = record["text"].replace("Sale ", '');
-    record["text"] = record["text"].replace(/\s/g, '');
+    if (record["text"].indexOf('$ ') > -1) {
+      record["text"] = record["text"].replace(/\s/g, '');
+    }
     if (elementStyle.textDecorationLine != 'none') {
       record['textDecoration'] = true;
     } else {
