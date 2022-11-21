@@ -367,7 +367,7 @@ const showModal = async (exist_token, isFirst) => {
 		border-radius:20px;
 		background-color:white;
 		position: fixed; box-shadow: 0px 12px 48px rgba(29, 5, 64, 0.32);
-		z-index: 99999999;
+		z-index: 10000002;
     max-height: 100vh;
     overflow-y: hidden;
 		`
@@ -1699,11 +1699,17 @@ function getProductPrice() {
   let defaultHeight = 90;
   let checkFontSize = true;
   elements = [...document.querySelectorAll(" body *")];
+  if (window.location.href.indexOf('www.amazon') > -1) {
+    elements = [...document.querySelector("#centerCol").querySelectorAll('*')];
+  }
   if (window.location.href.indexOf('bedbathandbeyond.com') > -1 || window.location.href.indexOf('buybuybaby.com') > -1) {
     elements = [...document.querySelector("#wmHostPdp").shadowRoot.querySelectorAll('*')];
   }
   if (window.location.href.indexOf('homedepot.com') > -1) {
     elements = [...document.querySelector("div[name='zone-a']").querySelectorAll('*')];
+  }
+  if (window.location.href.indexOf('goat.com') > -1) {
+    elements = [...document.querySelector('div[data-qa="buy_bar_desktop"] .swiper-slide-active').querySelectorAll('*')];
   }
   if (window.location.href.indexOf('somethingnavy.com') > -1) {
     elements = [...document.querySelector(".price").querySelectorAll('*')];
@@ -1718,13 +1724,22 @@ function getProductPrice() {
   if (window.location.href.indexOf('rh.com') > -1) {
     defaultFontSize = 11;
   }
+  if (window.location.href.indexOf('michaelkors.') > -1) {
+    defaultFontSize = 12;
+  }
+  if (window.location.href.indexOf('ssense.com') > -1) {
+    defaultFontSize = 11;
+  }
   if (window.location.href.indexOf('zitsticka.com') > -1) {
     defaultHeight = 0;
     defaultFontSize = 12;
   }
   function createRecordFromElement(element) {
     const elementStyle = getComputedStyle(element);
-    const text = element.textContent.trim();
+    const text = element.textContent;
+    if (!text) {
+      return false;
+    }
     var record = {};
     const bBox = element.getBoundingClientRect();
     if (checkFontSize && text.length <= 30 && !(bBox.x == 0 && bBox.y == 0)) {
@@ -1734,7 +1749,7 @@ function getProductPrice() {
     }
     record["y"] = bBox.y;
     record["x"] = bBox.x;
-    record["text"] = text;
+    record["text"] = text.replace(/\n        /g, '');
     if(record["text"].indexOf('Sale Price:') > -1 && record["text"].length > 11) {
       record["text"] = record["text"].replace('Sale Price:', '');
     }
@@ -1765,6 +1780,9 @@ function getProductPrice() {
     if(record["text"].indexOf('CA$') > -1) {
       record["text"] = record["text"].replace('CA', '');
     }
+    if(record["text"].indexOf('MRP : ') > -1) {
+      record["text"] = record["text"].replace('MRP : ', '');
+    }
     if(record["text"].indexOf(',') > -1) {
       const textArys = record["text"].split(',');
       if (textArys.length > 2 && (parseInt(textArys[textArys.length - 1]) + "").length == 2) {
@@ -1786,6 +1804,17 @@ function getProductPrice() {
     if(record["text"].indexOf('FREE delivery') > -1) {
       record["text"] = record["text"].replace('FREE delivery', '');
     }
+    if(window.location.href.indexOf('harborfreight.com') > -1) {
+      var len = record["text"].length;
+      var x = record["text"].substring(0, len-2) + "." + record["text"].substring(len-2);
+      record["text"] = x;
+    }
+    record["text"] = record["text"].replace("Now        ", '');
+    record["text"] = record["text"].split("\n\n")[0];
+    record["text"] = record["text"].replace(/\n        /g, '');
+    record["text"] = record["text"].replace("Discounted price", '');
+    record["text"] = record["text"].replace("Sale ", '');
+    record["text"] = record["text"].replace(/\s/g, '');
     if (elementStyle.textDecorationLine != 'none') {
       record['textDecoration'] = true;
     } else {
@@ -1793,8 +1822,14 @@ function getProductPrice() {
     }
     return record;
   }
-  let records = elements.map(createRecordFromElement);
+  let records = elements.map(createRecordFromElement).filter(r => r !== false);
   function canBePrice(record) {
+    if (!record) {
+      return false;
+    } 
+    if (!record['text']) {
+      return false;
+    }
     if(record["text"].indexOf('Sale :') > -1 && record["text"].length > 6) {
       record["text"] = record["text"].replace('Sale :', '');
     }
@@ -1811,13 +1846,20 @@ function getProductPrice() {
       record["text"] = record["text"].replace('current price: ', '');
     }
     if(record["text"].indexOf(' USD') > -1 && record["text"].length > 4) {
-      record["text"] = record["text"].replace(' USD', '');
+      if (record["text"].indexOf('$') > -1) {
+        record["text"] = record["text"].replace(' USD', '');
+      } else {
+        record["text"] = '$' + record["text"].replace(' USD', '');
+      }
     }
     if(record["text"].indexOf('Sale \n\n') > -1) {
       record["text"] = record["text"].replace('Sale \n\n', '');
     }
     if(record["text"].indexOf('-') > -1 && record["text"].indexOf('$') > -1) {
       record["text"] = record["text"].split('-')[1].trim();
+    }
+    if(record["text"].indexOf('Now') > -1) {
+      record["text"] = record["text"].replace('Now', '');
     }
     record["text"] = record['text'].trim();
 
@@ -1846,7 +1888,7 @@ function getProductPrice() {
   if (window.location.href.indexOf('zitsticka.com') > -1 && priceRecordsSortedByFontSize.length > 1) {
     return '$' + (parseFloat(priceRecordsSortedByFontSize[1]['text'].match(/-?(?:\d+(?:\.\d*)?|\.\d+)/)[0]) - parseFloat(priceRecordsSortedByFontSize[0]['text'].match(/-?(?:\d+(?:\.\d*)?|\.\d+)/)[0]));
   }
-  if (window.location.href.indexOf('victoriassecret.com') > -1 || window.location.href.indexOf('bedbathandbeyond.com') > -1 || window.location.href.indexOf('jcrew.com') > -1) {
+  if (window.location.href.indexOf('victoriassecret.com') > -1 || window.location.href.indexOf('jcrew.com') > -1) {
     return priceRecordsSortedByFontSize && priceRecordsSortedByFontSize[1] ? priceRecordsSortedByFontSize[1]['text'] : (priceRecordsSortedByFontSize && priceRecordsSortedByFontSize[0] ? priceRecordsSortedByFontSize[0]['text'] : '');
   }
   if (window.location.href.indexOf('sears.com') > -1 || window.location.href.indexOf('landsend.com') > -1 || window.location.href.indexOf('tommybahama.com') > -1) {
@@ -1855,7 +1897,7 @@ function getProductPrice() {
   if ((window.location.href.indexOf('unitedbyblue.com') > -1 || window.location.href.indexOf('zitsticka.com') > -1) && priceRecordsSortedByFontSize.length > 1) {
     return priceRecordsSortedByFontSize && priceRecordsSortedByFontSize[1] ? priceRecordsSortedByFontSize[1]['text'] : (priceRecordsSortedByFontSize && priceRecordsSortedByFontSize[0] ? priceRecordsSortedByFontSize[0]['text'] : '');
   }
-  if (window.location.href.indexOf('aesop.com') > -1) {
+  if (window.location.href.indexOf('aesop.com') > -1 || window.location.href.indexOf('bedbathandbeyond.com') > -1 || window.location.href.indexOf('prettylittlething.com') > -1 || window.location.href.indexOf('miumiu.com') > -1 || window.location.href.indexOf('princesspolly.com') > -1 || window.location.href.indexOf('heydudeshoesusa.com') > -1 || window.location.href.indexOf('stelladot.com') > -1 || window.location.href.indexOf('loft.com') > -1) {
     return priceRecordsSortedByFontSize && priceRecordsSortedByFontSize[priceRecordsSortedByFontSize.length - 1] ? priceRecordsSortedByFontSize[priceRecordsSortedByFontSize.length - 1]['text'] : '';
   }
   if (window.location.href.indexOf('harrypottershop.com') > -1 && priceRecordsSortedByFontSize.length > 1) {
@@ -1865,7 +1907,7 @@ function getProductPrice() {
 }
 
 function getProductTitle() {
-  return document.getElementsByTagName('title')[0].innerText.trim().replace(/\t/g, '').replace(/\s\s/g, '').split('–')[0].replace('/"/g', '\\"');
+  return document.getElementsByTagName('title')[0].innerText.trim().replace(/\t/g, '').replace(/\s\s/g, '').split('–')[0].split(' - ')[0].replace('/"/g', '\\"');
 }
 
 function getProductDescription() {
@@ -1914,6 +1956,53 @@ function getProductImages() {
   if (window.location.href.indexOf('josephjoseph.com') > -1) {
     images = document.querySelectorAll("#template-cart-items img");
   }
+  if (window.location.href.indexOf('potterybarnkids.com') > -1) {
+    images = document.querySelectorAll(".product-pip img");
+    mainImageIndex = 5;
+    httpOnly = true;
+  }
+  if (window.location.href.indexOf('stanley1913.com') > -1) {
+    images = document.querySelectorAll(".product__photos img");
+    useSrcset = true;
+  }
+  if (window.location.href.indexOf('ssense.com') > -1) {
+    images = document.querySelectorAll(".pdp-images__desktop img");
+    useSrcset = true;
+  }
+  if (window.location.href.indexOf('heydudeshoesusa.com') > -1) {
+    images = document.querySelectorAll('.bg-image-bg img');
+  }
+  if (window.location.href.indexOf('theordinary.com') > -1) {
+    images = document.querySelectorAll(".product-images source");
+    useSrcset = true;
+  }
+  if (window.location.href.indexOf('glossier.com') > -1) {
+    images = document.querySelectorAll(".product-gallery__slider img");
+    mainImageIndex = 1;
+  }
+  if (window.location.href.indexOf('chloe.com') > -1) {
+    images = document.querySelectorAll(".swiper-wrapper img");
+    mainImageIndex = 2;
+  }
+  if (window.location.href.indexOf('loft.com') > -1) {
+    images = document.querySelectorAll(".swiper-container img");
+    mainImageIndex = 1;
+  }
+  if (window.location.href.indexOf('miumiu.com') > -1) {
+    images = document.querySelectorAll(".grid-product-details__gallery source");
+    useSrcset = true;
+  }
+  if (window.location.href.indexOf('carhartt.com') > -1) {
+    images = document.querySelectorAll(".static-main-image-wrapper img");
+  }
+  if (window.location.href.indexOf('baublebar.com') > -1) {
+    images = document.querySelectorAll(".Product__Wrapper img");
+    useSrcset = true;
+  }
+  if (window.location.href.indexOf('princesspolly.com') > -1) {
+    images = document.querySelectorAll(".product__left img");
+    mainImageIndex = 3;
+  }
   if (window.location.href.indexOf('lonecone.com') > -1) {
     images = document.querySelectorAll("#ProductPhoto img");
     useSrcset = true;
@@ -1928,6 +2017,10 @@ function getProductImages() {
   }
   if (window.location.href.indexOf('louisvuitton.com') > -1) {
     images = document.querySelectorAll(".lv-product img");
+    useSrcset = true;
+  }
+  if (window.location.href.indexOf('melissaanddoug.com') > -1) {
+    images = document.querySelectorAll(".product-main__media img");
     useSrcset = true;
   }
   if (window.location.href.indexOf('williams-sonoma.com') > -1) {
@@ -1969,6 +2062,17 @@ function getProductImages() {
   if (window.location.href.indexOf('hillhousehome.com') > -1) {
     images = document.querySelectorAll(".pdpCarousel img");
     useSrcset = true;
+  }
+  if (window.location.href.indexOf('maisonette.com') > -1) {
+    images = document.querySelectorAll("#maincontent img");
+    httpOnly = true;
+  }
+  if (window.location.href.indexOf('charlottetilbury.com') > -1) {
+    images = document.querySelectorAll(".PDPCarousel img");
+  }
+  if (window.location.href.indexOf('converse.com') > -1) {
+    images = document.querySelectorAll("#main img");
+    httpOnly = true;
   }
   if (window.location.href.indexOf('jcrew.com') > -1) {
     images = document.querySelectorAll("#c-product__photos img");

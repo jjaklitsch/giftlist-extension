@@ -20,12 +20,16 @@
   top: 0px;
   background-color: rgba(0, 0, 0, 0.6);
   position: fixed;
-  z-index: 9999998;
+  z-index: 9999999999999999;
   display: flex;
   justify-content: center;
   align-items: center;
   color: #101a34;
   font-family: Poppins;
+}
+
+#giftlist_extension_popup_container *::placeholder {
+  font-size: 16px!important;
 }
 
 #giftlist_extension_popup_container #giftlist_extension_popup_main_content {
@@ -42,6 +46,7 @@
   cursor: pointer;
   background: none!important;
   box-shadow: none!important;
+  min-width: 18px!important;
 }
 
 #giftlist_extension_popup_container * {
@@ -112,7 +117,7 @@
   font-family: Poppins-Semibold;
   text-transform: initial!important;
   border-bottom: 0px!important;
-  font-weight: bold;
+  font-weight: 600;
   text-align: left;
 }
 
@@ -220,7 +225,7 @@
 #giftlist_extension_popup_container
   .giftlist-extension-success-added-content
   h2 {
-  font-weight: bold;
+  font-weight: 600;
   font-size: 30px;
   line-height: 36px;
   color: #101a34;
@@ -293,7 +298,7 @@
 }
 
 #giftlist_extension_popup_content h2 {
-  font-weight: bold;
+  font-weight: 600;
   font-size: 20px;
   line-height: 24px;
   color: #101a34;
@@ -329,6 +334,7 @@
     height: 19px;
     opacity: 1!important;
     z-index: inherit!important;
+    box-shadow: none!important;
 }
 
 #giftlist_extension_popup_content input:active, #giftlist_extension_popup_content input:focus, #giftlist_extension_popup_content input:hover {
