@@ -37,7 +37,7 @@
   max-height: 88vh;
 }
 
-#giftlist_extension_popup_container #close_dialog_btn{
+#giftlist_extension_popup_container #giftlist_close_dialog_btn{
   padding: 8px 12px;
   font-size: 16px;
   border: none;
@@ -47,6 +47,22 @@
   background: none!important;
   box-shadow: none!important;
   min-width: 18px!important;
+}
+
+#giftlist_extension_popup_container #giftlist_close_dialog_btn img{
+  width: 18px;
+  height: 18px;
+  z-index: 1;
+  position: absolute;
+  right: 10px;
+}
+
+#giftlist_extension_popup_container img + span{
+  display: none!important;
+}
+
+#giftlist_extension_popup_container .leading-normal{
+  display: none!important;
 }
 
 #giftlist_extension_popup_container * {
@@ -117,6 +133,7 @@
   font-family: Poppins-Semibold;
   text-transform: initial!important;
   border-bottom: 0px!important;
+  border-top: 0px!important;
   font-weight: 600;
   text-align: left;
 }
@@ -231,6 +248,7 @@
   color: #101a34;
   text-transform: initial!important;
   border-bottom: 0px!important;
+  border-top: 0px!important;
   text-align: left;
 }
 
@@ -295,6 +313,7 @@
   border-top: 1px solid grey;
   border-bottom: 1px solid grey;
   height: 0px;
+  width: 100%;
 }
 
 #giftlist_extension_popup_content h2 {
@@ -306,6 +325,7 @@
   margin-bottom: 10px;
   text-transform: initial!important;
   border-bottom: 0px!important;
+  border-top: 0px!important;
   text-align: left;
 }
 
@@ -544,10 +564,10 @@
 
 /** Loading Spinner animation */
 .lds-ellipsis {
-  display: inline-block;
+  display: inline-block!important;
   position: relative;
-  width: 80px;
-  height: 80px;
+  width: 80px!important;
+  height: 80px!important;
 }
 .lds-ellipsis div {
   position: absolute;
