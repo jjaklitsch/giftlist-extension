@@ -68,7 +68,7 @@ try {
       },
     })
   );
-} catch (e) {}
+} catch (e) { }
 
 var wheelOpt = supportsPassive ? { passive: false } : false;
 var wheelEvent =
@@ -167,24 +167,23 @@ const getShowMoreImageModal = () => {
 			</div>
 			<hr>
 			<div class="giftlist-extension-item-image-container">
-				${
-          product &&
-          product[0] &&
-          product[0].product &&
-          product[0].product.images &&
-          product[0].product.images.length > 0
-            ? product[0].product.images.reduce((acc, item) => {
-                return (
-                  acc +
-                  `
+				${product &&
+      product[0] &&
+      product[0].product &&
+      product[0].product.images &&
+      product[0].product.images.length > 0
+      ? product[0].product.images.reduce((acc, item) => {
+        return (
+          acc +
+          `
 						<div class="giftlist-extension-item-image">
 							<img src='${item}' class="selected-item-image" />
 						</div>
 					`
-                );
-              }, "")
-            : '<p style="margin-top: 10px; text-align: center; font-weight: bold;">No images</p>'
-        }
+        );
+      }, "")
+      : '<p style="margin-top: 10px; text-align: center; font-weight: bold;">No images</p>'
+    }
 			</div>
 		</div>
 	`;
@@ -196,9 +195,8 @@ const getAddGiftModal = (data) => {
   return `
     <div style="position: relative;">
       <h2>Add gift</h2>
-      ${
-        !product || (product && product.length > 0 && !product[0].product)
-          ? `
+      ${!product || (product && product.length > 0 && !product[0].product)
+      ? `
       <div style="position: absolute;width: 100%; height: 100%;display:flex;justify-content:center; align-items:center;top: 3px;">
         <div id="giftlist_extension_add_gift_error_message">
           <div id="giftlist_extension_add_gift_error_message_icon">
@@ -210,86 +208,78 @@ const getAddGiftModal = (data) => {
           </div>
         </div>
       </div>`
-          : ""
-      }
+      : ""
+    }
     </div>
     <hr>
 		<div class="giftlist-extension-add-gift-content">
 			<div class="giftlist-extension-image-container">
-        ${
-          product && product[0] && product[0].product
-            ? `
-          <img src="${
-            selected_image ??
-            (product[0].product && product[0].product.mainImage
-              ? product[0].product.mainImage
-              : "")
-          }" class="selected-item-image" />
-          ${
-            product[0].product &&
-            product[0].product.images &&
-            product[0].product.images.length > 0
-              ? '<button id="giftlist_extension_view_more_images" class="extension-btn extension-btn-link">View more images</button>'
-              : ""
-          }
+        ${product && product[0] && product[0].product
+      ? `
+          <img src="${selected_image ??
+      (product[0].product && product[0].product.mainImage
+        ? product[0].product.mainImage
+        : "")
+      }" class="selected-item-image" />
+          ${product[0].product &&
+        product[0].product.images &&
+        product[0].product.images.length > 0
+        ? '<button id="giftlist_extension_view_more_images" class="extension-btn extension-btn-link">View more images</button>'
+        : ""
+      }
         `
-            : `
+      : `
           <img src="${noneImage}" class="selected-item-image" />
           <p style="width: 70%;color: #818694;text-align:center;font-size: 15px;line-height:20px;font-weight:400;">You can add an image manually from the GiftList website.</p>
         `
-        }
+    }
 			</div>
 			<div class="giftlist-extension-add-gift-form">
 				<div class="extension-form-group">
 					<label>Add to List</label>
 					<select class="extension-form-control" id="giftlist_extension_list_id">
-						<option value="favourite" ${
-              selected_list_id === "favourite" ? "selected" : ""
-            }>Favorites</option>
+						<option value="favourite" ${selected_list_id === "favourite" ? "selected" : ""
+    }>Favorites</option>
 						${(data || []).map(
-              (item) =>
-                '<option value="' +
-                item.id +
-                "_" +
-                (item.isSanta ? "santa" : "list") +
-                '" ' +
-                (selected_list_id ===
-                item.id + "_" + (item.isSanta ? "santa" : "list")
-                  ? "selected"
-                  : "") +
-                ">" +
-                item.name +
-                "</option>"
-            )}
+      (item) =>
+        '<option value="' +
+        item.id +
+        "_" +
+        (item.isSanta ? "santa" : "list") +
+        '" ' +
+        (selected_list_id ===
+          item.id + "_" + (item.isSanta ? "santa" : "list")
+          ? "selected"
+          : "") +
+        ">" +
+        item.name +
+        "</option>"
+    )}
 					</select>
 				</div>
 				<div class="extension-form-group">
 					<label>Item name</label>
-					<input type="text" placeholder="Item Name" value="${
-            item_title ||
-            (product && product[0].product ? product[0].product.name.replace(/"/g, "'") : "")
-          }" id="giftlist_extension_selected_product_name" />
+					<input type="text" placeholder="Item Name" value="${item_title ||
+    (product && product[0].product ? product[0].product.name.replace(/"/g, "'") : "")
+    }" id="giftlist_extension_selected_product_name" />
 				</div>
 				<div class="extension-form-group" style="display: flex;">
-					<input type="checkbox" value="" id="giftlist_extension_most_wanted" ${
-            is_most_wanted ? "checked" : ""
-          }/>
+					<input type="checkbox" value="" id="giftlist_extension_most_wanted" ${is_most_wanted ? "checked" : ""
+    }/>
 					<label style="margin-left: 8px;font-weight: 400;font-size: 15px; line-height: 20px;margin-bottom: -1px;" for="giftlist_extension_most_wanted">Most wanted gift</label>
 				</div>
 				<div class="extension-form-group">
 					<label>Item URL</label>
-					<input type="text" placeholder="Item URL" value="${
-            item_url || window.location.href
-          }" id="giftlist_extension_selected_product_url" />
+					<input type="text" placeholder="Item URL" value="${item_url || window.location.href
+    }" id="giftlist_extension_selected_product_url" />
 				</div>
 				<div class="extension-form-group">
 					<label>Price<span style="color: #A8ACB3; margin-left: 6px;">(optional)</span></label>
-					<input type="text" placeholder="Price" value="${
-            (item_price ? (item_price * 1).toFixed(2) : "") ||
-            (product && product[0].product && product[0].product.offers
-              ? (product[0].product.offers[0].price * 1).toFixed(2)
-              : "")
-          }" id="giftlist_extension_selected_product_price" />
+					<input type="text" placeholder="Price" value="${(item_price ? (item_price * 1).toFixed(2) : "") ||
+    (product && product[0].product && product[0].product.offers
+      ? (product[0].product.offers[0].price * 1).toFixed(2)
+      : "")
+    }" id="giftlist_extension_selected_product_price" />
 				</div>
 				<div class="extension-form-group">
 					<label>Other details<span style="color: #A8ACB3; margin-left: 6px;">(optional)</span></label>
@@ -309,10 +299,26 @@ const getAddGiftModal = (data) => {
 const getLoginModal = () => {
   const eyeIcon = "https://www.giftlist.com/assets/extension-icons/eye.svg";
   const errorIcon = "https://www.giftlist.com/assets/extension-icons/error.svg";
+  const login_with_google = chrome.runtime.getURL('/public/images/login_with_google.svg');
+  const login_with_facebook = chrome.runtime.getURL('/public/images/login_with_facebook.svg');
+
   return `
 		<div class="giftlist-extension-login-content">
-			<h2>Please login to add this item to your list</h2>
-			<hr>
+      <div style="display: flex; flex-direction: row; gap: 8px;">
+        <div style="display: flex; flex: 1;" id="google_login_btn">
+          <img src="${login_with_google}" style="width: 100%;" />
+        </div>
+        <div style="display: flex; flex: 1;" id="facebook_login_btn">
+          <img src="${login_with_facebook}" style="width: 100%;" />
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: row; gap: 8px; margin-top: 20px; margin-bottom: 20px; justify-content: center; align-items: center;">
+        <div style="display: flex; flex: 1; height: 1px; background-color: rgba(0, 9, 31, 0.08);">
+        </div>
+        <span style="font-weight: bold;"> OR </span>
+        <div style="display: flex; flex: 1; height: 1px; background-color: rgba(0, 9, 31, 0.08);">
+        </div>
+      </div>
 			<div class="extension-form-group">
 				<label>Your email</label>
 				<input type="text" placeholder="Enter your email" id="giftlist-extension-login-email" autocomplete="on" />
@@ -342,11 +348,45 @@ const getLoginModal = () => {
           Sign in
         </button>
 				<a href="https://www.giftlist.com/forgot-password" target="_blank" style="padding-top: 15px; padding-bottom: 20px;font-weight: 500;font-size: 15px;line-height: 20px;">Forgot password?</a>
-				<span style="font-size: 13px;line-height: 16px;">New to GiftList? <a href="https://www.giftlist.com/signup" style="font-weight: bold;" target="_blank">Sign up</a></span>
+				<span style="font-size: 13px;line-height: 16px;">New to GiftList? <a href="https://www.giftlist.com/sign-up" style="font-weight: bold;" target="_blank">Sign up</a></span>
 			</div>
 		</div>
 	`;
 };
+
+const initFacebookSdk = () => {
+  window.fbAsyncInit = function () {
+    FB.init({
+      appId: '686337189167901',
+      cookie: true,
+      xfbml: true,
+      version: '{api-version}'
+    });
+
+    FB.AppEvents.logPageView();
+
+  };
+
+  (function (d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) { return; }
+    js = d.createElement(s); js.id = id;
+    js.src = "https://connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+}
+
+function signinWithGoogle() {
+  window.open('https://giftlist-31067.firebaseapp.com/__/auth/handler?apiKey=AIzaSyAXdTT8STbQJeVzcOdR0Yf2C0RGHNt_Xgk&appName=%5BDEFAULT%5D&authType=signInViaPopup&redirectUrl=https%3A%2F%2Fwww.giftlist.com%2Flogin&v=9.12.1&eventId=4836865683&providerId=google.com&scopes=profile', '_blank');
+}
+
+function signinWithFacebook() {
+  window.open('https://giftlist-31067.firebaseapp.com/__/auth/handler?apiKey=AIzaSyAXdTT8STbQJeVzcOdR0Yf2C0RGHNt_Xgk&appName=%5BDEFAULT%5D&authType=signInViaPopup&redirectUrl=https%3A%2F%2Fwww.giftlist.com%2Flogin&v=9.12.1&eventId=8959624613&providerId=facebook.com', '_blank');
+}
+
+function authCallback(err, token) {
+  console.log(token);
+}
 
 const showModal = async (exist_token, isFirst) => {
   const isLogin = false;
@@ -609,7 +649,7 @@ const showModal = async (exist_token, isFirst) => {
         } else if (selected_list_id.indexOf("_santa") > -1) {
           window.open(
             "https://www.giftlist.com/gift-exchange/" +
-              selected_list_id.split("_")[0],
+            selected_list_id.split("_")[0],
             "_blank"
           );
         }
@@ -667,7 +707,7 @@ const showModal = async (exist_token, isFirst) => {
       chrome.storage.sync.get(["is_first"], function (result) {
         chrome.storage.sync.set(
           { is_first: (result.is_first || 0) * 1 + 1 },
-          function () {}
+          function () { }
         );
       });
       if (
@@ -1152,7 +1192,7 @@ const showModal = async (exist_token, isFirst) => {
           selected_list_id = evt.target.value;
           chrome.storage.sync.set(
             { last_selected_list_id: selected_list_id },
-            function () {}
+            function () { }
           );
         });
     }
@@ -1395,6 +1435,21 @@ const showModal = async (exist_token, isFirst) => {
         }
       });
   }
+
+  if (mask.querySelector('#google_login_btn')) {
+    mask
+      .querySelector("#google_login_btn")
+      .addEventListener("click", async () => {
+        const google_result = await signinWithGoogle();
+      });
+  }
+  if (mask.querySelector('#facebook_login_btn')) {
+    mask
+      .querySelector("#facebook_login_btn")
+      .addEventListener("click", async () => {
+        const facebook_result = await signinWithFacebook();
+      });
+  }
   if (mask.querySelector("#giftlist-extension-login-email")) {
     mask
       .querySelector("#giftlist-extension-login-email")
@@ -1486,12 +1541,12 @@ const showModal = async (exist_token, isFirst) => {
 
   const tags = document.querySelectorAll('#giftlist_extension_popup_container img');
   tags.forEach(t => {
-    t.addEventListener('mouseover', function(e) {
+    t.addEventListener('mouseover', function (e) {
       e.preventDefault();
       e.stopPropagation();
       return false;
     });
-    t.addEventListener('mouseenter', function(e) {
+    t.addEventListener('mouseenter', function (e) {
       e.preventDefault();
       e.stopPropagation();
       return false;
@@ -1516,7 +1571,7 @@ function refreshToken() {
           if (res.status === 200) {
             chrome.storage.sync.set(
               { giftlist_access_token: res.token },
-              function (result) {}
+              function (result) { }
             );
             resolve(res.token);
           } else {
@@ -1526,7 +1581,7 @@ function refreshToken() {
                 giftlist_access_token: "",
                 giftlist_user: null,
               },
-              function (result) {}
+              function (result) { }
             );
             resolve("");
           }
@@ -1602,7 +1657,7 @@ async function getAllList(token) {
     })),
   ];
   tempData = {
-    user_token: token, 
+    user_token: token,
     lists,
   };
   tempListData = lists;
@@ -1671,7 +1726,7 @@ async function getProductData() {
     //     resolve(error);
     //   });
     // }
-    
+
     isScraped = true;
     if (productData && productData.status === 200) {
       scrappedProduct = productData;
@@ -1713,7 +1768,7 @@ function getProductPrice() {
   let defaultHeight = 90;
   let checkFontSize = true;
   let limitHeight = 1300;
-  
+
   if (window.location.href.indexOf('shoppersdrugmart.') > -1) {
     document.querySelector('h2[aria-label="Price Details"] span').remove();
   }
@@ -1772,70 +1827,70 @@ function getProductPrice() {
     record["y"] = bBox.y;
     record["x"] = bBox.x;
     record["text"] = text.trim().replace(/\n        /g, '');
-    if(record["text"].indexOf('Sale Price:') > -1 && record["text"].length > 11) {
+    if (record["text"].indexOf('Sale Price:') > -1 && record["text"].length > 11) {
       record["text"] = record["text"].replace('Sale Price:', '');
     }
-    if(record["text"].indexOf('Sale :') > -1) {
+    if (record["text"].indexOf('Sale :') > -1) {
       record["text"] = record["text"].replace('Sale :', '');
     }
-    if(record["text"].indexOf('Standard Price:') > -1) {
+    if (record["text"].indexOf('Standard Price:') > -1) {
       record["text"] = record["text"].replace('Standard Price:', '');
     }
-    if(record["text"].indexOf('Price') > -1) {
+    if (record["text"].indexOf('Price') > -1) {
       record["text"] = record["text"].replace('Price', '');
     }
-    if(record["text"].indexOf('Limited Time Offer') > -1) {
+    if (record["text"].indexOf('Limited Time Offer') > -1) {
       record["text"] = record["text"].replace('Limited Time Offer', '');
     }
-    if(record["text"].indexOf('USD ') > -1) {
+    if (record["text"].indexOf('USD ') > -1) {
       record["text"] = record["text"].replace('USD ', '');
     }
-    if(record["text"].indexOf('CAD ') > -1) {
+    if (record["text"].indexOf('CAD ') > -1) {
       if (record["text"].indexOf('$') > -1) {
         record["text"] = record["text"].replace('CAD ', '');
       } else {
         record["text"] = record["text"].replace('CAD ', '$');
       }
     }
-    if(record["text"].indexOf('Now') > -1) {
+    if (record["text"].indexOf('Now') > -1) {
       record["text"] = record["text"].replace('Now ', '');
     }
-    if(record["text"].indexOf('Save') > -1) {
+    if (record["text"].indexOf('Save') > -1) {
       record["text"] = record["text"].replace('Save ', '');
     }
-    if(record["text"].indexOf('CA$') > -1) {
+    if (record["text"].indexOf('CA$') > -1) {
       record["text"] = record["text"].replace('CA', '');
     }
-    if(record["text"].indexOf('CAD$') > -1) {
+    if (record["text"].indexOf('CAD$') > -1) {
       record["text"] = record["text"].replace('CAD$', '$');
     }
-    if(record["text"].indexOf('AU$') > -1) {
+    if (record["text"].indexOf('AU$') > -1) {
       record["text"] = record["text"].replace('AU$', '$');
     }
-    if(record["text"].indexOf('MRP : ') > -1) {
+    if (record["text"].indexOf('MRP : ') > -1) {
       record["text"] = record["text"].replace('MRP : ', '');
     }
-    if(record["text"].includes('Sale \n\n') && record["text"].length > 10) {
+    if (record["text"].includes('Sale \n\n') && record["text"].length > 10) {
       record["text"] = record["text"].replace('Sale \n\n', '');
     }
-    if(record["text"].indexOf('off - ') > -1) {
+    if (record["text"].indexOf('off - ') > -1) {
       record["text"] = record["text"].split('off - ')[1];
     }
-    if(record["text"].indexOf('-') > -1) {
+    if (record["text"].indexOf('-') > -1) {
       record["text"] = record["text"].split('-')[0].trim();
     }
-    if(record["text"].indexOf('Add to your cart — ') > -1) {
+    if (record["text"].indexOf('Add to your cart — ') > -1) {
       record["text"] = record["text"].replace('Add to your cart — ', '');
     }
-    if(record["text"].indexOf('FREE delivery') > -1) {
+    if (record["text"].indexOf('FREE delivery') > -1) {
       record["text"] = record["text"].replace('FREE delivery', '');
     }
-    if(window.location.href.indexOf('harborfreight.com') > -1 || window.location.href.indexOf('academy.com') > -1 || window.location.href.indexOf('charmit.com') > -1) {
+    if (window.location.href.indexOf('harborfreight.com') > -1 || window.location.href.indexOf('academy.com') > -1 || window.location.href.indexOf('charmit.com') > -1) {
       var len = record["text"].length;
-      var x = record["text"].substring(0, len-2) + "." + record["text"].substring(len-2);
+      var x = record["text"].substring(0, len - 2) + "." + record["text"].substring(len - 2);
       record["text"] = x;
     }
-    if(window.location.href.indexOf('mercadolibre.com') > -1 && record["text"].indexOf('pesos') > -1) {
+    if (window.location.href.indexOf('mercadolibre.com') > -1 && record["text"].indexOf('pesos') > -1) {
       record["text"] = record["text"].split('pesos')[1];
     }
     record["text"] = record["text"].replace("Now        ", '');
@@ -1857,10 +1912,10 @@ function getProductPrice() {
     if (scRe.test(record["text"]) && record["text"].indexOf('USD') > -1) {
       record["text"] = record["text"].replace('USD', '');
     }
-    if(record["text"].indexOf(' CAD') > -1) {
+    if (record["text"].indexOf(' CAD') > -1) {
       record["text"] = record["text"].replace(' CAD', '');
     }
-    if(record["text"].indexOf(',') > -1) {
+    if (record["text"].indexOf(',') > -1) {
       const textArys = record["text"].split(',');
       if (textArys.length >= 2 && (parseInt(textArys[textArys.length - 1]) + "").length == 2) {
         record["text"] = record["text"].replace(/,([^,]*)$/, ".$1");
@@ -1878,46 +1933,46 @@ function getProductPrice() {
   function canBePrice(record) {
     if (!record) {
       return false;
-    } 
+    }
     if (!record['text']) {
       return false;
     }
-    if(record["text"].indexOf('Sale :') > -1 && record["text"].length > 6) {
+    if (record["text"].indexOf('Sale :') > -1 && record["text"].length > 6) {
       record["text"] = record["text"].replace('Sale :', '');
     }
-    if(record["text"].indexOf(' Standard Price') > -1 && record["text"].length > 15) {
+    if (record["text"].indexOf(' Standard Price') > -1 && record["text"].length > 15) {
       record["text"] = record["text"].replace(' Standard Price', '');
     }
-    if(record["text"].indexOf('Standard ') > -1 && record["text"].length > 9) {
+    if (record["text"].indexOf('Standard ') > -1 && record["text"].length > 9) {
       record["text"] = record["text"].replace('Standard ', '');
     }
-    if(record["text"].indexOf('Chewy') > -1 && record["text"].length > 5) {
+    if (record["text"].indexOf('Chewy') > -1 && record["text"].length > 5) {
       record["text"] = record["text"].replace('Chewy', '');
     }
-    if(record["text"].indexOf('current price: ') > -1 && record["text"].length > 15) {
+    if (record["text"].indexOf('current price: ') > -1 && record["text"].length > 15) {
       record["text"] = record["text"].replace('current price: ', '');
     }
-    if(record["text"].indexOf(' USD') > -1 && record["text"].length > 4) {
+    if (record["text"].indexOf(' USD') > -1 && record["text"].length > 4) {
       if (record["text"].indexOf('$') > -1) {
         record["text"] = record["text"].replace(' USD', '');
       } else {
         record["text"] = '$' + record["text"].replace(' USD', '');
       }
     }
-    if(record["text"].indexOf(' CAD') > -1 && record["text"].length > 4) {
+    if (record["text"].indexOf(' CAD') > -1 && record["text"].length > 4) {
       if (record["text"].indexOf('$') > -1) {
         record["text"] = record["text"].replace(' CAD', '');
       } else {
         record["text"] = '$' + record["text"].replace(' CAD', '');
       }
     }
-    if(record["text"].indexOf('Sale \n\n') > -1) {
+    if (record["text"].indexOf('Sale \n\n') > -1) {
       record["text"] = record["text"].replace('Sale \n\n', '');
     }
-    if(record["text"].indexOf('-') > -1 && record["text"].indexOf('$') > -1) {
+    if (record["text"].indexOf('-') > -1 && record["text"].indexOf('$') > -1) {
       record["text"] = record["text"].split('-')[1].trim();
     }
-    if(record["text"].indexOf('Now') > -1) {
+    if (record["text"].indexOf('Now') > -1) {
       record["text"] = record["text"].replace('Now', '');
     }
     record["text"] = record['text'].trim();
@@ -2262,7 +2317,7 @@ function getProductImages() {
   if (window.location.href.indexOf('piccalio.com') > -1) {
     defaultMainIndex = 1;
   }
-  
+
   if (window.location.href.indexOf('bedbathandbeyond.com') > -1 || window.location.href.indexOf('buybuybaby.com') > -1) {
     const shadowInside = document.querySelector("#wmHostPdp").shadowRoot;
     images = shadowInside.querySelectorAll('img');
@@ -2285,7 +2340,7 @@ function getProductImages() {
 
   let result = [];
   let mainImage = null;
-  
+
   if (divs && divs.length) {
     for (let i = 0; i < divs.length; i++) {
       const divStyle = getComputedStyle(divs[i]);
@@ -2301,7 +2356,7 @@ function getProductImages() {
         if (url && url.indexOf('http') > -1 && url.indexOf('Loading') === -1) {
           if (divBox.height > 300 && divBox.width > 300 && divs[i].style.display != 'none' && divBox.y < 2500) {
             result.push(url);
-      
+
             if (divBox.height > 300 && divBox.width > 300 && !mainImage && divBox.y < 600) {
               mainImage = url;
             }
@@ -2342,7 +2397,7 @@ function getProductImages() {
       }
     }
   }
-  
+
   if (!result.length || useSrcset) {
     for (let i = 0; i < images.length; i++) {
       const imageElement = images[i];
@@ -2373,6 +2428,6 @@ function getProductImages() {
   if (defaultMainIndex > -1) {
     mainImage = result[defaultMainIndex];
   }
-  
+
   return { images: result, mainImage };
 }

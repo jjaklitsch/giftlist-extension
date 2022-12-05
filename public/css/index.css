@@ -37,6 +37,10 @@
   max-height: 88vh;
 }
 
+#giftlist_extension_popup_container #google_login_btn, #giftlist_extension_popup_container #facebook_login_btn {
+  cursor: pointer;
+}
+
 #giftlist_extension_popup_container #giftlist_close_dialog_btn{
   padding: 8px 12px;
   font-size: 16px;
