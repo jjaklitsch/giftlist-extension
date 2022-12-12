@@ -15,7 +15,8 @@
     "resources": [
       "public/css/index.css",
       "public/images/*.*",
-      "public/fonts/*.*"
+      "public/fonts/*.*",
+      "build/index.html"
     ],
     "matches": ["<all_urls>"],
     "extension_ids": []

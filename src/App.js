@@ -1,15 +1,84 @@
-import logo from './logo.svg';
+import { useEffect, useState } from "react";
+import {
+  Router,
+  getCurrent,
+  getComponentStack,
+} from "react-chrome-extension-router";
 import './App.css';
-import { changeColor } from './main';
+import Header from "./components/Header";
+import Loading from "./components/Loading";
+import { ProductContext } from "./contexts/ProductContext";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import { checkToken } from "./store/api";
 
 function App() {
+  const [values, setValues] = useState({
+    isAuthencated: false,
+    selected_image: null,
+    selected_product: {
+      item_title: '',
+      is_most_wanted: false,
+      item_url: '',
+      item_price: '',
+      item_description: '',
+    },
+    product: null,
+  });
+  const [isLoading, setLoading] = useState(false);
+
   useEffect(() => {
-    changeColor();
+    const checkTokenValid = async () => {
+      setLoading(true);
+      const token = await checkToken();
+      if (token) {
+        setValues({ ...values, isAuthencated: true });
+      }
+      setLoading(false);
+    };
+
+    checkTokenValid();
   }, []);
+
+  useEffect(() => {
+    var eventMethod = window.addEventListener
+      ? "addEventListener"
+      : "attachEvent";
+    var eventer = window[eventMethod];
+    var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
+
+    // Listen to message from child window
+    eventer(messageEvent, async function (e) {
+      console.log(e.data);
+      if (e.data.type === 'product_data') {
+        setValues({ ...values, product: e.data.data });
+      }
+    });
+  }, []);
+
+  const storeAllValues = (val) => {
+    setValues(val);
+  };
+
   return (
-    <div className="App">
-      
-    </div>
+    <ProductContext.Provider value={[values, storeAllValues]}>
+      <Router>
+        {isLoading &&
+          <div className="App" id="giftlist_extension_popup_container">
+            <div id="giftlist_extension_popup_content">
+              <Header isAuthenticated={values.isAuthencated} />
+              <Loading />
+            </div>
+          </div>
+        }
+        {(!isLoading && !values.isAuthencated) &&
+          <Login />
+        }
+        {(!isLoading && values.isAuthencated) &&
+          <Home />
+        }
+      </Router>
+    </ProductContext.Provider>
   );
 }
 

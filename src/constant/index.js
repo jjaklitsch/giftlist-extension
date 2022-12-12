@@ -1,0 +1,11 @@
+export const LOGO = 'https://www.giftlist.com/assets/extension-icons/logo.png';
+export const SHAKE_HAND = 'https://www.giftlist.com/assets/extension-icons/shake_hand.svg';
+export const CLOSE = 'https://www.giftlist.com/assets/extension-icons/close.svg';
+export const THUMB_UP = 'https://www.giftlist.com/assets/extension-icons/thumb_up.svg';
+export const THUMB_DOWN = 'https://www.giftlist.com/assets/extension-icons/thumb_down.svg';
+export const RAISE_HANDS = 'https://www.giftlist.com/assets/extension-icons/raise_hands.svg';
+export const GIFT_BOX = 'https://www.giftlist.com/assets/extension-icons/gift_box.svg';
+export const CRY = 'https://www.giftlist.com/assets/extension-icons/cry.svg';
+export const NONE_IMAGE = 'https://www.giftlist.com/assets/extension-icons/none-image.png';
+export const EYE = 'https://www.giftlist.com/assets/extension-icons/eye.svg';
+export const ERROR_ICON = 'https://www.giftlist.com/assets/extension-icons/error.svg';
