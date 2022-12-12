@@ -134,12 +134,12 @@ const showModal = async () => {
   );
 
   modal.innerHTML = `<div id="giftlist_extension_popup_content" style="height: 100%">
-          <div style="position:absolute; top: 18px; right:5px;">
+          <div style="position:absolute; top: 30px; right:5px;">
             <div id="giftlist_close_dialog_btn">
               <img src="${closeIcon}" style="width: 18px; height: 18px;" />
             </div>
           </div>
-          <iframe src="${website_url}" id="giftlist_extension_popup_iframe" style="width: 800px; height: 600px; border: none;" />
+          <iframe src="${website_url}" id="giftlist_extension_popup_iframe" style="width: 800px; height: 730px; border: none;" />
 				</div>`;
 
   mask.innerHTML = modal.outerHTML;
@@ -152,15 +152,17 @@ const showModal = async () => {
   });
 
   document.body.appendChild(mask);
-
   const product_data = await getProductData();
-  if (product_data) {
-    const child_window = document.querySelector('#giftlist_extension_popup_iframe').contentWindow;
-    child_window.postMessage({
-      type: 'product_data',
-      data: product_data,
-    }, "*");
-  }
+  setTimeout(() => {
+    console.log('product', product_data);
+    if (product_data) {
+      const child_window = document.querySelector('#giftlist_extension_popup_iframe').contentWindow;
+      child_window.postMessage({
+        type: 'product_data',
+        data: product_data.data,
+      }, "*");
+    }
+  }, 3000);
 };
 
 const callback = () => {

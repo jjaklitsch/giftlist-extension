@@ -3,13 +3,13 @@ import Header from "../components/Header";
 import { useProductContext } from "../contexts/ProductContext";
 import Home from "./Home";
 
-const MoreImages = () => {
-  const product = null;
+const MoreImages = ({ product }) => {
   const [context, setContext] = useProductContext();
   const handleSelectImage = (val) => {
     context.selected_image = val;
     setContext({ ...context });
-    goTo(Home);
+    product[0].product.mainImage = val;
+    goTo(Home, { data: product });
   };
 
   return (

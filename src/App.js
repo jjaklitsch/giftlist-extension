@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import {
   Router,
-  getCurrent,
-  getComponentStack,
 } from "react-chrome-extension-router";
 import './App.css';
 import Header from "./components/Header";
@@ -25,6 +23,7 @@ function App() {
     },
     product: null,
   });
+  const [product, setProduct] = useState(null);
   const [isLoading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -49,9 +48,8 @@ function App() {
 
     // Listen to message from child window
     eventer(messageEvent, async function (e) {
-      console.log(e.data);
       if (e.data.type === 'product_data') {
-        setValues({ ...values, product: e.data.data });
+        setProduct({ ...e.data.data });
       }
     });
   }, []);
@@ -75,7 +73,7 @@ function App() {
           <Login />
         }
         {(!isLoading && values.isAuthencated) &&
-          <Home />
+          <Home data={product} />
         }
       </Router>
     </ProductContext.Provider>
