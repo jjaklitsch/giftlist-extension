@@ -74,10 +74,10 @@ const Login = () => {
 
   const signinWithSSO = (data, provider) => {
     if (data) {
-      const postData = {
-        email: "coredev9431@gmail.com",
+      let postData = {
+        email: data.email,
         register_type: provider,
-        social_id: "105893674874206395764",
+        social_id: provider === 'facebook' ? data.id : data.sub,
       }
       setLoading(!isLoading);
       instance
