@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { goTo } from "react-chrome-extension-router";
 import Header from "../components/Header";
 import { GIFT_BOX } from "../constant";
@@ -28,6 +29,10 @@ const Success = () => {
   const handleContinue = () => {
     window.parent.postMessage({ type: 'close' }, "*");
   }
+
+  useEffect(() => {
+    window.parent.postMessage({ type: 'resize-modal', width: '800px', height: '315px' }, "*");
+  }, []);
 
   return (
     <div className="App" id="giftlist_extension_popup_container">

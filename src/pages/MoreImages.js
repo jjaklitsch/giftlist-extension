@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { goTo } from "react-chrome-extension-router";
 import Header from "../components/Header";
 import { useProductContext } from "../contexts/ProductContext";
@@ -11,6 +12,10 @@ const MoreImages = ({ product }) => {
     product[0].product.mainImage = val;
     goTo(Home, { data: product });
   };
+
+  useEffect(() => {
+    window.parent.postMessage({ type: 'resize-modal', width: '1100px', height: '730px' }, "*");
+  }, []);
 
   return (
     <div className="App" id="giftlist_extension_popup_container">

@@ -46,7 +46,11 @@ eventer(
     if (e.data.type === 'open') {
       window.open(e.data.link, '_blank');
     }
-    if (e.data.type === 'modal') {
+    if (e.data.type === 'resize-modal') {
+      if (document.querySelector('#giftlist_extension_popup_iframe')) {
+        document.querySelector('#giftlist_extension_popup_iframe').style.width = e.data.width;
+        document.querySelector('#giftlist_extension_popup_iframe').style.height = e.data.height;
+      }
     }
     if (e.data.type === 'close') {
       document.querySelector('#giftlist_extension_popup_container').remove();

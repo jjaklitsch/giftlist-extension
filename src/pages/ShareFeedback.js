@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "../components/Header";
 import { RAISE_HANDS, THUMB_DOWN, THUMB_UP } from "../constant";
 
@@ -14,11 +14,16 @@ const ShareFeedback = () => {
 
   const handleThumb = (val) => {
     setStatus(val);
+    window.parent.postMessage({ type: 'resize-modal', width: '900px', height: '470px' }, "*");
   }
 
   const handleBadFeedback = () => {
     window.parent.postMessage({ type: 'close' }, "*");
   }
+
+  useEffect(() => {
+    window.parent.postMessage({ type: 'resize-modal', width: '900px', height: '315px' }, "*");
+  }, []);
 
   return (
     <div className="App" id="giftlist_extension_popup_container">

@@ -2,6 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { useState } from 'react';
 import { goTo } from 'react-chrome-extension-router';
 import Header from '../components/Header';
+import Loading from '../components/Loading';
 import { CRY, NONE_IMAGE } from '../constant';
 import { useProductContext } from '../contexts/ProductContext';
 import { instance } from '../store/api';
@@ -11,12 +12,12 @@ import Success from './Success';
 const Home = ({ data }) => {
   const [context, setContext] = useProductContext();
   const [product, setProduct] = useState(data);
+  const [isGetting, setGetting] = useState(true);
   const [isLoading, setLoading] = useState(false);
   const [is_most_wanted, setMostWanted] = useState(false);
   const [selected_list_id, setSelected] = useState('');
   const [lists, setListData] = useState([]);
   const [selected_item, setSelectedItem] = useState({});
-  const selected_image = '';
 
   const changeItemName = (value) => {
     setSelectedItem({ ...selected_item, item_title: value });
@@ -90,10 +91,11 @@ const Home = ({ data }) => {
 
   useEffect(() => {
     getAllList();
+    const last_selected = localStorage.getItem('@last_selected');
+    setSelected(last_selected);
   }, []);
 
   useEffect(() => {
-    console.log(data);
     if (data) {
       setSelectedItem({
         selected_image: data && data[0].product && data[0].product.mainImage ? data[0].product.mainImage : "",
@@ -103,99 +105,109 @@ const Home = ({ data }) => {
         item_url: data && data[0].product ? data[0].product.url.replace(/"/g, "'") : "",
         images: data && data[0].product ? data[0].product.images : [],
       });
+      setGetting(false);
     }
   }, [data]);
+
+  useEffect(() => {
+    window.parent.postMessage({ type: 'resize-modal', width: '800px', height: '730px' }, "*");
+  }, []);
 
   return (
     <div className="App" id="giftlist_extension_popup_container">
       <div id="giftlist_extension_popup_content">
         <Header isAuthenticated={context.isAuthencated} />
-        <div id="giftlist_extension_popup_main_content">
-          <div style={{ position: 'relative' }}>
-            <h2>Add gift</h2>
-            {(!selected_item || (selected_item && !selected_item.item_title)) &&
-              <div style={{ position: 'absolute', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', top: -2 }}>
-                <div id="giftlist_extension_add_gift_error_message">
-                  <div id="giftlist_extension_add_gift_error_message_icon">
-                    <img src={CRY} style={{ width: 25, height: 25 }} alt={''} />
+        {isGetting &&
+          <Loading />
+        }
+        {!isGetting &&
+          <div id="giftlist_extension_popup_main_content">
+            <div style={{ position: 'relative' }}>
+              <h2>Add gift</h2>
+              {(!selected_item || (selected_item && !selected_item.item_title)) &&
+                <div style={{ position: 'absolute', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', top: -2 }}>
+                  <div id="giftlist_extension_add_gift_error_message">
+                    <div id="giftlist_extension_add_gift_error_message_icon">
+                      <img src={CRY} style={{ width: 25, height: 25 }} alt={''} />
+                    </div>
+                    <div id="giftlist_extension_add_gift_error_title">
+                      <p>Sorry, we couldn’t fetch item details from this site.</p>
+                      <p>Please add your item details manually.</p>
+                    </div>
                   </div>
-                  <div id="giftlist_extension_add_gift_error_title">
-                    <p>Sorry, we couldn’t fetch item details from this site.</p>
-                    <p>Please add your item details manually.</p>
-                  </div>
-                </div>
-              </div>
-            }
-          </div>
-          <hr />
-          <div className="giftlist-extension-add-gift-content">
-            <div className="giftlist-extension-image-container">
-              {selected_item && selected_item.images && selected_item.images.length > 0
-                ?
-                <div>
-                  <img src={selected_item?.selected_image ?? (product[0].product && product[0].product.mainImage ? product[0].product.mainImage : "")} className="selected-item-image" alt={''} />
-                  {selected_item.images.length > 0
-                    ? <button id="giftlist_extension_view_more_images" className="extension-btn extension-btn-link" onClick={handleViewMoreImages}>View more images</button>
-                    : ""
-                  }
-                </div>
-                :
-                <div>
-                  <img src={NONE_IMAGE} className="selected-item-image" alt={''} />
-                  <p style={{ color: '#818694', textAlign: 'center', fontSize: 15, lineHeight: '20px', fontWeight: 400 }}>You can add an image manually from the GiftList website.</p>
                 </div>
               }
             </div>
-            <div className="giftlist-extension-add-gift-form">
-              <div className="extension-form-group">
-                <label>Add to List</label>
-                <select className="extension-form-control" id="giftlist_extension_list_id" value={selected_list_id} onChange={handleCategory}>
-                  <option value="favourite">Favorites</option>
-                  {(lists || []).map(
-                    (item) =>
-                      <option value={item.id + "_" + (item.isSanta ? "santa" : "list")} key={item.id + "_" + (item.isSanta ? "santa" : "list")}>
-                        {item.name}
-                      </option>
-                  )}
-                </select>
+            <hr />
+            <div className="giftlist-extension-add-gift-content">
+              <div className="giftlist-extension-image-container">
+                {selected_item && selected_item.images && selected_item.images.length > 0
+                  ?
+                  <div>
+                    <img src={selected_item?.selected_image ?? (product[0].product && product[0].product.mainImage ? product[0].product.mainImage : "")} className="selected-item-image" alt={''} />
+                    {selected_item.images.length > 0
+                      ? <button id="giftlist_extension_view_more_images" className="extension-btn extension-btn-link" onClick={handleViewMoreImages}>View more images</button>
+                      : ""
+                    }
+                  </div>
+                  :
+                  <div>
+                    <img src={NONE_IMAGE} className="selected-item-image" alt={''} />
+                    <p style={{ color: '#818694', textAlign: 'center', fontSize: 15, lineHeight: '20px', fontWeight: 400 }}>You can add an image manually from the GiftList website.</p>
+                  </div>
+                }
               </div>
-              <div className="extension-form-group">
-                <label>Item name</label>
-                <input
-                  type="text"
-                  placeholder="Item Name"
-                  value={selected_item.item_title || (product && product[0].product ? product[0].product.name.replace(/"/g, "'") : "")}
-                  onChange={(e) => changeItemName(e.target.value)}
-                  id="giftlist_extension_selected_product_name"
-                />
-              </div>
-              <div className="extension-form-group" style={{ display: 'flex' }}>
-                <input type="checkbox" value="" id="giftlist_extension_most_wanted" checked={is_most_wanted} onChange={() => setMostWanted(!is_most_wanted)} />
-                <label style={{ marginLeft: 8, fontWeight: 400, fontSize: 15, lineHeight: '20px', marginBottom: -1 }} htmlFor="giftlist_extension_most_wanted">Most wanted gift</label>
-              </div>
-              <div className="extension-form-group">
-                <label>Item URL</label>
-                <input type="text" placeholder="Item URL" value={selected_item.item_url || window.location.href} onChange={(e) => setSelectedItem({ ...selected_item, item_url: e.target.value })} id="giftlist_extension_selected_product_url" />
-              </div>
-              <div className="extension-form-group">
-                <label>Price<span style={{ color: '#A8ACB3', marginLeft: 6 }}>(optional)</span></label>
-                <input type="text" placeholder="Price" value={(selected_item.item_price ? (selected_item.item_price * 1).toFixed(2) : "") || (product && product[0].product && product[0].product.offers ? (product[0].product.offers[0].price * 1).toFixed(2) : "")} onChange={(e) => setSelectedItem({ ...selected_item, item_price: e.target.value })} id="giftlist_extension_selected_product_price" />
-              </div>
-              <div className="extension-form-group">
-                <label>Other details<span style={{ color: '#A8ACB3', marginLeft: 6 }}>(optional)</span></label>
-                <textarea className="extension-form-control" rows="3" placeholder="Other important details: size, color, etc." id="giftlist_extension_selected_product_others" onChange={(e) => setSelectedItem({ ...selected_item, item_description: e.target.value })}>{selected_item.item_description}</textarea>
-              </div>
-              <div className="form-actions">
-                <button className="extension-btn" id="giftlist_extension_add_btn" onClick={handleAddGift} disabled={isLoading}>
-                  {isLoading &&
-                    <div className="lds-ring"><div></div><div></div><div></div><div></div></div>
-                  }
-                  Add gift
-                </button>
+              <div className="giftlist-extension-add-gift-form">
+                <div className="extension-form-group">
+                  <label>Add to List</label>
+                  <select className="extension-form-control" id="giftlist_extension_list_id" value={selected_list_id} onChange={handleCategory}>
+                    <option value="favourite">Favorites</option>
+                    {(lists || []).map(
+                      (item) =>
+                        <option value={item.id + "_" + (item.isSanta ? "santa" : "list")} key={item.id + "_" + (item.isSanta ? "santa" : "list")}>
+                          {item.name}
+                        </option>
+                    )}
+                  </select>
+                </div>
+                <div className="extension-form-group">
+                  <label>Item name</label>
+                  <input
+                    type="text"
+                    placeholder="Item Name"
+                    value={selected_item.item_title || (product && product[0].product ? product[0].product.name.replace(/"/g, "'") : "")}
+                    onChange={(e) => changeItemName(e.target.value)}
+                    id="giftlist_extension_selected_product_name"
+                  />
+                </div>
+                <div className="extension-form-group" style={{ display: 'flex' }}>
+                  <input type="checkbox" value="" id="giftlist_extension_most_wanted" checked={is_most_wanted} onChange={() => setMostWanted(!is_most_wanted)} />
+                  <label style={{ marginLeft: 8, fontWeight: 400, fontSize: 15, lineHeight: '20px', marginBottom: -1 }} htmlFor="giftlist_extension_most_wanted">Most wanted gift</label>
+                </div>
+                <div className="extension-form-group">
+                  <label>Item URL</label>
+                  <input type="text" placeholder="Item URL" value={selected_item.item_url || window.location.href} onChange={(e) => setSelectedItem({ ...selected_item, item_url: e.target.value })} id="giftlist_extension_selected_product_url" />
+                </div>
+                <div className="extension-form-group">
+                  <label>Price<span style={{ color: '#A8ACB3', marginLeft: 6 }}>(optional)</span></label>
+                  <input type="text" placeholder="Price" value={(selected_item.item_price ? (selected_item.item_price * 1).toFixed(2) : "") || (product && product[0].product && product[0].product.offers ? (product[0].product.offers[0].price * 1).toFixed(2) : "")} onChange={(e) => setSelectedItem({ ...selected_item, item_price: e.target.value })} id="giftlist_extension_selected_product_price" />
+                </div>
+                <div className="extension-form-group">
+                  <label>Other details<span style={{ color: '#A8ACB3', marginLeft: 6 }}>(optional)</span></label>
+                  <textarea className="extension-form-control" rows="3" placeholder="Other important details: size, color, etc." id="giftlist_extension_selected_product_others" onChange={(e) => setSelectedItem({ ...selected_item, item_description: e.target.value })}>{selected_item.item_description}</textarea>
+                </div>
+                <div className="form-actions">
+                  <button className="extension-btn" id="giftlist_extension_add_btn" onClick={handleAddGift} disabled={isLoading}>
+                    {isLoading &&
+                      <div className="lds-ring"><div></div><div></div><div></div><div></div></div>
+                    }
+                    Add gift
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        }
       </div>
     </div>
   )

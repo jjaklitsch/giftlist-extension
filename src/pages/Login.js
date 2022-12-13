@@ -1,4 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import {
+  LoginSocialGoogle,
+  LoginSocialFacebook,
+} from 'reactjs-social-login';
 import Header from '../components/Header';
 import { ERROR_ICON, EYE } from "../constant";
 import { useProductContext } from '../contexts/ProductContext';
@@ -52,6 +56,26 @@ const Login = () => {
       })
   };
 
+  const handleForgotPassword = () => {
+    window.parent.postMessage({ type: 'open', link: 'https://www.giftlist.com/forgot-password' }, '*');
+  }
+
+  const handleSignup = () => {
+    window.parent.postMessage({ type: 'open', link: 'https://www.giftlist.com/sign-up' }, '*');
+  }
+
+  const onLoginStart = () => {
+    console.log('start');
+  }
+
+  const onLogoutSuccess = () => {
+    console.log('logout');
+  }
+
+  useEffect(() => {
+    window.parent.postMessage({ type: 'resize-modal', width: '465px', height: '525px' }, "*");
+  }, []);
+
   return (
     <div className="App" id="giftlist_extension_popup_container">
       <div id="giftlist_extension_popup_content">
@@ -59,10 +83,41 @@ const Login = () => {
         <div className="giftlist-extension-login-content">
           <div style={{ display: 'flex', flexDirection: 'row', gap: 8 }}>
             <div style={{ display: 'flex', flex: 1 }} id="google_login_btn">
-              <img src="/images/login_with_google.svg" style={{ width: '100%' }} alt={''} />
+              <LoginSocialGoogle
+                client_id={'192788379011-3uf0ii69k0igf4uj5hvdla853jhmlo4r.apps.googleusercontent.com'}
+                onLoginStart={onLoginStart}
+                redirect_uri={'https://giftlist-31067.firebaseapp.com/__/auth/handler'}
+                scope="openid profile email"
+                discoveryDocs="claims_supported"
+                access_type="offline"
+                onResolve={({ provider, data }) => {
+                  console.log(data);
+                }}
+                onReject={err => {
+                  console.log(err);
+                }}
+              >
+                <img src="/images/login_with_google.svg" style={{ width: '100%' }} alt={''} />
+              </LoginSocialGoogle>
             </div>
             <div style={{ display: 'flex', flex: 1 }} id="facebook_login_btn">
-              <img src="/images/login_with_facebook.svg" style={{ width: '100%' }} alt={''} />
+              <LoginSocialFacebook
+                appId={'686337189167901'}
+                fieldsProfile={
+                  'id,first_name,last_name,middle_name,name,name_format,picture,short_name,email,gender'
+                }
+                onLoginStart={onLoginStart}
+                onLogoutSuccess={onLogoutSuccess}
+                redirect_uri={'https://giftlist-31067.firebaseapp.com/__/auth/handler'}
+                onResolve={({ provider, data }) => {
+                  console.log(data);
+                }}
+                onReject={err => {
+                  console.log(err);
+                }}
+              >
+                <img src="/images/login_with_facebook.svg" style={{ width: '100%' }} alt={''} />
+              </LoginSocialFacebook>
             </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'row', gap: 8, marginTop: 20, marginBottom: 20, justifyContent: 'center', alignItems: 'center' }}>
@@ -104,8 +159,8 @@ const Login = () => {
               }
               Sign in
             </button>
-            <a href="https://www.giftlist.com/forgot-password" target="_blank" rel="noreferrer" style={{ paddingTop: 15, paddingBottom: 20, fontWeight: 500, fontSize: 15, lineHeight: '20px' }}>Forgot password?</a>
-            <span style={{ fontSize: 13, lineHeight: '16px' }}>New to GiftList? <a href="https://www.giftlist.com/sign-up" style={{ fontWeight: 'bold' }} target="_blank" rel="noreferrer">Sign up</a></span>
+            <a href="#" rel="noreferrer" onClick={handleForgotPassword} style={{ paddingTop: 15, paddingBottom: 20, fontWeight: 500, fontSize: 15, lineHeight: '20px' }}>Forgot password?</a>
+            <span style={{ fontSize: 13, lineHeight: '16px' }}>New to GiftList? <a href="#" style={{ fontWeight: 'bold' }} rel="noreferrer" onClick={handleSignup}>Sign up</a></span>
           </div>
         </div>
       </div>
