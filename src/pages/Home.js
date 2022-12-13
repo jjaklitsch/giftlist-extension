@@ -49,6 +49,8 @@ const Home = ({ data }) => {
       })),
     ];
     setListData(lists);
+    const last_selected = localStorage.getItem('@last_selected');
+    setSelected(last_selected);
     return lists;
   };
 
@@ -91,8 +93,6 @@ const Home = ({ data }) => {
 
   useEffect(() => {
     getAllList();
-    const last_selected = localStorage.getItem('@last_selected');
-    setSelected(last_selected);
   }, []);
 
   useEffect(() => {
@@ -111,7 +111,9 @@ const Home = ({ data }) => {
 
   useEffect(() => {
     window.parent.postMessage({ type: 'resize-modal', width: '800px', height: '730px' }, "*");
+    window.parent.postMessage({ type: 'require_product' }, "*");
   }, []);
+
 
   return (
     <div className="App" id="giftlist_extension_popup_container">

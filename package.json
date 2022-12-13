@@ -7,6 +7,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.2.1",
+    "firebase": "^9.15.0",
     "react": "^18.2.0",
     "react-chrome-extension-router": "^1.4.0",
     "react-dom": "^18.2.0",
@@ -20,7 +21,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "move": "yarn build && rm -rf ./static && mv build/static ./static",
-    "move-win": "yarn build && if exist \"static\" rmdir /S /Q \"static\" && xcopy \"build/static\" \"static\" /E /I"
+    "move-win": "yarn build && if exist \"static\" rmdir /S /Q \"static\" && xcopy \"build/static\" \"static\" /E /I",
+    "deploy": "firebase deploy --only hosting:giftlist-extension"
   },
   "eslintConfig": {
     "extends": [

@@ -13,15 +13,12 @@
   ],
   "web_accessible_resources": [{
     "resources": [
-      "public/css/index.css",
-      "public/images/*.*",
-      "public/fonts/*.*",
-      "build/index.html"
+      "public/css/index.css"
     ],
     "matches": ["<all_urls>"],
     "extension_ids": []
   }],
-  "host_permissions": ["https://admin.giftlist.com/api/*", "https://apis.google.com/*", "https://www.gstatic.com/*", "https://www.googleapis.com/*", "https://securetoken.googleapis.com/*"],
+  "host_permissions": ["https://admin.giftlist.com/api/*"],
   "content_scripts": [{
     "js": ["scripts/content.js"],
     "css": ["public/css/index.css"],

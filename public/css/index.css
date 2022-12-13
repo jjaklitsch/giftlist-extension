@@ -160,7 +160,7 @@
   margin-right: 15px;
   flex: 1;
   max-height: 600px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 #giftlist_extension_popup_container

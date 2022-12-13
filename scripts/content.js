@@ -54,6 +54,17 @@ eventer(
     }
     if (e.data.type === 'close') {
       document.querySelector('#giftlist_extension_popup_container').remove();
+      isOpen = false;
+    }
+    if (e.data.type === 'require_product') {
+      const product_data = await getProductData();
+      if (product_data) {
+        const child_window = document.querySelector('#giftlist_extension_popup_iframe').contentWindow;
+        child_window.postMessage({
+          type: 'product_data',
+          data: product_data.data,
+        }, "*");
+      }
     }
   },
   false
@@ -116,8 +127,6 @@ function enableScroll() {
 const showModal = async () => {
   const closeIcon = "https://www.giftlist.com/assets/extension-icons/close.svg";
 
-  const website_url = chrome.runtime.getURL('/build/index.html');
-
   const mask = document.createElement("div");
   mask.setAttribute("id", "giftlist_extension_popup_container");
   const modal = document.createElement("div");
@@ -143,7 +152,7 @@ const showModal = async () => {
               <img src="${closeIcon}" style="width: 18px; height: 18px;" />
             </div>
           </div>
-          <iframe src="${website_url}" id="giftlist_extension_popup_iframe" style="width: 800px; height: 730px; border: none;" />
+          <iframe src="https://giftlist-extension.web.app" id="giftlist_extension_popup_iframe" style="width: 800px; height: 730px; border: none;" />
 				</div>`;
 
   mask.innerHTML = modal.outerHTML;
@@ -156,17 +165,6 @@ const showModal = async () => {
   });
 
   document.body.appendChild(mask);
-  const product_data = await getProductData();
-  setTimeout(() => {
-    console.log('product', product_data);
-    if (product_data) {
-      const child_window = document.querySelector('#giftlist_extension_popup_iframe').contentWindow;
-      child_window.postMessage({
-        type: 'product_data',
-        data: product_data.data,
-      }, "*");
-    }
-  }, 3000);
 };
 
 const callback = () => {

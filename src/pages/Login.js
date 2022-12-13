@@ -72,6 +72,45 @@ const Login = () => {
     console.log('logout');
   }
 
+  const signinWithSSO = (data, provider) => {
+    if (data) {
+      const postData = {
+        email: "coredev9431@gmail.com",
+        register_type: provider,
+        social_id: "105893674874206395764",
+      }
+      setLoading(!isLoading);
+      instance
+        .post('/user/existency/check', postData)
+        .then(res => {
+          if (res.status === 200) {
+            instance
+              .post('/user/social/signin', postData)
+              .then(res => {
+                setLoading(false);
+                if (res.status === 200) {
+                  localStorage.setItem('@access_token', res.token);
+                  localStorage.setItem('@refresh_token', res.refresh_token);
+                  localStorage.setItem('@user', JSON.stringify(res.data));
+                  instance.defaults.headers.common['x-access-token'] = res.token;
+                  window.location.reload();
+                } else {
+                  if (res.message) {
+                    setErrorMessage(res.message);
+                  }
+                }
+              })
+              .catch(err => {
+                setLoading(false);
+                setErrorMessage(err);
+              })
+          } else {
+            handleSignup();
+          }
+        })
+    }
+  }
+
   useEffect(() => {
     window.parent.postMessage({ type: 'resize-modal', width: '465px', height: '525px' }, "*");
   }, []);
@@ -91,7 +130,7 @@ const Login = () => {
                 discoveryDocs="claims_supported"
                 access_type="offline"
                 onResolve={({ provider, data }) => {
-                  console.log(data);
+                  signinWithSSO(data, 'google');
                 }}
                 onReject={err => {
                   console.log(err);
@@ -110,7 +149,7 @@ const Login = () => {
                 onLogoutSuccess={onLogoutSuccess}
                 redirect_uri={'https://giftlist-31067.firebaseapp.com/__/auth/handler'}
                 onResolve={({ provider, data }) => {
-                  console.log(data);
+                  signinWithSSO(data, 'facebook');
                 }}
                 onReject={err => {
                   console.log(err);
