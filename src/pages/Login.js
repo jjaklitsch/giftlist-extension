@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   LoginSocialGoogle,
   LoginSocialFacebook,
@@ -9,6 +9,8 @@ import { useProductContext } from '../contexts/ProductContext';
 import { instance } from '../store/api';
 
 const Login = () => {
+  let emailRef = useRef(null);
+  let passwordRef = useRef(null);
   const [context] = useProductContext();
   const [loginInfo, setLoginInfo] = useState({
     email: '',
@@ -168,11 +170,28 @@ const Login = () => {
           </div>
           <div className="extension-form-group">
             <label>Your email</label>
-            <input type="text" placeholder="Enter your email" id="giftlist-extension-login-email" autoComplete="on" value={loginInfo.email} onChange={handleEmailChange} />
+            <input type="text" ref={r => emailRef = r} onKeyUp={(e) => { if (e.keyCode === 13 && loginInfo.email) passwordRef.focus() }} placeholder="Enter your email" id="giftlist-extension-login-email" autoComplete="on" value={loginInfo.email} onChange={handleEmailChange} />
           </div>
           <div className="extension-form-group" style={{ position: 'relative' }}>
             <label>Password</label>
-            <input type={showPassword ? "text" : "password"} placeholder="Enter password" id="giftlist-extension-login-input" style={{ paddingRight: 20 }} autoComplete="on" value={loginInfo.password} onChange={handlePasswordChange} />
+            <input
+              ref={r => passwordRef = r}
+              type={showPassword ? "text" : "password"}
+              onKeyUp={(e) => {
+                if (e.keyCode === 13 && loginInfo.email && loginInfo.password) {
+                  handleSignin();
+                }
+                if (e.keyCode === 13 && !loginInfo.email) {
+                  emailRef.focus();
+                }
+              }}
+              placeholder="Enter password"
+              id="giftlist-extension-login-input"
+              style={{ paddingRight: 20 }}
+              autoComplete="on"
+              value={loginInfo.password}
+              onChange={handlePasswordChange}
+            />
             <div style={{ position: 'absolute', right: 12, bottom: 6, zIndex: 2 }} id="show_password_btn" onClick={handleShowPassword}>
               <img src={EYE} style={{ width: 18, height: 18 }} alt={''} />
             </div>

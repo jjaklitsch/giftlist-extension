@@ -1,11 +1,15 @@
 import { LOGO, SHAKE_HAND } from "../constant";
+import { useProductContext } from "../contexts/ProductContext";
 
 const Header = ({ isAuthenticated }) => {
+  const [context,  setContext] = useProductContext();
   const user = JSON.parse(localStorage.getItem('@user'));
   const handleLogout = () => {
     localStorage.removeItem('@access_token');
     localStorage.removeItem('@refresh_token');
     localStorage.removeItem('@user');
+    context.isAuthencated = false;
+    setContext({...context});
     window.location.reload();
   }
 

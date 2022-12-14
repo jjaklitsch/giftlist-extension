@@ -8,7 +8,7 @@ import Loading from "./components/Loading";
 import { ProductContext } from "./contexts/ProductContext";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import { checkToken } from "./store/api";
+import { checkToken, refreshToken } from "./store/api";
 
 function App() {
   const [values, setValues] = useState({
@@ -30,8 +30,14 @@ function App() {
     const checkTokenValid = async () => {
       setLoading(true);
       const token = await checkToken();
+      const refresh_token = localStorage.getItem('@refresh_token');
       if (token) {
         setValues({ ...values, isAuthencated: true });
+      } else {
+        if (refresh_token) {
+          await refreshToken();
+          setValues({ ...values, isAuthencated: true });
+        }
       }
       setLoading(false);
     };

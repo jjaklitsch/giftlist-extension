@@ -62,7 +62,7 @@ const Home = ({ data }) => {
       price: selected_item.item_price,
       details: selected_item.item_description,
       isMostWanted: is_most_wanted === true ? true : false,
-      product_url: selected_item.item_url,
+      product_url: selected_item.item_url.split('/ref=')[0],
       shop_product_id: null,
     };
 
@@ -110,7 +110,7 @@ const Home = ({ data }) => {
   }, [data]);
 
   useEffect(() => {
-    window.parent.postMessage({ type: 'resize-modal', width: '800px', height: '730px' }, "*");
+    window.parent.postMessage({ type: 'resize-modal', width: '800px', height: '750px' }, "*");
     window.parent.postMessage({ type: 'require_product' }, "*");
   }, []);
 
@@ -126,7 +126,7 @@ const Home = ({ data }) => {
           <div id="giftlist_extension_popup_main_content">
             <div style={{ position: 'relative' }}>
               <h2>Add gift</h2>
-              {(!selected_item || (selected_item && !selected_item.item_title)) &&
+              {(!selected_item || (!Object.keys(selected_item).length)) &&
                 <div style={{ position: 'absolute', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', top: -2 }}>
                   <div id="giftlist_extension_add_gift_error_message">
                     <div id="giftlist_extension_add_gift_error_message_icon">
@@ -192,7 +192,7 @@ const Home = ({ data }) => {
                 </div>
                 <div className="extension-form-group">
                   <label>Price<span style={{ color: '#A8ACB3', marginLeft: 6 }}>(optional)</span></label>
-                  <input type="text" placeholder="Price" value={(selected_item.item_price ? (selected_item.item_price * 1).toFixed(2) : "") || (product && product[0].product && product[0].product.offers ? (product[0].product.offers[0].price * 1).toFixed(2) : "")} onChange={(e) => setSelectedItem({ ...selected_item, item_price: e.target.value })} id="giftlist_extension_selected_product_price" />
+                  <input type="text" placeholder="Price" value={selected_item.item_price || (product && product[0].product && product[0].product.offers ? (product[0].product.offers[0].price * 1) : "")} onChange={(e) => setSelectedItem({ ...selected_item, item_price: e.target.value })} onBlur={() => setSelectedItem({ ...selected_item, item_price: selected_item.item_price.toFixed(2) })} id="giftlist_extension_selected_product_price" />
                 </div>
                 <div className="extension-form-group">
                   <label>Other details<span style={{ color: '#A8ACB3', marginLeft: 6 }}>(optional)</span></label>

@@ -310,6 +310,30 @@
 /** content container controls */
 #giftlist_extension_popup_content {
   padding: 18px;
+  padding-top: 24px;
+  padding-bottom: 24px;
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+/* width */
+#giftlist_extension_popup_iframe::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+#giftlist_extension_popup_iframe::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+}
+ 
+/* Handle */
+#giftlist_extension_popup_iframe::-webkit-scrollbar-thumb {
+  background: #888; 
+}
+
+/* Handle on hover */
+#giftlist_extension_popup_iframe::-webkit-scrollbar-thumb:hover {
+  background: #555; 
 }
 
 #giftlist_extension_popup_content hr {

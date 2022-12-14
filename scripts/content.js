@@ -146,7 +146,7 @@ const showModal = async () => {
 		`
   );
 
-  modal.innerHTML = `<div id="giftlist_extension_popup_content" style="height: 100%">
+  modal.innerHTML = `<div id="giftlist_extension_popup_content">
           <div style="position:absolute; top: 30px; right:5px;">
             <div id="giftlist_close_dialog_btn">
               <img src="${closeIcon}" style="width: 18px; height: 18px;" />
@@ -496,6 +496,9 @@ function getProductPrice() {
 
 function getProductTitle() {
   if (window.location.href.indexOf('coachoutlet.com') > -1) {
+    return document.getElementsByTagName('title')[0].innerText.trim().split('|')[1];
+  }
+  if (window.location.href.indexOf('amazon.') > -1) {
     return document.getElementsByTagName('title')[0].innerText.trim().split('|')[1];
   }
   return document.getElementsByTagName('title')[0].innerText.trim().replace(/\t/g, '').replace(/\s\s/g, '').split('–')[0].split(' - ')[0].replace('/"/g', '\\"').split('|')[0];

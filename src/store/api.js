@@ -1,7 +1,7 @@
 import axios from "axios";
 
 let defaultAccessToken = "";
-const defaultRefreshToken = "";
+const defaultRefreshToken = "babdc6ef-3a19-49f7-87d0-6964c77729fd2t5MyADrFXtGciHlU76Dcs";
 
 const accessTokenValue = localStorage.getItem('@access_token') || defaultAccessToken;
 
@@ -21,10 +21,8 @@ export const checkToken = () => {
   return instance
     .post("/token/check")
     .then(async (res) => {
-      console.log(res);
       if (res.status !== 200) {
-        const data = await refreshToken();
-        return data?.token || null;
+        return null;
       } else {
         return currentToken;
       }
@@ -50,6 +48,20 @@ export const refreshToken = () => {
 };
 
 instance.interceptors.response.use(async (response) => {
+  if (response.data.status !== 200 && (response.config.url === '/giftlist/my/list/all' || response.config.url === '/secret_santa/all/list')) {
+    return refreshToken().then(data => {
+      defaultAccessToken = data.token;
+      return instance({
+        ...response.config,
+        headers: {
+          Accept: "application/json",
+          'Content-Type': "application/json",
+          'Access-Control-Allow-Origin': "*",
+          'x-access-token': defaultAccessToken
+        },
+      });
+    });
+  }
   return response.data;
 }, error => {
   const status = error.response ? error.response.status : null

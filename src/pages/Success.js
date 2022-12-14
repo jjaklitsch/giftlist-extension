@@ -13,21 +13,25 @@ const Success = () => {
   }
 
   const handleViewList = () => {
-    if (context.selected_list_id == "favourite") {
-      window.parent.postMessage({ type: 'open', link: 'https://www.giftlist.com/lists/favorites' }, "*");
-    } else {
-      if (context.selected_list_id) {
-        if (context.selected_list_id.indexOf("_list") > -1) {
-          window.parent.postMessage({ type: 'open', link: "https://www.giftlist.com/lists/" + context.selected_list_id.split("_")[0] }, "*");
-        } else if (context.selected_list_id.indexOf("_santa") > -1) {
-          window.parent.postMessage({ type: 'open', link:  "https://www.giftlist.com/gift-exchange/" + context.selected_list_id.split("_")[0] }, "*");
-        }
+    console.log(context.selected_list_id);
+    if (context.selected_list_id !== "favourite" && context.selected_list_id) {
+      if (context.selected_list_id.indexOf("_list") > -1) {
+        window.parent.postMessage({ type: 'open', link: "https://www.giftlist.com/lists/" + context.selected_list_id.split("_")[0] }, "*");
+      } else if (context.selected_list_id.indexOf("_santa") > -1) {
+        window.parent.postMessage({ type: 'open', link:  "https://www.giftlist.com/gift-exchange/" + context.selected_list_id.split("_")[0] }, "*");
       }
+    } else {
+      window.parent.postMessage({ type: 'open', link: 'https://www.giftlist.com/lists/favorites' }, "*");
     }
   }
 
   const handleContinue = () => {
-    window.parent.postMessage({ type: 'close' }, "*");
+    const isFirst = localStorage.getItem('@is_first') || 0;
+    if (isFirst === 3) {
+      goTo(ShareFeedback);
+    } else {
+      window.parent.postMessage({ type: 'close' }, "*");
+    }
   }
 
   useEffect(() => {
