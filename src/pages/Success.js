@@ -26,7 +26,7 @@ const Success = () => {
   }
 
   const handleContinue = () => {
-    const isFirst = localStorage.getItem('@is_first') || 0;
+    const isFirst = localStorage.getItem('@is_first') * 1 || 0;
     if (isFirst === 3) {
       goTo(ShareFeedback);
     } else {

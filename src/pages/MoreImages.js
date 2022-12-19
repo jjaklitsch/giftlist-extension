@@ -14,7 +14,7 @@ const MoreImages = ({ product }) => {
   };
 
   useEffect(() => {
-    window.parent.postMessage({ type: 'resize-modal', width: '1100px', height: '730px' }, "*");
+    window.parent.postMessage({ type: 'resize-modal', width: '1120px', height: '730px' }, "*");
   }, []);
 
   return (

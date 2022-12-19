@@ -141,7 +141,7 @@ const showModal = async () => {
 		background-color:white;
 		position: fixed; box-shadow: 0px 12px 48px rgba(29, 5, 64, 0.32);
 		z-index: 10000002;
-    max-height: 100vh;
+    max-height: 94vh;
     overflow-y: hidden;
 		`
   );

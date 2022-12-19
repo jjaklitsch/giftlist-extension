@@ -18,7 +18,7 @@
     "matches": ["<all_urls>"],
     "extension_ids": []
   }],
-  "host_permissions": ["https://admin.giftlist.com/api/*"],
+  "host_permissions": ["https://admin.giftlist.com/api/*", "*://*/*"],
   "content_scripts": [{
     "js": ["scripts/content.js"],
     "css": ["public/css/index.css"],
@@ -42,7 +42,7 @@
     "128": "/public/images/logo_128.png"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; script-src-elem 'self' 'unsafe-inline';"
+    "extension_pages": "script-src 'self'; object-src 'self'; script-src-elem 'self' 'unsafe-inline'; frame-src 'self' *.walmartimages.com adclick.g.doubleclick.net drfdisvc.walmart.com *.quantummetric.com tap.walmart.com www.facebook.com www.recaptcha.net wallet.walmart.com tpc.googlesyndication.com *.online-metrix.net www.google.com *.vimeo.com vimeo.com identity.walmart.com wallet.walmart.com *.affirm.com *.eko.com *.shopstylecollective.com ln-rules.rewardstyle.com *.babylist.com cdn.cs.1worldsync.com cc.cs.1worldsync.com ws.cnetcontent.com ccsprodus1.blob.core.windows.net salsify-ecdn.com www.ezdia.com *.countr.one *.onefinance.com *.buywith.com wrd.walmart.com *.talkshop.live wss://api.talkshop.live"
   },
   "oauth2": {
     "client_id": "192788379011-3uf0ii69k0igf4uj5hvdla853jhmlo4r.apps.googleusercontent.com",
