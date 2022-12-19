@@ -9,9 +9,9 @@ import { instance } from '../store/api';
 import MoreImages from './MoreImages';
 import Success from './Success';
 
-const Home = ({ data }) => {
+const Home = ({ selected_image }) => {
   const [context, setContext] = useProductContext();
-  const [product, setProduct] = useState(data);
+  const [product, setProduct] = useState({});
   const [isGetting, setGetting] = useState(true);
   const [isLoading, setLoading] = useState(false);
   const [is_most_wanted, setMostWanted] = useState(false);
@@ -30,10 +30,15 @@ const Home = ({ data }) => {
   }
 
   const handleViewMoreImages = useCallback(() => {
-    goTo(MoreImages, { product: data })
-  }, [data]);
+    goTo(MoreImages, { product })
+  }, [product]);
 
   const getAllList = async () => {
+    if (context.authorized_token) {
+      instance.defaults.headers.common['x-access-token'] = context.authorized_token;
+    } else {
+      instance.defaults.headers.common['x-access-token'] = await localStorage.getItem('@access_token');
+    }
     const mainListData = await instance.post("/giftlist/my/list/all").then(res => res.data);
     const santaListData = await instance.post("/secret_santa/all/list").then(res => res.data);
 
@@ -93,21 +98,35 @@ const Home = ({ data }) => {
 
   useEffect(() => {
     getAllList();
-  }, []);
+  }, []);  
 
   useEffect(() => {
-    if (data) {
-      setSelectedItem({
-        selected_image: data && data[0].product && data[0].product.mainImage ? data[0].product.mainImage : "",
-        item_title: data && data[0].product ? data[0].product.name.replace(/"/g, "'") : "",
-        item_price: data && data[0].product && data[0].product.offers ? (data[0].product.offers[0].price * 1).toFixed(2) : "",
-        item_description: "",
-        item_url: data && data[0].product ? data[0].product.url.replace(/"/g, "'") : "",
-        images: data && data[0].product ? data[0].product.images : [],
-      });
-      setGetting(false);
-    }
-  }, [data]);
+    var eventMethod = window.addEventListener
+      ? "addEventListener"
+      : "attachEvent";
+    var eventer = window[eventMethod];
+    var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
+
+    // Listen to message from child window
+    eventer(messageEvent, async function (e) {
+      if (e.data.type === 'product_data') {
+        const tempProduct = e.data.data;
+        if (selected_image) {
+          tempProduct[0].product.mainImage = selected_image;
+        }
+        setSelectedItem({
+          selected_image: tempProduct && tempProduct[0].product && tempProduct[0].product.mainImage ? tempProduct[0].product.mainImage : "",
+          item_title: tempProduct && tempProduct[0].product ? tempProduct[0].product.name.replace(/"/g, "'") : "",
+          item_price: tempProduct && tempProduct[0].product && tempProduct[0].product.offers ? (tempProduct[0].product.offers[0].price * 1).toFixed(2) : "",
+          item_description: "",
+          item_url: tempProduct && tempProduct[0].product ? tempProduct[0].product.url.replace(/"/g, "'") : "",
+          images: tempProduct && tempProduct[0].product ? tempProduct[0].product.images : [],
+        });
+        setProduct({ ...tempProduct });
+        setGetting(false);
+      }
+    });
+  }, []);
 
   useEffect(() => {
     window.parent.postMessage({ type: 'resize-modal', width: '800px', height: '750px' }, "*");

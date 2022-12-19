@@ -10,7 +10,7 @@ const MoreImages = ({ product }) => {
     context.selected_image = val;
     setContext({ ...context });
     product[0].product.mainImage = val;
-    goTo(Home, { data: product });
+    goTo(Home, { selected_image: val });
   };
 
   useEffect(() => {

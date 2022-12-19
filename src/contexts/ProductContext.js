@@ -14,6 +14,7 @@ export const ProductContext = React.createContext([
     selected_list_id: last_selected || 'favourite',
     isAuthencated: false,
     product: null,
+    authorized_token: '',
   },
   null
 ]);

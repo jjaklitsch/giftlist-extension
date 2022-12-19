@@ -58,6 +58,7 @@ eventer(
     }
     if (e.data.type === 'require_product') {
       const product_data = await getProductData();
+      console.log(product_data);
       if (product_data) {
         const child_window = document.querySelector('#giftlist_extension_popup_iframe').contentWindow;
         child_window.postMessage({
@@ -152,7 +153,7 @@ const showModal = async () => {
               <img src="${closeIcon}" style="width: 18px; height: 18px;" />
             </div>
           </div>
-          <iframe src="https://giftlist-extension.web.app" id="giftlist_extension_popup_iframe" style="width: 800px; height: 730px; border: none;" />
+          <iframe src="https://giftlist-extension.web.app/?v=6" id="giftlist_extension_popup_iframe" style="width: 800px; height: 730px; border: none;" />
 				</div>`;
 
   mask.innerHTML = modal.outerHTML;

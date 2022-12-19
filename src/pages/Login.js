@@ -14,7 +14,7 @@ import Home from './Home';
 const Login = () => {
   let emailRef = useRef(null);
   let passwordRef = useRef(null);
-  const [context] = useProductContext();
+  const [context, setContext] = useProductContext();
   const [loginInfo, setLoginInfo] = useState({
     email: '',
     password: '',
@@ -49,6 +49,9 @@ const Login = () => {
           localStorage.setItem('@refresh_token', res.refresh_token);
           localStorage.setItem('@user', JSON.stringify(res.data));
           instance.defaults.headers.common['x-access-token'] = res.token;
+          context.isAuthencated = true;
+          context.authorized_token = res.token;
+          setContext({...context});
           goTo(Home);
         } else {
           if (res.message) {
@@ -71,7 +74,7 @@ const Login = () => {
   }
 
   const onLoginStart = () => {
-    console.log('start');
+    setMoving(true);
   }
 
   const onLogoutSuccess = () => {
@@ -96,9 +99,12 @@ const Login = () => {
                 setMoving(false);
                 if (res.status === 200) {
                   localStorage.setItem('@access_token', res.token);
-                  localStorage.setItem('@refresh_token', res.refresh_token);
+                  // localStorage.setItem('@refresh_token', res.refresh_token);
                   localStorage.setItem('@user', JSON.stringify(res.data));
                   instance.defaults.headers.common['x-access-token'] = res.token;
+                  context.isAuthencated = true;
+                  context.authorized_token = res.token;
+                  setContext({...context});
                   goTo(Home);
                 } else {
                   if (res.message) {
@@ -144,6 +150,7 @@ const Login = () => {
                   }}
                   onReject={err => {
                     console.log(err);
+                    setMoving(false);
                   }}
                 >
                   <img src="/images/login_with_google.svg" style={{ width: '100%' }} alt={''} />
@@ -163,6 +170,7 @@ const Login = () => {
                   }}
                   onReject={err => {
                     console.log(err);
+                    setMoving(false);
                   }}
                 >
                   <img src="/images/login_with_facebook.svg" style={{ width: '100%' }} alt={''} />

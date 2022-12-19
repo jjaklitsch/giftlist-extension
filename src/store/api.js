@@ -48,20 +48,6 @@ export const refreshToken = () => {
 };
 
 instance.interceptors.response.use(async (response) => {
-  if (response.data.status !== 200 && (response.config.url === '/giftlist/my/list/all' || response.config.url === '/secret_santa/all/list')) {
-    return refreshToken().then(data => {
-      defaultAccessToken = data.token;
-      return instance({
-        ...response.config,
-        headers: {
-          Accept: "application/json",
-          'Content-Type': "application/json",
-          'Access-Control-Allow-Origin': "*",
-          'x-access-token': defaultAccessToken
-        },
-      });
-    });
-  }
   return response.data;
 }, error => {
   const status = error.response ? error.response.status : null
