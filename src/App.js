@@ -11,7 +11,10 @@ import Login from "./pages/Login";
 import { checkToken, refreshToken } from "./store/api";
 
 function App() {
+  const last_selected = localStorage.getItem('@last_selected');
   const [values, setValues] = useState({
+    authorized_token: '',
+    categories: [],
     isAuthencated: false,
     selected_image: null,
     selected_product: {
@@ -21,9 +24,9 @@ function App() {
       item_price: '',
       item_description: '',
     },
+    selected_list_id: last_selected || 'favourite',
     product: null,
   });
-  const [product, setProduct] = useState(null);
   const [isLoading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -32,11 +35,11 @@ function App() {
       const token = await checkToken();
       const refresh_token = localStorage.getItem('@refresh_token');
       if (token) {
-        setValues({ ...values, isAuthencated: true });
+        setValues({ ...values, isAuthencated: true, authorized_token: token });
       } else {
         if (refresh_token) {
-          await refreshToken();
-          setValues({ ...values, isAuthencated: true });
+          const refreshed_token_res = await refreshToken();
+          setValues({ ...values, isAuthencated: true, authorized_token: refreshed_token_res.token });
         }
       }
       setLoading(false);
@@ -64,7 +67,7 @@ function App() {
           <Login />
         }
         {(!isLoading && values.isAuthencated) &&
-          <Home data={product} />
+          <Home />
         }
       </Router>
     </ProductContext.Provider>

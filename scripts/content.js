@@ -148,12 +148,12 @@ const showModal = async () => {
   );
 
   modal.innerHTML = `<div id="giftlist_extension_popup_content">
-          <div style="position:absolute; top: 30px; right:5px;">
+          <div style="position:absolute; top: 20px; right:5px;">
             <div id="giftlist_close_dialog_btn">
               <img src="${closeIcon}" style="width: 18px; height: 18px;" />
             </div>
           </div>
-          <iframe src="https://giftlist-extension.web.app/?v=6" id="giftlist_extension_popup_iframe" style="width: 800px; height: 730px; border: none;" />
+          <iframe src="https://giftlist-extension.web.app/?v=10" id="giftlist_extension_popup_iframe" style="width: 465px; height: 525px; border: none;" />
 				</div>`;
 
   mask.innerHTML = modal.outerHTML;
@@ -497,10 +497,10 @@ function getProductPrice() {
 
 function getProductTitle() {
   if (window.location.href.indexOf('coachoutlet.com') > -1) {
-    return document.getElementsByTagName('title')[0].innerText.trim().split('|')[1];
+    return document.getElementsByTagName('title')[0].innerText.trim().split('|').length > 1 ? document.getElementsByTagName('title')[0].innerText.trim().split('|')[1] : document.getElementsByTagName('title')[0].innerText.trim().split('|')[0];
   }
   if (window.location.href.indexOf('amazon.') > -1) {
-    return document.getElementsByTagName('title')[0].innerText.trim().split('|')[1];
+    return document.getElementsByTagName('title')[0].innerText.trim().split('|').length > 1 ? document.getElementsByTagName('title')[0].innerText.trim().split('|')[1] : document.getElementsByTagName('title')[0].innerText.trim().split('|')[0];
   }
   return document.getElementsByTagName('title')[0].innerText.trim().replace(/\t/g, '').replace(/\s\s/g, '').split('–')[0].split(' - ')[0].replace('/"/g', '\\"').split('|')[0];
 }

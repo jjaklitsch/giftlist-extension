@@ -11,16 +11,18 @@ import Success from './Success';
 
 const Home = ({ selected_image }) => {
   const [context, setContext] = useProductContext();
-  const [product, setProduct] = useState({});
+  const [product, setProduct] = useState(context.product || {});
   const [isGetting, setGetting] = useState(true);
   const [isLoading, setLoading] = useState(false);
   const [is_most_wanted, setMostWanted] = useState(false);
-  const [selected_list_id, setSelected] = useState('');
-  const [lists, setListData] = useState([]);
-  const [selected_item, setSelectedItem] = useState({});
+  const [selected_list_id, setSelected] = useState(context.selected_list_id);
+  const [lists, setListData] = useState(context.categories || []);
+  const [selected_item, setSelectedItem] = useState(context.selected_product || {});
 
   const changeItemName = (value) => {
     setSelectedItem({ ...selected_item, item_title: value });
+    context.selected_product.item_title = value;
+    setContext({ ...context });
   };
 
   const handleCategory = (e) => {
@@ -34,29 +36,36 @@ const Home = ({ selected_image }) => {
   }, [product]);
 
   const getAllList = async () => {
+    if (lists.length > 0) {
+      return;
+    }
+    setGetting(true);
     if (context.authorized_token) {
       instance.defaults.headers.common['x-access-token'] = context.authorized_token;
     } else {
-      instance.defaults.headers.common['x-access-token'] = await localStorage.getItem('@access_token');
+      instance.defaults.headers.common['x-access-token'] = localStorage.getItem('@access_token');
     }
     const mainListData = await instance.post("/giftlist/my/list/all").then(res => res.data);
     const santaListData = await instance.post("/secret_santa/all/list").then(res => res.data);
 
-    const lists = [
-      ...mainListData.map((item) => ({
+    const temp_lists = [
+      ...((mainListData || []).map((item) => ({
         id: item.id,
         name: item.list_name,
-      })),
-      ...santaListData.map((item) => ({
+      }))),
+      ...((santaListData || []).map((item) => ({
         id: item.id,
         name: item.event_name,
         isSanta: true,
-      })),
+      }))),
     ];
-    setListData(lists);
+    setListData(temp_lists);
     const last_selected = localStorage.getItem('@last_selected');
     setSelected(last_selected);
-    return lists;
+    context.categories = [...temp_lists];
+    setContext({ ...context });
+    setGetting(false);
+    return temp_lists;
   };
 
   const handleAddGift = () => {
@@ -98,7 +107,7 @@ const Home = ({ selected_image }) => {
 
   useEffect(() => {
     getAllList();
-  }, []);  
+  }, []);
 
   useEffect(() => {
     var eventMethod = window.addEventListener
@@ -114,23 +123,35 @@ const Home = ({ selected_image }) => {
         if (selected_image) {
           tempProduct[0].product.mainImage = selected_image;
         }
-        setSelectedItem({
+        const temp_selected_item = {
           selected_image: tempProduct && tempProduct[0].product && tempProduct[0].product.mainImage ? tempProduct[0].product.mainImage : "",
           item_title: tempProduct && tempProduct[0].product ? tempProduct[0].product.name.replace(/"/g, "'") : "",
           item_price: tempProduct && tempProduct[0].product && tempProduct[0].product.offers ? (tempProduct[0].product.offers[0].price * 1).toFixed(2) : "",
           item_description: "",
           item_url: tempProduct && tempProduct[0].product ? tempProduct[0].product.url.replace(/"/g, "'") : "",
           images: tempProduct && tempProduct[0].product ? tempProduct[0].product.images : [],
-        });
+        };
+        setSelectedItem({ ...temp_selected_item });
         setProduct({ ...tempProduct });
-        setGetting(false);
+        context.product = tempProduct;
+        context.selected_product = temp_selected_item;
+        setContext({ ...context });
       }
     });
   }, []);
 
   useEffect(() => {
     window.parent.postMessage({ type: 'resize-modal', width: '800px', height: '750px' }, "*");
-    window.parent.postMessage({ type: 'require_product' }, "*");
+    if (!product.length) {
+      window.parent.postMessage({ type: 'require_product' }, "*");
+    } else {
+      if (selected_image) {
+        context.selected_product.selected_image = selected_image;
+        setContext({ ...context });
+      }
+      setSelectedItem({ ...context.selected_product });
+      setGetting(false);
+    }
   }, []);
 
 
@@ -196,26 +217,68 @@ const Home = ({ selected_image }) => {
                   <input
                     type="text"
                     placeholder="Item Name"
-                    value={selected_item.item_title || (product && product[0].product ? product[0].product.name.replace(/"/g, "'") : "")}
+                    value={selected_item.item_title}
                     onChange={(e) => changeItemName(e.target.value)}
                     id="giftlist_extension_selected_product_name"
                   />
                 </div>
                 <div className="extension-form-group" style={{ display: 'flex' }}>
-                  <input type="checkbox" value="" id="giftlist_extension_most_wanted" checked={is_most_wanted} onChange={() => setMostWanted(!is_most_wanted)} />
+                  <input
+                    type="checkbox"
+                    value=""
+                    id="giftlist_extension_most_wanted"
+                    checked={is_most_wanted}
+                    onChange={() => {
+                      context.selected_product.is_most_wanted = !is_most_wanted;
+                      setContext({ ...context });
+                      setMostWanted(!is_most_wanted);
+                    }}
+                  />
                   <label style={{ marginLeft: 8, fontWeight: 400, fontSize: 15, lineHeight: '20px', marginBottom: -1 }} htmlFor="giftlist_extension_most_wanted">Most wanted gift</label>
                 </div>
                 <div className="extension-form-group">
                   <label>Item URL</label>
-                  <input type="text" placeholder="Item URL" value={selected_item.item_url || window.location.href} onChange={(e) => setSelectedItem({ ...selected_item, item_url: e.target.value })} id="giftlist_extension_selected_product_url" />
+                  <input
+                    type="text"
+                    placeholder="Item URL"
+                    value={selected_item.item_url}
+                    onChange={(e) => {
+                      context.selected_product.item_url = e.target.value;
+                      setContext({ ...context });
+                      setSelectedItem({ ...selected_item, item_url: e.target.value })
+                    }}
+                    id="giftlist_extension_selected_product_url"
+                  />
                 </div>
                 <div className="extension-form-group">
                   <label>Price<span style={{ color: '#A8ACB3', marginLeft: 6 }}>(optional)</span></label>
-                  <input type="text" placeholder="Price" value={selected_item.item_price || (product && product[0].product && product[0].product.offers ? (product[0].product.offers[0].price * 1) : "")} onChange={(e) => setSelectedItem({ ...selected_item, item_price: e.target.value })} onBlur={() => setSelectedItem({ ...selected_item, item_price: selected_item.item_price.toFixed(2) })} id="giftlist_extension_selected_product_price" />
+                  <input
+                    type="text"
+                    placeholder="Price"
+                    value={selected_item.item_price}
+                    id="giftlist_extension_selected_product_price"
+                    onChange={(e) => {
+                      context.selected_product.item_price = e.target.value;
+                      setContext({ ...context });
+                      setSelectedItem({ ...selected_item, item_price: e.target.value })
+                    }}
+                  />
                 </div>
                 <div className="extension-form-group">
                   <label>Other details<span style={{ color: '#A8ACB3', marginLeft: 6 }}>(optional)</span></label>
-                  <textarea className="extension-form-control" rows="3" placeholder="Other important details: size, color, etc." id="giftlist_extension_selected_product_others" onChange={(e) => setSelectedItem({ ...selected_item, item_description: e.target.value })}>{selected_item.item_description}</textarea>
+                  <textarea
+                    className="extension-form-control"
+                    rows="1"
+                    placeholder="Other important details: size, color, etc."
+                    id="giftlist_extension_selected_product_others"
+                    value={selected_item.item_description}
+                    onChange={(e) => {
+                      context.selected_product.item_description = e.target.value;
+                      setContext({ ...context });
+                      console.log(e.target.value);
+                      setSelectedItem({ ...selected_item, item_description: e.target.value })
+                    }}
+                  />
                 </div>
                 <div className="form-actions">
                   <button className="extension-btn" id="giftlist_extension_add_btn" onClick={handleAddGift} disabled={isLoading}>

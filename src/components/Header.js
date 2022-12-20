@@ -2,6 +2,7 @@ import { goTo } from "react-chrome-extension-router";
 import { LOGO, SHAKE_HAND } from "../constant";
 import { useProductContext } from "../contexts/ProductContext";
 import Login from "../pages/Login";
+import { setToken } from "../store/api";
 
 const Header = ({ isAuthenticated }) => {
   const [context,  setContext] = useProductContext();
@@ -12,6 +13,7 @@ const Header = ({ isAuthenticated }) => {
     localStorage.removeItem('@user');
     context.isAuthencated = false;
     setContext({...context});
+    setToken('');
     goTo(Login);
   }
 

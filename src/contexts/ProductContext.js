@@ -15,6 +15,7 @@ export const ProductContext = React.createContext([
     isAuthencated: false,
     product: null,
     authorized_token: '',
+    categories: [],
   },
   null
 ]);

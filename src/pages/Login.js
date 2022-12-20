@@ -8,7 +8,7 @@ import Header from '../components/Header';
 import Loading from '../components/Loading';
 import { ERROR_ICON, EYE } from "../constant";
 import { useProductContext } from '../contexts/ProductContext';
-import { instance } from '../store/api';
+import { instance, setToken } from '../store/api';
 import Home from './Home';
 
 const Login = () => {
@@ -42,7 +42,7 @@ const Login = () => {
     setLoading(!isLoading);
     instance
       .post('/user/signin', loginInfo)
-      .then(res => {
+      .then(async (res) => {
         setLoading(false);
         if (res.status === 200) {
           localStorage.setItem('@access_token', res.token);
@@ -52,6 +52,7 @@ const Login = () => {
           context.isAuthencated = true;
           context.authorized_token = res.token;
           setContext({...context});
+          setToken(res.token);
           goTo(Home);
         } else {
           if (res.message) {
@@ -95,7 +96,7 @@ const Login = () => {
           if (res.status === 200) {
             instance
               .post('/user/social/signin', postData)
-              .then(res => {
+              .then(async (res) => {
                 setMoving(false);
                 if (res.status === 200) {
                   localStorage.setItem('@access_token', res.token);
@@ -105,6 +106,7 @@ const Login = () => {
                   context.isAuthencated = true;
                   context.authorized_token = res.token;
                   setContext({...context});
+                  setToken(res.token);
                   goTo(Home);
                 } else {
                   if (res.message) {

@@ -5,7 +5,7 @@ const defaultRefreshToken = "babdc6ef-3a19-49f7-87d0-6964c77729fd2t5MyADrFXtGciH
 
 const accessTokenValue = localStorage.getItem('@access_token') || defaultAccessToken;
 
-export const instance = axios.create({
+export let instance = axios.create({
   baseURL: `https://admin.giftlist.com/api`,
   withCredentials: false,
   headers: {
@@ -18,6 +18,7 @@ export const instance = axios.create({
 
 export const checkToken = () => {
   const currentToken = localStorage.getItem('@access_token');
+  instance.defaults.headers.common['x-access-token'] = currentToken;
   return instance
     .post("/token/check")
     .then(async (res) => {
@@ -68,4 +69,39 @@ instance.interceptors.response.use(async (response) => {
     });
   }
   return Promise.reject(error);
-})
+});
+
+export const setToken = (token) => {
+  instance = axios.create({
+    baseURL: `https://admin.giftlist.com/api`,
+    withCredentials: false,
+    headers: {
+      Accept: "application/json",
+      'Content-Type': "application/json",
+      'x-access-token': token,
+      'Access-Control-Allow-Origin': "*",
+    },
+  });
+  instance.interceptors.response.use(async (response) => {
+    return response.data;
+  }, error => {
+    const status = error.response ? error.response.status : null
+    const currentRefreshToken = localStorage.getItem("@refresh_token") || defaultRefreshToken;
+    if (status === 401 && !error.config._retry && currentRefreshToken) {
+      return refreshToken().then(data => {
+        defaultAccessToken = data.token;
+        return instance({
+          ...error.config,
+          headers: {
+            Accept: "application/json",
+            'Content-Type': "application/json",
+            'Access-Control-Allow-Origin': "*",
+            'x-access-token': defaultAccessToken
+          },
+        });
+      });
+    }
+    return Promise.reject(error);
+  });
+  return instance;
+}
