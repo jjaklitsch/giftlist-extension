@@ -67,6 +67,11 @@ eventer(
         }, "*");
       }
     }
+    if (e.data.type === 'loaded') {
+      if (document.querySelector('#giftlist_extension_popup_loader')) {
+        document.querySelector('#giftlist_extension_popup_loader').remove();
+      }
+    }
   },
   false
 );
@@ -153,7 +158,10 @@ const showModal = async () => {
               <img src="${closeIcon}" style="width: 18px; height: 18px;" />
             </div>
           </div>
-          <iframe src="https://giftlist-extension.web.app/?v=10" id="giftlist_extension_popup_iframe" style="width: 465px; height: 525px; border: none;" />
+          <div id="giftlist_extension_popup_loader">
+            <div class="lds-ellipsis" style="margin-top: -150px;margin-left: 40px;"><div></div><div></div><div></div><div></div></div>
+          </div>
+          <iframe src="https://giftlist-extension.web.app/?v=11" id="giftlist_extension_popup_iframe" style="width: 465px; height: 525px; border: none;" />
 				</div>`;
 
   mask.innerHTML = modal.outerHTML;

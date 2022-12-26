@@ -10,6 +10,7 @@ const MoreImages = ({ product }) => {
     context.selected_image = val;
     setContext({ ...context });
     product[0].product.mainImage = val;
+    window.parent.postMessage({ type: 'resize-modal', width: '800px', height: '750px' }, "*");
     goTo(Home, { selected_image: val });
   };
 

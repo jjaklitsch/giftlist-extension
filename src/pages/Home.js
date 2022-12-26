@@ -36,7 +36,10 @@ const Home = ({ selected_image }) => {
   }, [product]);
 
   const getAllList = async () => {
+    const last_selected = localStorage.getItem('@last_selected');
+    setSelected(last_selected);
     if (lists.length > 0) {
+      window.parent.postMessage({ type: 'resize-modal', width: '800px', height: '750px' }, "*");
       return;
     }
     setGetting(true);
@@ -60,11 +63,10 @@ const Home = ({ selected_image }) => {
       }))),
     ];
     setListData(temp_lists);
-    const last_selected = localStorage.getItem('@last_selected');
-    setSelected(last_selected);
     context.categories = [...temp_lists];
     setContext({ ...context });
     setGetting(false);
+    window.parent.postMessage({ type: 'resize-modal', width: '800px', height: '750px' }, "*");
     return temp_lists;
   };
 
@@ -141,7 +143,6 @@ const Home = ({ selected_image }) => {
   }, []);
 
   useEffect(() => {
-    window.parent.postMessage({ type: 'resize-modal', width: '800px', height: '750px' }, "*");
     if (!product.length) {
       window.parent.postMessage({ type: 'require_product' }, "*");
     } else {

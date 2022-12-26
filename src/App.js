@@ -43,6 +43,7 @@ function App() {
         }
       }
       setLoading(false);
+      window.parent.postMessage({ type: 'loaded' }, "*");
     };
 
     checkTokenValid();
