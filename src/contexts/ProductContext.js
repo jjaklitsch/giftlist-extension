@@ -12,9 +12,7 @@ export const ProductContext = React.createContext([
       item_description: '',
     },
     selected_list_id: last_selected || 'favourite',
-    isAuthencated: false,
     product: null,
-    authorized_token: '',
     categories: [],
   },
   null

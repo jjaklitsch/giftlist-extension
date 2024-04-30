@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useContext } from 'react';
 import { goTo } from 'react-chrome-extension-router';
 import {
   LoginSocialGoogle,
@@ -7,63 +7,44 @@ import {
 import Header from '../components/Header';
 import Loading from '../components/Loading';
 import { ERROR_ICON, EYE } from "../constant";
-import { useProductContext } from '../contexts/ProductContext';
 import { instance, setToken } from '../store/api';
 import Home from './Home';
+
+import AuthenticationContext from '../contexts/AuthenticationContext';
+import { useProductContext } from '../contexts/ProductContext';
+
 
 const Login = () => {
   let emailRef = useRef(null);
   let passwordRef = useRef(null);
-  const [context, setContext] = useProductContext();
+
+  const { loading, isLoggedIn, signIn, signInWithProvider, signOut, error, cleanError } = useContext(AuthenticationContext);
+
+  const [context] = useProductContext();
+
   const [loginInfo, setLoginInfo] = useState({
     email: '',
     password: '',
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setLoading] = useState(false);
   const [isMoving, setMoving] = useState(false);
-  const [errMessage, setErrorMessage] = useState('');
 
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
   };
 
   const handleEmailChange = (e) => {
-    setErrorMessage('');
+    cleanError();
     setLoginInfo({ ...loginInfo, email: e.target.value });
   };
 
   const handlePasswordChange = (e) => {
-    setErrorMessage('');
+    cleanError();
     setLoginInfo({ ...loginInfo, password: e.target.value });
   }
 
   const handleSignin = () => {
-    setLoading(!isLoading);
-    instance
-      .post('/user/signin', loginInfo)
-      .then(async (res) => {
-        setLoading(false);
-        if (res.status === 200) {
-          localStorage.setItem('@access_token', res.token);
-          localStorage.setItem('@refresh_token', res.refresh_token);
-          localStorage.setItem('@user', JSON.stringify(res.data));
-          instance.defaults.headers.common['x-access-token'] = res.token;
-          context.isAuthencated = true;
-          context.authorized_token = res.token;
-          setContext({...context});
-          setToken(res.token);
-          goTo(Home);
-        } else {
-          if (res.message) {
-            setErrorMessage(res.message);
-          }
-        }
-      })
-      .catch(err => {
-        setLoading(false);
-        setErrorMessage(err);
-      })
+    signIn(loginInfo.email, loginInfo.password);
   };
 
   const handleForgotPassword = () => {
@@ -74,55 +55,9 @@ const Login = () => {
     window.parent.postMessage({ type: 'open', link: 'https://www.giftlist.com/sign-up' }, '*');
   }
 
-  const onLoginStart = () => {
-    setMoving(true);
-  }
 
   const onLogoutSuccess = () => {
     console.log('logout');
-  }
-
-  const signinWithSSO = (data, provider) => {
-    if (data) {
-      let postData = {
-        email: data.email,
-        register_type: provider,
-        social_id: provider === 'facebook' ? data.id : data.sub,
-      }
-      setMoving(true);
-      instance
-        .post('/user/existency/check', postData)
-        .then(res => {
-          if (res.status === 200) {
-            instance
-              .post('/user/social/signin', postData)
-              .then(async (res) => {
-                setMoving(false);
-                if (res.status === 200) {
-                  localStorage.setItem('@access_token', res.token);
-                  // localStorage.setItem('@refresh_token', res.refresh_token);
-                  localStorage.setItem('@user', JSON.stringify(res.data));
-                  instance.defaults.headers.common['x-access-token'] = res.token;
-                  context.isAuthencated = true;
-                  context.authorized_token = res.token;
-                  setContext({...context});
-                  setToken(res.token);
-                  goTo(Home);
-                } else {
-                  if (res.message) {
-                    setErrorMessage(res.message);
-                  }
-                }
-              })
-              .catch(err => {
-                setMoving(false);
-                setErrorMessage(err);
-              })
-          } else {
-            handleSignup();
-          }
-        })
-    }
   }
 
   useEffect(() => {
@@ -132,51 +67,18 @@ const Login = () => {
   return (
     <div className="App" id="giftlist_extension_popup_container">
       <div id="giftlist_extension_popup_content">
-        <Header isAuthenticated={context.isAuthencated} />
+        <Header />
         {isMoving && (
           <Loading />
         )}
         {!isMoving && (
           <div className="giftlist-extension-login-content">
             <div style={{ display: 'flex', flexDirection: 'row', gap: 8 }}>
-              <div style={{ display: 'flex', flex: 1 }} id="google_login_btn">
-                <LoginSocialGoogle
-                  client_id={'192788379011-3uf0ii69k0igf4uj5hvdla853jhmlo4r.apps.googleusercontent.com'}
-                  onLoginStart={onLoginStart}
-                  redirect_uri={'https://giftlist-31067.firebaseapp.com/__/auth/handler'}
-                  scope="openid profile email"
-                  discoveryDocs="claims_supported"
-                  access_type="offline"
-                  onResolve={({ provider, data }) => {
-                    signinWithSSO(data, 'google');
-                  }}
-                  onReject={err => {
-                    console.log(err);
-                    setMoving(false);
-                  }}
-                >
-                  <img src="/images/login_with_google.svg" style={{ width: '100%' }} alt={''} />
-                </LoginSocialGoogle>
+              <div style={{ display: 'flex', flex: 1 }} id="google_login_btn" onClick={() => signInWithProvider('google')}>
+                <img src="/images/login_with_google.svg" style={{ width: '100%' }} alt={''} />
               </div>
-              <div style={{ display: 'flex', flex: 1 }} id="facebook_login_btn">
-                <LoginSocialFacebook
-                  appId={'686337189167901'}
-                  fieldsProfile={
-                    'id,first_name,last_name,middle_name,name,name_format,picture,short_name,email,gender'
-                  }
-                  onLoginStart={onLoginStart}
-                  onLogoutSuccess={onLogoutSuccess}
-                  redirect_uri={'https://giftlist-31067.firebaseapp.com/__/auth/handler'}
-                  onResolve={({ provider, data }) => {
-                    signinWithSSO(data, 'facebook');
-                  }}
-                  onReject={err => {
-                    console.log(err);
-                    setMoving(false);
-                  }}
-                >
-                  <img src="/images/login_with_facebook.svg" style={{ width: '100%' }} alt={''} />
-                </LoginSocialFacebook>
+              <div style={{ display: 'flex', flex: 1 }} id="facebook_login_btn" onClick={() => signInWithProvider('facebook')}>
+                <img src="/images/login_with_facebook.svg" style={{ width: '100%' }} alt={''} />
               </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'row', gap: 8, marginTop: 20, marginBottom: 20, justifyContent: 'center', alignItems: 'center' }}>
@@ -214,7 +116,7 @@ const Login = () => {
                 <img src={EYE} style={{ width: 18, height: 18 }} alt={''} />
               </div>
             </div>
-            {errMessage &&
+            {error &&
               <div className="extension-error-container" style={{ position: 'relative', height: 60 }}>
                 <div style={{ 'position': 'absolute', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', top: 3 }}>
                   <div id="giftlist_extension_add_gift_error_message" style={{ width: '100%' }}>
@@ -222,15 +124,15 @@ const Login = () => {
                       <img src={ERROR_ICON} style={{ width: 25, height: 25 }} alt={''} />
                     </div>
                     <div id="giftlist_extension_add_gift_error_title" style={{ fontSize: 12, background: '#FF574D' }}>
-                      {errMessage}
+                      {error.message || error}
                     </div>
                   </div>
                 </div>
               </div>
             }
             <div className="form-actions" style={{ marginTop: 24 }}>
-              <button className="extension-btn" id="giftlist_sign_in" disabled={!loginInfo.email || !loginInfo.password || isLoading} onClick={handleSignin}>
-                {isLoading &&
+              <button className="extension-btn" id="giftlist_sign_in" disabled={!loginInfo.email || !loginInfo.password || loading} onClick={handleSignin}>
+                {loading &&
                   <div className="lds-ring"><div></div><div></div><div></div><div></div></div>
                 }
                 Sign in

@@ -1,10 +1,10 @@
-import * as firebase from 'firebase';
-import 'firebase/firestore';
+import { initializeApp, getApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+import { getAuth } from 'firebase/auth'
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBSoEgmmmD9odaJYRZphc-wRZ9bXtShB28",
+  apiKey: "AIzaSyAXdTT8STbQJeVzcOdR0Yf2C0RGHNt_Xgk",
   authDomain: "giftlist-31067.firebaseapp.com",
-  databaseURL: "https://giftlist-31067-default-rtdb.firebaseio.com",
   projectId: "giftlist-31067",
   storageBucket: "giftlist-31067.appspot.com",
   messagingSenderId: "192788379011",
@@ -12,7 +12,7 @@ const firebaseConfig = {
   measurementId: "G-1LPY0XNFC3"
 };
 
-firebase.initializeApp(firebaseConfig);
-firebase.firestore();
+export const app = initializeApp(firebaseConfig);
+export const db = getFirestore();
 
-export default firebase;
+export const auth = getAuth(app);

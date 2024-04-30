@@ -43,11 +43,6 @@ const Home = ({ selected_image }) => {
       return;
     }
     setGetting(true);
-    if (context.authorized_token) {
-      instance.defaults.headers.common['x-access-token'] = context.authorized_token;
-    } else {
-      instance.defaults.headers.common['x-access-token'] = localStorage.getItem('@access_token');
-    }
     const mainListData = await instance.post("/giftlist/my/list/all").then(res => res.data);
     const santaListData = await instance.post("/secret_santa/all/list").then(res => res.data);
 
@@ -116,7 +111,7 @@ const Home = ({ selected_image }) => {
       ? "addEventListener"
       : "attachEvent";
     var eventer = window[eventMethod];
-    var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
+    var messageEvent = eventMethod === "attachEvent" ? "onmessage" : "message";
 
     // Listen to message from child window
     eventer(messageEvent, async function (e) {

@@ -1,8 +1,13 @@
 import { useEffect } from "react";
+
 import { goTo } from "react-chrome-extension-router";
-import Header from "../components/Header";
+
 import { GIFT_BOX } from "../constant";
+
 import { useProductContext } from "../contexts/ProductContext";
+
+import Header from "../components/Header";
+
 import ShareFeedback from "./ShareFeedback";
 
 const Success = () => {
@@ -16,9 +21,9 @@ const Success = () => {
     console.log(context.selected_list_id);
     if (context.selected_list_id !== "favourite" && context.selected_list_id) {
       if (context.selected_list_id.indexOf("_list") > -1) {
-        window.parent.postMessage({ type: 'open', link: "https://www.giftlist.com/lists/" + context.selected_list_id.split("_")[0] }, "*");
+        window.parent.postMessage({ type: 'open', link: `https://www.giftlist.com/lists/${context.selected_list_id.split("_")[0]}` }, "*");
       } else if (context.selected_list_id.indexOf("_santa") > -1) {
-        window.parent.postMessage({ type: 'open', link:  "https://www.giftlist.com/gift-exchange/" + context.selected_list_id.split("_")[0] }, "*");
+        window.parent.postMessage({ type: 'open', link:  `https://www.giftlist.com/gift-exchange/${context.selected_list_id.split("_")[0]}` }, "*");
       }
     } else {
       window.parent.postMessage({ type: 'open', link: 'https://www.giftlist.com/lists/favorites' }, "*");

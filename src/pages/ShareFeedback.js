@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import Header from "../components/Header";
+
 import { RAISE_HANDS, THUMB_DOWN, THUMB_UP } from "../constant";
+
+import Header from "../components/Header";
 
 const ShareFeedback = () => {
   const [status, setStatus] = useState(0);
