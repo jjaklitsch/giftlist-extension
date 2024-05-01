@@ -41,14 +41,15 @@ function App() {
     if (!authUser || authUser.isAnonymous) {
       // User is not signed in
       setIsLoggedIn(false);
-      setIsLoading(false);
-      return;
     } else {
       // User is signed in
       setIsLoggedIn(true);
-      setIsLoading(false);
-      return;
     }
+
+    setIsLoading(false);
+    window.parent.postMessage({ type: 'loaded' }, "*");
+
+    return;
   }));
 
   const storeAllValues = (val) => {
